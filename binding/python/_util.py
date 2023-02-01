@@ -12,9 +12,6 @@
 import os
 import platform
 import subprocess
-from typing import *
-
-from koala import *
 
 
 def _linux_machine():
@@ -77,29 +74,4 @@ def default_model_path(relative):
     return os.path.join(os.path.dirname(__file__), relative, 'lib/common/koala_params.pv')
 
 
-def create(
-        access_key: str,
-        model_path: Optional[str] = None,
-        library_path: Optional[str] = None) -> Koala:
-    """
-    Factory method for Koala noise suppression engine.
-
-    :param access_key: AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)
-    :param model_path: Absolute path to the file containing model parameters. If not set it will be set to the default
-    location.
-    :param library_path: Absolute path to Koala's dynamic library. If not set it will be set to the default location.
-    """
-
-    if model_path is None:
-        model_path = default_model_path('')
-
-    if library_path is None:
-        library_path = default_library_path('')
-
-    return Koala(
-        access_key=access_key,
-        model_path=model_path,
-        library_path=library_path)
-
-
-__all__ = ['create', 'default_library_path', 'default_model_path']
+__all__ = ['default_library_path', 'default_model_path']

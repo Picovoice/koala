@@ -14,13 +14,13 @@ import struct
 import sys
 import unittest
 import wave
-from typing import *
+from typing import Optional, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
 
-from koala import Koala
-from util import *
+from _koala import Koala
+from _util import default_library_path, default_model_path
 
 
 class KoalaTestCase(unittest.TestCase):

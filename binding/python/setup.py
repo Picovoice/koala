@@ -24,8 +24,8 @@ os.mkdir(package_folder)
 shutil.copy(os.path.join(os.path.dirname(__file__), '../../LICENSE'), package_folder)
 
 shutil.copy(os.path.join(os.path.dirname(__file__), '__init__.py'), os.path.join(package_folder, '__init__.py'))
-shutil.copy(os.path.join(os.path.dirname(__file__), 'koala.py'), os.path.join(package_folder, 'koala.py'))
-shutil.copy(os.path.join(os.path.dirname(__file__), 'util.py'), os.path.join(package_folder, 'util.py'))
+shutil.copy(os.path.join(os.path.dirname(__file__), '_koala.py'), os.path.join(package_folder, '_koala.py'))
+shutil.copy(os.path.join(os.path.dirname(__file__), '_util.py'), os.path.join(package_folder, '_util.py'))
 
 # platforms = ('jetson', 'linux', 'mac', 'raspberry-pi', 'windows')
 #

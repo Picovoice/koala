@@ -17,8 +17,8 @@ import unittest
 import wave
 from time import perf_counter
 
-from koala import Koala
-from util import *
+from _koala import Koala
+from _util import default_library_path, default_model_path
 
 
 class KoalaPerformanceTestCase(unittest.TestCase):

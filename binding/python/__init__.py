@@ -9,5 +9,6 @@
 # specific language governing permissions and limitations under the License.
 #
 
-from .koala import *
-from .util import *
+from ._factory import *
+from ._koala import *
+from ._util import *
