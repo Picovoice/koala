@@ -1,0 +1,117 @@
+name: Python performance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/python-perf.yml'
+      - 'binding/python/test_koala_perf.py'
+      - 'lib/common/**'
+      - 'lib/linux/**'
+      - 'lib/jetson/**'
+      - 'lib/mac/**'
+      - 'lib/raspberry-pi/**'
+      - 'lib/windows/**'
+  pull_request:
+    branches: [master]
+    paths:
+      - '.github/workflows/python-perf.yml'
+      - 'binding/python/test_koala_perf.py'
+      - 'lib/common/**'
+      - 'lib/linux/**'
+      - 'lib/jetson/**'
+      - 'lib/mac/**'
+      - 'lib/raspberry-pi/**'
+      - 'lib/windows/**'
+
+defaults:
+  run:
+    working-directory: binding/python
+
+jobs:
+  perf-github-hosted:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+        - os: ubuntu-latest
+          init_performance_threshold_sec: 0.5
+          proc_performance_threshold_sec: 0.5
+        - os: windows-latest
+          init_performance_threshold_sec: 0.5
+          proc_performance_threshold_sec: 0.6
+        - os: macos-latest
+          init_performance_threshold_sec: 0.5
+          proc_performance_threshold_sec: 0.8
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Pre-build dependencies
+      run: python -m pip install --upgrade pip
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Test
+      run: >
+        python3 test_koala_perf.py 
+        --access-key ${{secrets.PV_VALID_ACCESS_KEY}} 
+        --num-test-iterations 20
+        --init-performance-threshold-sec ${{matrix.init_performance_threshold_sec}}
+        --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
+
+  perf-self-hosted:
+    runs-on: ${{ matrix.machine }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        machine: [rpi3-32, rpi3-64, rpi4-32, rpi4-64, jetson]
+        include:
+        - machine: rpi3-32
+          init_performance_threshold_sec: 7.5
+          proc_performance_threshold_sec: 3.6
+        - machine: rpi3-64
+          init_performance_threshold_sec: 8.3
+          proc_performance_threshold_sec: 3.5
+        - machine: rpi4-32
+          init_performance_threshold_sec: 5.7
+          proc_performance_threshold_sec: 2.0
+        - machine: rpi4-64
+          init_performance_threshold_sec: 5.1
+          proc_performance_threshold_sec: 1.9
+        - machine: jetson
+          init_performance_threshold_sec: 5.2
+          proc_performance_threshold_sec: 1.9
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Machine state before
+      working-directory: resources/scripts
+      run: bash machine-state.sh
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Test
+      run: >
+        python3 test_koala_perf.py 
+        --access-key ${{secrets.PV_VALID_ACCESS_KEY}} 
+        --num-test-iterations 20
+        --init-performance-threshold-sec ${{matrix.init_performance_threshold_sec}}
+        --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
+
+    - name: Machine state after
+      working-directory: resources/scripts
+      run: bash machine-state.sh
