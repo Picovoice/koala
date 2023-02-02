@@ -24,8 +24,8 @@ pip3 install pvkoala
 
 ## AccessKey
 
-Koala requires a valid Picovoice `AccessKey` at initialization. `AccessKey` acts as your credentials when using Koala SDKs.
-You can get your `AccessKey` for free. Make sure to keep your `AccessKey` secret.
+Koala requires a valid Picovoice `AccessKey` at initialization. `AccessKey` acts as your credentials when using Koala 
+SDKs. You can get your `AccessKey` for free. Make sure to keep your `AccessKey` secret.
 Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get your `AccessKey`.
 
 ### Usage
@@ -35,19 +35,18 @@ Create an instance of the engine and enhance audio:
 ```python
 import pvkoala
 
-handle = pvkoala.create(access_key='${ACCESS_KEY}')
+koala = pvkoala.create(access_key='${ACCESS_KEY}')
 
 def get_next_audio_frame():
     pass
 
 while True:
-    enhanced_audio = handle.process(get_next_audio_frame())
+    enhanced_audio = koala.process(get_next_audio_frame())
 ```
 
 Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://console.picovoice.ai/). When done be sure
-to explicitly release the resources using `handle.delete()`.
+to explicitly release the resources using `koala.delete()`.
 
 ## Demos
 
-[pvkoalademo](https://pypi.org/project/pvkoalademo/) provides command-line utilities for processing audio using
-Koala.
+[pvkoalademo](https://pypi.org/project/pvkoalademo/) provides command-line utilities for processing audio using Koala.

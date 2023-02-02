@@ -27,7 +27,7 @@ Koala is an on-device noise suppression engine. Koala is:
 
 AccessKey is your authentication and authorization token for deploying Picovoice SDKs, including Koala. Anyone who is
 using Picovoice needs to have a valid AccessKey. You must keep your AccessKey secret. You would need internet
-connectivity to validate your AccessKey with Picovoice license servers even though the voice recognition is running 100%
+connectivity to validate your AccessKey with Picovoice license servers even though the noise suppression is running 100%
 offline.
 
 AccessKey also verifies that your usage is within the limits of your account. Everyone who signs up for
