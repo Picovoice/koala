@@ -181,12 +181,13 @@ class Koala(object):
 
         :param pcm: A frame of audio samples. The number of samples per frame can be attained by calling
         `.frame_length`. The incoming audio needs to have a sample rate equal to `.sample_rate` and be 16-bit
-        linearly-encoded. Koala operates on single-channel audio. The audio frame must be the one directly after the
-        frame that was passed to the last call to `process`, unless `reset` has been called in between.
+        linearly-encoded. Koala operates on single-channel audio. Consecutive calls to `.process()` must provide
+        consecutive frames of audio from the same source, unless `.reset()` has been called in between.
 
         :return: A frame of enhanced audio samples, stored in a contiguous `numpy` array with `dtype=np.int16`.
-        The output is NOT directly the enhanced version of the input PCM, but corresponds to samples that were given in
-        previous calls to `process`. The length of the delay (in samples) can be attained by calling `.delay_sample`.
+        The output is not directly the enhanced version of the input PCM, but corresponds to samples that were given in
+        previous calls to `.process()`. The delay in samples between the start time of the input frame and the start
+        time of the output frame can be attained from `.delay_sample`.
         """
 
         if len(pcm) != self.frame_length:
@@ -203,48 +204,10 @@ class Koala(object):
 
         return enhanced_pcm
 
-    def process_complete(self, pcm: Sequence[int]) -> NDArray[int]:
-        """
-        Processes a sequence of audio and returns synchronized enhanced audio.
-        This is a convenience function that adds padding to the input audio, divides it into frames, calls `.process()`
-        on each frame, concatenates and synchronizes the output by removing the delay, and finally calls `.reset()`.
-
-        :param pcm: A sequence of audio samples of arbitrary length. The incoming audio needs to have a sample rate
-        equal to `.sample_rate` and be 16-bit linearly-encoded. Koala operates on single-channel audio.
-
-        :return: A frame of enhanced audio samples, stored in a contiguous `numpy` array with `dtype=np.int16`.
-        Its length is identical to the
-        """
-        input_length = len(pcm)
-        start_sample = 0
-        output_frames = []
-        while start_sample < input_length + self.delay_sample:
-            end_sample = start_sample + self.frame_length
-            if end_sample <= input_length:
-                input_frame = pcm[start_sample:end_sample]
-            else:
-                input_frame = np.zeros(self.frame_length, dtype=np.int16)
-                if start_sample < input_length:
-                    input_frame[:input_length - start_sample] = pcm[start_sample:]
-
-            output_frame = self.process(input_frame)
-
-            if end_sample > self._delay_sample:
-                if end_sample > input_length + self.delay_sample:
-                    output_frame = output_frame[:input_length + self.delay_sample - start_sample]
-                if start_sample < self.delay_sample:
-                    output_frame = output_frame[self.delay_sample - start_sample:]
-                output_frames.append(output_frame)
-
-            start_sample = end_sample
-
-        self.reset()
-        return np.concatenate(output_frames)
-
     def reset(self) -> None:
         """
         Resets Koala into a state as if it had just been newly created.
-        Call this function in between calls to `process` that do not refer to back-to-back frames of audio.
+        Call this function in between calls to `process` that do not provide consecutive frames of audio.
         """
 
         status = self._reset_func(self._handle)
@@ -271,8 +234,8 @@ class Koala(object):
     @property
     def delay_sample(self) -> int:
         """
-        Delay in samples. If the input and output of sequential calls to `pv_koala_process` are viewed as two
-        contiguous streams of audio data, this delay specifies the time shift between the input and output stream."""
+        Delay in samples. If the input and output of consecutive calls to `.process()` are viewed as two contiguous
+        streams of audio data, this delay specifies the time shift between the input and output stream."""
 
         return self._delay_sample
 
