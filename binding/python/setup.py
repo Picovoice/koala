@@ -14,37 +14,29 @@ import shutil
 
 import setuptools
 
-# os.system('git clean -dfx')
+
+INCLUDE_FILES = ('../../LICENSE', '__init__.py', '_factory.py', '_koala.py', '_util.py')
+INCLUDE_LIBS = ('common', 'jetson', 'linux', 'mac', 'raspberry-pi', 'windows')
+
+os.system('git clean -dfx')
 
 package_folder = os.path.join(os.path.dirname(__file__), 'pvkoala')
-if os.path.exists(package_folder):
-    shutil.rmtree(package_folder)
 os.mkdir(package_folder)
+manifest_in = ""
 
-shutil.copy(os.path.join(os.path.dirname(__file__), '../../LICENSE'), package_folder)
+for rel_path in INCLUDE_FILES:
+    shutil.copy(os.path.join(os.path.dirname(__file__), rel_path), package_folder)
+    manifest_in += "include pvkoala/%s\n" % os.path.basename(rel_path)
 
-shutil.copy(os.path.join(os.path.dirname(__file__), '__init__.py'), os.path.join(package_folder, '__init__.py'))
-shutil.copy(os.path.join(os.path.dirname(__file__), '_koala.py'), os.path.join(package_folder, '_koala.py'))
-shutil.copy(os.path.join(os.path.dirname(__file__), '_util.py'), os.path.join(package_folder, '_util.py'))
-
-# platforms = ('jetson', 'linux', 'mac', 'raspberry-pi', 'windows')
-#
-# os.mkdir(os.path.join(package_folder, 'lib'))
-# for platform in ('common',) + platforms:
-#     shutil.copytree(
-#         os.path.join(os.path.dirname(__file__), '../../lib', platform),
-#         os.path.join(package_folder, 'lib', platform))
-
-MANIFEST_IN = """
-include pvkoala/LICENSE
-include pvkoala/__init__.py
-include pvkoala/koala.py
-include pvkoala/util.py
-recursive-include pvkoala/lib/ *
-"""
+os.mkdir(os.path.join(package_folder, 'lib'))
+for platform in INCLUDE_LIBS:
+    shutil.copytree(
+        os.path.join(os.path.dirname(__file__), '../../lib', platform),
+        os.path.join(package_folder, 'lib', platform))
+manifest_in += "recursive-include pvkoala/lib/ *\n"
 
 with open(os.path.join(os.path.dirname(__file__), 'MANIFEST.in'), 'w') as f:
-    f.write(MANIFEST_IN.strip('\n '))
+    f.write(manifest_in)
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
     long_description = f.read()
@@ -69,5 +61,5 @@ setuptools.setup(
         "Topic :: Multimedia :: Sound/Audio :: Speech"
     ],
     python_requires='>=3.5',
-    keywords="Noise Suppression, Speech Enhancement, Noise Removal",
+    keywords="Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
 )

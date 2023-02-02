@@ -3,32 +3,28 @@ import shutil
 
 import setuptools
 
-# os.system('git clean -dfx')
+
+INCLUDE_FILES = ('../../LICENSE', 'koala_demo_file.py', 'koala_demo_mic.py')
+
+os.system('git clean -dfx')
 
 package_folder = os.path.join(os.path.dirname(__file__), 'pvkoalademo')
 os.mkdir(package_folder)
+manifest_in = ""
 
-shutil.copy(os.path.join(os.path.dirname(__file__), '../../LICENSE'), package_folder)
-
-shutil.copy(
-    os.path.join(os.path.dirname(__file__), 'koala_demo_file.py'),
-    os.path.join(package_folder, 'koala_demo_file.py'))
-
-shutil.copy(
-    os.path.join(os.path.dirname(__file__), 'koala_demo_mic.py'),
-    os.path.join(package_folder, 'koala_demo_mic.py'))
+for rel_path in INCLUDE_FILES:
+    shutil.copy(os.path.join(os.path.dirname(__file__), rel_path), package_folder)
+    manifest_in += "include pvkoalademo/%s\n" % os.path.basename(rel_path)
 
 with open(os.path.join(os.path.dirname(__file__), 'MANIFEST.in'), 'w') as f:
-    f.write('include pvkoalademo/LICENSE\n')
-    f.write('include pvkoalademo/koala_demo_file.py\n')
-    f.write('include pvkoalademo/koala_demo_mic.py\n')
+    f.write(manifest_in)
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
     long_description = f.read()
 
 setuptools.setup(
     name="pvkoalademo",
-    version="1.1.2",
+    version="1.0.0",
     author="Picovoice",
     author_email="hello@picovoice.ai",
     description="Koala noise suppression engine demos",
@@ -53,5 +49,5 @@ setuptools.setup(
         ],
     ),
     python_requires='>=3.5',
-    keywords="Noise Suppression, Speech Enhancement, Noise Removal",
+    keywords="Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
 )
