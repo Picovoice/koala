@@ -36,7 +36,7 @@ def main():
         with wave.open(args.input_path, 'rb') as inf:
             if inf.getframerate() != koala.sample_rate:
                 raise ValueError(
-                    f"Invalid sample rate of `{inf.getframerate()}`. Koala only accepts `{koala.sample_rate}`")
+                    "Invalid sample rate of `%d`. Koala only accepts `%d`" % (inf.getframerate(), koala.sample_rate))
             if inf.getnchannels() != 1:
                 raise ValueError("This demo can only process single-channel WAV files")
             if inf.getsampwidth() != 2:
@@ -61,16 +61,18 @@ def main():
                                 np.frombuffer(inf.readframes(input_length - start_sample), dtype=np.int16)
 
                     output_frame = koala.process(input_frame)
-                    if end_sample > input_length + koala.delay_sample:
-                        output_frame = output_frame[:input_length + koala.delay_sample - start_sample]
-                    if start_sample < koala.delay_sample:
-                        output_frame = output_frame[koala.delay_sample - start_sample:]
 
-                    outf.writeframes(output_frame)
+                    if end_sample > koala.delay_sample:
+                        if end_sample > input_length + koala.delay_sample:
+                            output_frame = output_frame[:input_length + koala.delay_sample - start_sample]
+                        if start_sample < koala.delay_sample:
+                            output_frame = output_frame[koala.delay_sample - start_sample:]
+                        outf.writeframes(output_frame)
+
                     start_sample = end_sample
 
     except KoalaActivationLimitError:
-        print("AccessKey has reached its processing limit.")
+        print("AccessKey has reached its processing limit")
     finally:
         koala.delete()
 
