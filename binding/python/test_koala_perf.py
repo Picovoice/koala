@@ -45,7 +45,6 @@ class KoalaPerformanceTestCase(unittest.TestCase):
             koala.delete()
 
         avg_perf = sum(perf_results) / self.NUM_TEST_ITERATIONS
-        print(perf_results)
         print("Average init performance: %s" % avg_perf)
         self.assertLess(avg_perf, self.INIT_PERFORMANCE_THRESHOLD_SEC)
 
@@ -74,7 +73,6 @@ class KoalaPerformanceTestCase(unittest.TestCase):
         koala.delete()
 
         avg_perf = sum(perf_results) / self.NUM_TEST_ITERATIONS
-        print(perf_results)
         print("Average proc performance: %s" % avg_perf)
         self.assertLess(avg_perf, self.PROC_PERFORMANCE_THRESHOLD_SEC)
 

@@ -79,20 +79,20 @@ jobs:
         machine: [rpi3-32, rpi3-64, rpi4-32, rpi4-64, jetson]
         include:
         - machine: rpi3-32
-          init_performance_threshold_sec: 7.5
-          proc_performance_threshold_sec: 3.6
+          init_performance_threshold_sec: 1.0
+          proc_performance_threshold_sec: 2.5
         - machine: rpi3-64
-          init_performance_threshold_sec: 8.3
-          proc_performance_threshold_sec: 3.5
+          init_performance_threshold_sec: 1.0
+          proc_performance_threshold_sec: 2.5
         - machine: rpi4-32
-          init_performance_threshold_sec: 5.7
-          proc_performance_threshold_sec: 2.0
+          init_performance_threshold_sec: 1.0
+          proc_performance_threshold_sec: 2.5
         - machine: rpi4-64
-          init_performance_threshold_sec: 5.1
-          proc_performance_threshold_sec: 1.9
+          init_performance_threshold_sec: 1.0
+          proc_performance_threshold_sec: 2.5
         - machine: jetson
-          init_performance_threshold_sec: 5.2
-          proc_performance_threshold_sec: 1.9
+          init_performance_threshold_sec: 1.0
+          proc_performance_threshold_sec: 2.5
 
     steps:
     - uses: actions/checkout@v2
