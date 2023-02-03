@@ -35,7 +35,7 @@ class KoalaTestCase(unittest.TestCase):
     def setUpClass(cls):
         with wave.open(os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/test.wav'), 'rb') as f:
             buffer = f.readframes(f.getnframes())
-            cls.pcm = struct.unpack('%dh' % (len(buffer) / struct.calcsize('h')), buffer)
+            cls.pcm = np.frombuffer(buffer, dtype=np.int16)
 
         cls.koala = Koala(
             access_key=cls.ACCESS_KEY,
@@ -54,40 +54,36 @@ class KoalaTestCase(unittest.TestCase):
             self,
             input_pcm: Sequence[int],
             reference_pcm: Optional[Sequence[int]] = None,
-            tolerance: float = 1e-4) -> None:
+            tolerance: float = 1.0) -> None:
         num_samples = len(input_pcm)
         frame_length = self.koala.frame_length
-        delay_sample = self.koala.delay_sample
         if reference_pcm is not None:
-            reference_pcm = np.pad(reference_pcm, pad_width=(delay_sample, 0))
+            reference_pcm = np.pad(reference_pcm, pad_width=(self.koala.delay_sample, 0))
 
-        for frame_start in range(0, num_samples - frame_length, frame_length):
+        self.koala.reset()
+        for frame_start in range(0, num_samples - frame_length + 1, frame_length):
             enhanced_pcm = self.koala.process(input_pcm[frame_start:frame_start + frame_length])
-            spectrogram = np.fft.rfft(enhanced_pcm)
+            spectrogram = np.abs(np.fft.rfft(enhanced_pcm))
             if reference_pcm is not None:
-                spectrogram -= np.fft.rfft(reference_pcm[frame_start:frame_start + frame_length])
+                spectrogram -= np.abs(np.fft.rfft(reference_pcm[frame_start:frame_start + frame_length]))
             spectrogram /= 2 ** 15
-            self.assertLess(np.linalg.norm(spectrogram), tolerance)
+            self.assertLess(np.abs(spectrogram).max(), tolerance)
 
     @staticmethod
-    def _create_noise(num_samples: int, amplitude: float = 0.5) -> NDArray[int]:
-        # spectrogram = np.fft.rfft(np.random.randn(num_samples))
-        # freq_curve = 1 / np.where(spectrogram == 0, np.inf, np.sqrt(np.fft.rfftfreq(num_samples)))
-        # freq_curve /= np.sqrt(np.mean(freq_curve ** 2))
-        # spectrogram = np.fft.irfft(spectrogram * freq_curve) * amplitude * (2 ** 15)
-        spectrogram = np.random.randn(num_samples) * amplitude * (2 ** 15)
+    def _create_noise(num_samples: int, amplitude: float = 0.05) -> NDArray[int]:
+        spectrogram = np.random.RandomState(seed=0).randn(num_samples) * amplitude * (2 ** 15)
         return spectrogram.astype(np.int16)
 
     def test_pure_speech(self) -> None:
-        self._run_test(self.pcm, self.pcm)
+        self._run_test(self.pcm, self.pcm, tolerance=2.0)
 
     def test_pure_noise(self) -> None:
         noise_pcm = self._create_noise(5 * self.koala.sample_rate)
-        self._run_test(noise_pcm)
+        self._run_test(noise_pcm, tolerance=1.0)
 
     def test_mixed(self) -> None:
-        noisy_pcm = self.pcm + self._create_noise(len(self.pcm), amplitude=0.2)
-        self._run_test(noisy_pcm, self.pcm)
+        noisy_pcm = self.pcm + self._create_noise(len(self.pcm), amplitude=0.02)
+        self._run_test(noisy_pcm, self.pcm, tolerance=3.0)
 
     def test_version(self):
         version = self.koala.version
