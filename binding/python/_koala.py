@@ -15,7 +15,6 @@ from enum import Enum
 from typing import Sequence
 
 import numpy as np
-from numpy.typing import NDArray
 
 
 class KoalaError(Exception):
@@ -175,7 +174,7 @@ class Koala(object):
         self._pv_free.argtypes = [c_void_p]
         self._pv_free.restype = None
 
-    def process(self, pcm: Sequence[int]) -> NDArray[int]:
+    def process(self, pcm: Sequence[int]) -> np.ndarray:
         """
         Processes a frame of audio and returns delayed enhanced audio.
 
