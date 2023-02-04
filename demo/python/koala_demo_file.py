@@ -10,9 +10,9 @@
 #
 
 import argparse
+import struct
 import wave
 
-import numpy as np
 from pvkoala import create, KoalaActivationLimitError
 
 
@@ -52,13 +52,12 @@ def main():
                 start_sample = 0
                 while start_sample < input_length + koala.delay_sample:
                     end_sample = start_sample + koala.frame_length
-                    if end_sample <= input_length:
-                        input_frame = np.frombuffer(inf.readframes(koala.frame_length), dtype=np.int16)
-                    else:
-                        input_frame = np.zeros(koala.frame_length, dtype=np.int16)
-                        if start_sample < input_length:
-                            input_frame[:input_length - start_sample] = \
-                                np.frombuffer(inf.readframes(input_length - start_sample), dtype=np.int16)
+
+                    frame_buffer = inf.readframes(koala.frame_length)
+                    num_samples_read = len(frame_buffer) // struct.calcsize('h')
+                    input_frame = struct.unpack('%dh' % num_samples_read, frame_buffer)
+                    if num_samples_read < koala.frame_length:
+                        input_frame = input_frame + (0,) * (koala.frame_length - num_samples_read)
 
                     output_frame = koala.process(input_frame)
 

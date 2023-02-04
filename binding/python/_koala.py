@@ -12,9 +12,7 @@
 import os
 from ctypes import *
 from enum import Enum
-from typing import Sequence
-
-import numpy as np
+from typing import List, Sequence
 
 
 class KoalaError(Exception):
@@ -174,7 +172,7 @@ class Koala(object):
         self._pv_free.argtypes = [c_void_p]
         self._pv_free.restype = None
 
-    def process(self, pcm: Sequence[int]) -> np.ndarray:
+    def process(self, pcm: Sequence[int]) -> List[int]:
         """
         Processes a frame of audio and returns delayed enhanced audio.
 
@@ -192,16 +190,15 @@ class Koala(object):
         if len(pcm) != self.frame_length:
             raise KoalaInvalidArgumentError()
 
-        enhanced_pcm = np.empty(self.frame_length, dtype=np.int16)
+        frame_type = c_short * self.frame_length
+        pcm = frame_type(*pcm)
+        enhanced_pcm = frame_type()
 
-        status = self._process_func(
-            self._handle,
-            (c_short * len(pcm))(*pcm),
-            enhanced_pcm.ctypes.data_as(POINTER(c_short)))
+        status = self._process_func(self._handle, pcm, enhanced_pcm)
         if status is not self.PicovoiceStatuses.SUCCESS:
             raise self._PICOVOICE_STATUS_TO_EXCEPTION[status]()
 
-        return enhanced_pcm
+        return list(enhanced_pcm)
 
     def reset(self) -> None:
         """

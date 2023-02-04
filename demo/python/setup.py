@@ -49,5 +49,5 @@ setuptools.setup(
         ],
     ),
     python_requires='>=3.5',
-    keywords="Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
+    keywords="Noise Cancellation, Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
 )

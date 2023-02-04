@@ -52,7 +52,9 @@ jobs:
       run: python -m pip install --upgrade pip
 
     - name: Install dependencies
-      run: pip install -r requirements.txt
+      run: >
+        pip install -r requirements.txt
+        pip install numpy
 
     - name: Test
       run: python test_koala.py --access-key ${{secrets.PV_VALID_ACCESS_KEY}}

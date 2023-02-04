@@ -14,7 +14,6 @@ import shutil
 
 import setuptools
 
-
 INCLUDE_FILES = ('../../LICENSE', '__init__.py', '_factory.py', '_koala.py', '_util.py')
 INCLUDE_LIBS = ('common', 'jetson', 'linux', 'mac', 'raspberry-pi', 'windows')
 
@@ -61,5 +60,5 @@ setuptools.setup(
         "Topic :: Multimedia :: Sound/Audio :: Speech"
     ],
     python_requires='>=3.5',
-    keywords="Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
+    keywords="Noise Cancellation, Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
 )

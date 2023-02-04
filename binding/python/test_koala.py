@@ -17,7 +17,6 @@ import wave
 from typing import Optional, Sequence
 
 import numpy as np
-from numpy.typing import NDArray
 
 from _koala import Koala
 from _util import default_library_path, default_model_path
@@ -29,20 +28,17 @@ class KoalaTestCase(unittest.TestCase):
 
     pcm: Sequence[int]
     koala: Koala
-    window: NDArray[float]
 
     @classmethod
     def setUpClass(cls):
         with wave.open(os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/test.wav'), 'rb') as f:
             buffer = f.readframes(f.getnframes())
-            cls.pcm = np.frombuffer(buffer, dtype=np.int16)
+            cls.pcm = struct.unpack('%dh' % f.getnframes(), buffer)
 
         cls.koala = Koala(
             access_key=cls.ACCESS_KEY,
             model_path=default_model_path('../..'),
             library_path=default_library_path('../..'))
-
-        cls.window = np.hanning(cls.koala.frame_length)
 
     def test_frame_length(self) -> None:
         self.assertGreater(self.koala.frame_length, 0)
@@ -50,40 +46,47 @@ class KoalaTestCase(unittest.TestCase):
     def test_delay_sample(self) -> None:
         self.assertGreaterEqual(self.koala.delay_sample, 0)
 
+    @staticmethod
+    def _pcm_root_mean_square(pcm: Sequence[int]) -> float:
+        return np.sqrt(np.mean(np.square(np.array(pcm) / (2 ** 15))))
+
     def _run_test(
             self,
             input_pcm: Sequence[int],
             reference_pcm: Optional[Sequence[int]] = None,
-            tolerance: float = 1.0) -> None:
+            tolerance: float = 0.01) -> None:
         num_samples = len(input_pcm)
         frame_length = self.koala.frame_length
-        if reference_pcm is not None:
-            reference_pcm = np.pad(reference_pcm, pad_width=(self.koala.delay_sample, 0))
+        delay_sample = self.koala.delay_sample
 
         self.koala.reset()
         for frame_start in range(0, num_samples - frame_length + 1, frame_length):
-            enhanced_pcm = self.koala.process(input_pcm[frame_start:frame_start + frame_length])
-            spectrogram = np.abs(np.fft.rfft(enhanced_pcm))
-            if reference_pcm is not None:
-                spectrogram -= np.abs(np.fft.rfft(reference_pcm[frame_start:frame_start + frame_length]))
-            spectrogram /= 2 ** 15
-            self.assertLess(np.abs(spectrogram).max(), tolerance)
+            enhanced_frame = self.koala.process(input_pcm[frame_start:frame_start + frame_length])
+
+            frame_energy = self._pcm_root_mean_square(enhanced_frame)
+            if reference_pcm is None or frame_start < delay_sample:
+                energy_deviation = frame_energy
+            else:
+                reference_frame = reference_pcm[frame_start - delay_sample:frame_start - delay_sample + frame_length]
+                energy_deviation = abs(frame_energy - self._pcm_root_mean_square(reference_frame))
+
+            self.assertLess(energy_deviation, tolerance)
 
     @staticmethod
-    def _create_noise(num_samples: int, amplitude: float = 0.05) -> NDArray[int]:
+    def _create_noise(num_samples: int, amplitude: float = 0.05) -> np.ndarray:
         spectrogram = np.random.RandomState(seed=0).randn(num_samples) * amplitude * (2 ** 15)
         return spectrogram.astype(np.int16)
 
     def test_pure_speech(self) -> None:
-        self._run_test(self.pcm, self.pcm, tolerance=2.0)
+        self._run_test(self.pcm, self.pcm, tolerance=0.01)
 
     def test_pure_noise(self) -> None:
         noise_pcm = self._create_noise(5 * self.koala.sample_rate)
-        self._run_test(noise_pcm, tolerance=1.0)
+        self._run_test(noise_pcm, tolerance=0.01)
 
     def test_mixed(self) -> None:
         noisy_pcm = self.pcm + self._create_noise(len(self.pcm), amplitude=0.02)
-        self._run_test(noisy_pcm, self.pcm, tolerance=3.0)
+        self._run_test(noisy_pcm, self.pcm, tolerance=0.02)
 
     def test_version(self):
         version = self.koala.version

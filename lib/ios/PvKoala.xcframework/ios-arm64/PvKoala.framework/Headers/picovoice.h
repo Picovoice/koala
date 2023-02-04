@@ -22,8 +22,6 @@ extern "C" {
 
 #define PV_API __attribute__((visibility("default")))
 
-#define PV_MOCKABLE
-
 /**
  * Audio sample rate accepted by Picovoice.
  */
@@ -33,17 +31,7 @@ PV_API int32_t pv_sample_rate(void);
  * Status codes.
  */
 typedef enum {
-
-#ifdef __PV_PLATFORM_WASM__
-
-    PV_STATUS_SUCCESS = 10000,
-
-#else
-
     PV_STATUS_SUCCESS = 0,
-
-#endif
-
     PV_STATUS_OUT_OF_MEMORY,
     PV_STATUS_IO_ERROR,
     PV_STATUS_INVALID_ARGUMENT,
@@ -66,6 +54,7 @@ typedef enum {
 PV_API const char *pv_status_to_string(pv_status_t status);
 
 #ifdef __cplusplus
+
 }
 
 #endif
