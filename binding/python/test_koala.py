@@ -92,20 +92,21 @@ class KoalaTestCase(unittest.TestCase):
         self._run_test(noisy_pcm, self.test_pcm, tolerance=0.02)
 
     def test_reset(self) -> None:
-        num_samples = len(self.test_pcm)
         frame_length = self.koala.frame_length
-        enhanced_frames = []
+
+        self.koala.process([32767 for _ in range(frame_length)])
+        self.koala.reset()
+
+        fresh_koala = Koala(
+            access_key=self.access_key,
+            model_path=default_model_path('../..'),
+            library_path=default_library_path('../..'))
 
         self.koala.reset()
-        for frame_start in range(0, num_samples - frame_length + 1, frame_length):
-            input_frame = self.test_pcm[frame_start:frame_start + frame_length]
-            enhanced_frames.append(self.koala.process(input_frame))
-
-        self.koala.reset()
-        for frame_start in range(0, num_samples - frame_length + 1, frame_length):
+        for frame_start in range(0, len(self.test_pcm) - frame_length + 1, frame_length):
             input_frame = self.test_pcm[frame_start:frame_start + frame_length]
             output_frame = self.koala.process(input_frame)
-            reference_frame = enhanced_frames.pop(0)
+            reference_frame = fresh_koala.process(input_frame)
             self.assertTrue(all(x == y for x, y in zip(output_frame, reference_frame)))
 
     def test_version(self) -> None:
