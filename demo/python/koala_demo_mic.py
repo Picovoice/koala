@@ -57,8 +57,8 @@ def main():
     finally:
         if num_frames > 0:
             print("%.2f seconds of audio have been written to %s." % (
-                    num_frames * koala.frame_length / koala.sample_rate,
-                    args.output_path))
+                num_frames * koala.frame_length / koala.sample_rate,
+                args.output_path))
         koala.delete()
 
 
