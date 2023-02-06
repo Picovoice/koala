@@ -18,11 +18,24 @@ from pvkoala import create, KoalaActivationLimitError
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--access_key', required=True)
-    parser.add_argument('--model_path')
-    parser.add_argument('--library_path')
-    parser.add_argument('--input_path', required=True)
-    parser.add_argument('--output_path', required=True)
+    parser.add_argument(
+        '--access_key',
+        required=True,
+        help='AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)')
+    parser.add_argument(
+        '--input_path',
+        required=True,
+        help='Absolute path to .wav file with the input audio to be enhanced')
+    parser.add_argument(
+        '--output_path',
+        required=True,
+        help='Absolute path to .wav file where the enhanced audio will be stored')
+    parser.add_argument(
+        '--library_path',
+        help='Absolute path to dynamic library. Default: use the library provided by `pvkoala`')
+    parser.add_argument(
+        '--model_path',
+        help='Absolute path to Koala model. Default: use the model provided by `pvkoala`')
     args = parser.parse_args()
 
     koala = create(

@@ -18,12 +18,25 @@ from pvrecorder import PvRecorder
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--access_key', required=True)
-    parser.add_argument('--output_path', required=True)
-    parser.add_argument('--library_path', default=None)
-    parser.add_argument('--model_path', default=None)
-    parser.add_argument('--device-index', type=int, default=-1)
+    parser.add_argument(
+        '--access_key',
+        required=True,
+        help='AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)')
+    parser.add_argument(
+        '--output_path',
+        required=True,
+        help='Absolute path to .wav file where the enhanced recorded audio will be stored')
+    parser.add_argument(
+        '--library_path',
+        help='Absolute path to dynamic library. Default: use the library provided by `pvkoala`')
+    parser.add_argument('--audio_device_index', type=int, default=-1, help='Index of input audio device')
+    parser.add_argument('--show_audio_devices', action='store_true', help='Only list available devices and exit')
     args = parser.parse_args()
+
+    if args.show_audio_devices:
+        for index, name in enumerate(PvRecorder.get_audio_devices()):
+            print("Device #%d: %s" % (index, name))
+        return
 
     koala = create(
         access_key=args.access_key,
@@ -34,7 +47,7 @@ def main():
     try:
         print('Koala version : %s' % koala.version)
 
-        recorder = PvRecorder(device_index=args.device_index, frame_length=koala.frame_length)
+        recorder = PvRecorder(device_index=args.audio_device_index, frame_length=koala.frame_length)
         recorder.start()
 
         try:
