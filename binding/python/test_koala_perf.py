@@ -28,7 +28,7 @@ class KoalaPerformanceTestCase(unittest.TestCase):
     num_test_iterations: int
     proc_performance_threshold_sec: float
 
-    def test_performance_proc(self):
+    def test_performance_proc(self) -> None:
         with wave.open(self.AUDIO_PATH, 'rb') as f:
             buffer = f.readframes(f.getnframes())
             pcm = struct.unpack('%dh' % (len(buffer) / struct.calcsize('h')), buffer)

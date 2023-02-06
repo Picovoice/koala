@@ -37,7 +37,7 @@ class KoalaTestCase(unittest.TestCase):
             return struct.unpack('%dh' % f.getnframes(), buffer)
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         cls.test_pcm = cls.load_wav_resource(cls.AUDIO_PATH)
         cls.noise_pcm = cls.load_wav_resource(cls.NOISE_PATH)
 
@@ -91,7 +91,24 @@ class KoalaTestCase(unittest.TestCase):
         noisy_pcm = [x + y for x, y in zip(self.test_pcm, self.noise_pcm)]
         self._run_test(noisy_pcm, self.test_pcm, tolerance=0.02)
 
-    def test_version(self):
+    def test_reset(self) -> None:
+        num_samples = len(self.test_pcm)
+        frame_length = self.koala.frame_length
+        enhanced_frames = []
+
+        self.koala.reset()
+        for frame_start in range(0, num_samples - frame_length + 1, frame_length):
+            input_frame = self.test_pcm[frame_start:frame_start + frame_length]
+            enhanced_frames.append(self.koala.process(input_frame))
+
+        self.koala.reset()
+        for frame_start in range(0, num_samples - frame_length + 1, frame_length):
+            input_frame = self.test_pcm[frame_start:frame_start + frame_length]
+            output_frame = self.koala.process(input_frame)
+            reference_frame = enhanced_frames.pop(0)
+            self.assertTrue(all(x == y for x, y in zip(output_frame, reference_frame)))
+
+    def test_version(self) -> None:
         version = self.koala.version
         self.assertIsInstance(version, str)
         self.assertGreater(len(version), 0)
