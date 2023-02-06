@@ -34,17 +34,22 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 
 ### Microphone Demo
 
-You need a working microphone connected to your machine for this demo. Run the following in the terminal:
+The microphone demo collects audio from a microphone connect to your machine. The audio is passed through the Koala
+noise suppression engine and stored in a `.wav` file.
+Run the following in the terminal:
 
 ```console
 koala_demo_mic --access_key ${ACCESS_KEY} --output-path ${WAV_OUTPUT_PATH}
 ```
 
 Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console and `${WAV_OUTPUT_PATH}` with a path to a `.wav` file
-where the enhanced audio will be stored.
+where the enhanced audio will be stored. Terminate the demo with `Ctrl+C`.
 
 ### File Demo
 
+The file demo passes audio stored in a `.wav` file through the Koala noise suppression engine. The result is shifted to
+compensate for the delay introduced by Koala and the result is stored in a separate `.wav` file that will have the same
+length as the input file without any delay.
 Run the following in the terminal:
 
 ```console

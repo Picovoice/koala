@@ -30,6 +30,9 @@ def main():
         model_path=args.model_path,
         library_path=args.library_path)
 
+    if args.input_path == args.output_path:
+        raise ValueError("This demo cannot overwrite its input path")
+
     try:
         print('Koala version : %s' % koala.version)
 

@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--output_path', required=True)
     parser.add_argument('--library_path', default=None)
     parser.add_argument('--model_path', default=None)
+    parser.add_argument('--device-index', type=int, default=-1)
     args = parser.parse_args()
 
     koala = create(
@@ -29,10 +30,11 @@ def main():
         model_path=args.model_path,
         library_path=args.library_path)
 
+    num_frames = 0
     try:
         print('Koala version : %s' % koala.version)
 
-        recorder = PvRecorder(device_index=-1, frame_length=koala.frame_length)
+        recorder = PvRecorder(device_index=args.device_index, frame_length=koala.frame_length)
         recorder.start()
 
         try:
@@ -44,6 +46,7 @@ def main():
                 while True:
                     enhanced_pcm = koala.process(recorder.read())
                     f.writeframes(enhanced_pcm)
+                    num_frames += 1
         finally:
             recorder.stop()
 
@@ -52,6 +55,10 @@ def main():
     except KoalaActivationLimitError:
         print("AccessKey has reached its processing limit.")
     finally:
+        if num_frames > 0:
+            print("%.2f seconds of audio have been written to %s." % (
+                    num_frames * koala.frame_length / koala.sample_rate,
+                    args.output_path))
         koala.delete()
 
 
