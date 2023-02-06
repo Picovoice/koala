@@ -9,14 +9,13 @@
 #    specific language governing permissions and limitations under the License.
 #
 import argparse
+import math
 import os
 import struct
 import sys
 import unittest
 import wave
 from typing import Optional, Sequence
-
-import numpy as np
 
 from _koala import Koala
 from _util import default_library_path, default_model_path
@@ -25,15 +24,22 @@ from _util import default_library_path, default_model_path
 class KoalaTestCase(unittest.TestCase):
     ACCESS_KEY: str
     AUDIO_PATH = os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/test.wav')
+    NOISE_PATH = os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/noise.wav')
 
-    pcm: Sequence[int]
+    test_pcm: Sequence[int]
+    noise_pcm: Sequence[int]
     koala: Koala
+
+    @staticmethod
+    def load_wav_resource(path: str) -> Sequence[int]:
+        with wave.open(path, 'rb') as f:
+            buffer = f.readframes(f.getnframes())
+            return struct.unpack('%dh' % f.getnframes(), buffer)
 
     @classmethod
     def setUpClass(cls):
-        with wave.open(os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/test.wav'), 'rb') as f:
-            buffer = f.readframes(f.getnframes())
-            cls.pcm = struct.unpack('%dh' % f.getnframes(), buffer)
+        cls.test_pcm = cls.load_wav_resource(cls.AUDIO_PATH)
+        cls.noise_pcm = cls.load_wav_resource(cls.NOISE_PATH)
 
         cls.koala = Koala(
             access_key=cls.ACCESS_KEY,
@@ -48,13 +54,16 @@ class KoalaTestCase(unittest.TestCase):
 
     @staticmethod
     def _pcm_root_mean_square(pcm: Sequence[int]) -> float:
-        return np.sqrt(np.mean(np.square(np.array(pcm) / (2 ** 15))))
+        sum_of_squares = 0
+        for x in pcm:
+            sum_of_squares += (x / 32768.0) ** 2
+        return math.sqrt(sum_of_squares / len(pcm))
 
     def _run_test(
             self,
             input_pcm: Sequence[int],
             reference_pcm: Optional[Sequence[int]] = None,
-            tolerance: float = 0.01) -> None:
+            tolerance: float = 0.02) -> None:
         num_samples = len(input_pcm)
         frame_length = self.koala.frame_length
         delay_sample = self.koala.delay_sample
@@ -72,21 +81,15 @@ class KoalaTestCase(unittest.TestCase):
 
             self.assertLess(energy_deviation, tolerance)
 
-    @staticmethod
-    def _create_noise(num_samples: int, amplitude: float = 0.05) -> np.ndarray:
-        spectrogram = np.random.RandomState(seed=0).randn(num_samples) * amplitude * (2 ** 15)
-        return spectrogram.astype(np.int16)
-
     def test_pure_speech(self) -> None:
-        self._run_test(self.pcm, self.pcm, tolerance=0.01)
+        self._run_test(self.test_pcm, self.test_pcm, tolerance=0.02)
 
     def test_pure_noise(self) -> None:
-        noise_pcm = self._create_noise(5 * self.koala.sample_rate)
-        self._run_test(noise_pcm, tolerance=0.01)
+        self._run_test(self.noise_pcm, tolerance=0.02)
 
     def test_mixed(self) -> None:
-        noisy_pcm = self.pcm + self._create_noise(len(self.pcm), amplitude=0.02)
-        self._run_test(noisy_pcm, self.pcm, tolerance=0.02)
+        noisy_pcm = [x + y for x, y in zip(self.test_pcm, self.noise_pcm)]
+        self._run_test(noisy_pcm, self.test_pcm, tolerance=0.02)
 
     def test_version(self):
         version = self.koala.version

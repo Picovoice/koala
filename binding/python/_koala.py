@@ -12,7 +12,7 @@
 import os
 from ctypes import *
 from enum import Enum
-from typing import List, Sequence
+from typing import Sequence
 
 
 class KoalaError(Exception):
@@ -172,7 +172,7 @@ class Koala(object):
         self._pv_free.argtypes = [c_void_p]
         self._pv_free.restype = None
 
-    def process(self, pcm: Sequence[int]) -> List[int]:
+    def process(self, pcm: Sequence[int]) -> Sequence[int]:
         """
         Processes a frame of audio and returns delayed enhanced audio.
 
@@ -181,7 +181,7 @@ class Koala(object):
         linearly-encoded. Koala operates on single-channel audio. Consecutive calls to `.process()` must provide
         consecutive frames of audio from the same source, unless `.reset()` has been called in between.
 
-        :return: A frame of enhanced audio samples, stored in a contiguous `numpy` array with `dtype=np.int16`.
+        :return: A frame of enhanced audio samples, stored as a sequence of 16-bit linearly-encoded integers.
         The output is not directly the enhanced version of the input PCM, but corresponds to samples that were given in
         previous calls to `.process()`. The delay in samples between the start time of the input frame and the start
         time of the output frame can be attained from `.delay_sample`.
