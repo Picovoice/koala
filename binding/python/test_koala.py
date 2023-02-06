@@ -22,10 +22,10 @@ from _util import default_library_path, default_model_path
 
 
 class KoalaTestCase(unittest.TestCase):
-    ACCESS_KEY: str
     AUDIO_PATH = os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/test.wav')
     NOISE_PATH = os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/noise.wav')
 
+    access_key: str
     test_pcm: Sequence[int]
     noise_pcm: Sequence[int]
     koala: Koala
@@ -42,7 +42,7 @@ class KoalaTestCase(unittest.TestCase):
         cls.noise_pcm = cls.load_wav_resource(cls.NOISE_PATH)
 
         cls.koala = Koala(
-            access_key=cls.ACCESS_KEY,
+            access_key=cls.access_key,
             model_path=default_model_path('../..'),
             library_path=default_library_path('../..'))
 
@@ -102,5 +102,5 @@ if __name__ == '__main__':
     parser.add_argument('--access-key', required=True)
     args = parser.parse_args()
 
-    KoalaTestCase.ACCESS_KEY = args.access_key
+    KoalaTestCase.access_key = args.access_key
     unittest.main(argv=sys.argv[:1])

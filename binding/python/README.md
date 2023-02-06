@@ -13,7 +13,7 @@ Koala is an on-device noise suppression engine. Koala is:
 
 ## Compatibility
 
-- Python 3
+- Python 3.5 or higher
 - Runs on Linux (x86_64), macOS (x86_64, arm64), Windows (x86_64), Raspberry Pi (4, 3), and NVIDIA Jetson Nano.
 
 ## Installation
@@ -44,8 +44,17 @@ while True:
     enhanced_audio = koala.process(get_next_audio_frame())
 ```
 
-Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://console.picovoice.ai/). When done be sure
-to explicitly release the resources using `koala.delete()`.
+Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://console.picovoice.ai/). 
+The input audio must come from a single-channel stream with integer 16-bit encoding. The sample rate must be identical
+to `koala.sample_rate`. The stream must be split into *frames* with a fixed length in samples that can be obtained 
+from `koala.frame_length`.
+
+The output of `koala.process()` is a frame of enhanced audio with the same 16-bit integer encoding. The delay in 
+samples between the start time of the input frame and the start time of the output frame can be attained from 
+`koala.delay_sample`.
+
+In case the next audio frame does not directly follow the previous one, call `koala.reset()`.
+When done be sure to explicitly release the resources using `koala.delete()`.
 
 ## Demos
 

@@ -14,7 +14,7 @@ import platform
 import subprocess
 
 
-def _linux_machine():
+def _linux_machine() -> str:
     machine = platform.machine()
     if machine == 'x86_64':
         return machine
@@ -47,7 +47,7 @@ _RASPBERRY_PI_MACHINES = {'cortex-a53', 'cortex-a72', 'cortex-a53-aarch64', 'cor
 _JETSON_MACHINES = {'cortex-a57-aarch64'}
 
 
-def default_library_path(relative):
+def default_library_path(relative: str = '') -> str:
     if platform.system() == 'Darwin':
         if platform.machine() == 'x86_64':
             return os.path.join(os.path.dirname(__file__), relative, 'lib/mac/x86_64/libpv_koala.dylib')
@@ -70,7 +70,7 @@ def default_library_path(relative):
     raise NotImplementedError('Unsupported platform.')
 
 
-def default_model_path(relative):
+def default_model_path(relative: str = '') -> str:
     return os.path.join(os.path.dirname(__file__), relative, 'lib/common/koala_params.pv')
 
 

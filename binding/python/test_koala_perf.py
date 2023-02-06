@@ -22,19 +22,20 @@ from _util import default_library_path, default_model_path
 
 
 class KoalaPerformanceTestCase(unittest.TestCase):
-    ACCESS_KEY: str
-    NUM_TEST_ITERATIONS: int
-    INIT_PERFORMANCE_THRESHOLD_SEC: float
-    PROC_PERFORMANCE_THRESHOLD_SEC: float
     AUDIO_PATH = os.path.join(os.path.dirname(__file__), '../../resources/audio_samples/test.wav')
+
+    access_key: str
+    num_test_iterations: int
+    init_performance_threshold_sec: float
+    proc_performance_threshold_sec: float
 
     def test_performance_init(self):
 
         perf_results = list()
-        for i in range(self.NUM_TEST_ITERATIONS + 1):
+        for i in range(self.num_test_iterations + 1):
             start = perf_counter()
             koala = Koala(
-                access_key=self.ACCESS_KEY,
+                access_key=self.access_key,
                 library_path=default_library_path('../..'),
                 model_path=default_model_path('../..'))
             init_time = perf_counter() - start
@@ -44,9 +45,9 @@ class KoalaPerformanceTestCase(unittest.TestCase):
 
             koala.delete()
 
-        avg_perf = sum(perf_results) / self.NUM_TEST_ITERATIONS
+        avg_perf = sum(perf_results) / self.num_test_iterations
         print("Average init performance: %s" % avg_perf)
-        self.assertLess(avg_perf, self.INIT_PERFORMANCE_THRESHOLD_SEC)
+        self.assertLess(avg_perf, self.init_performance_threshold_sec)
 
     def test_performance_proc(self):
         with wave.open(self.AUDIO_PATH, 'rb') as f:
@@ -54,14 +55,14 @@ class KoalaPerformanceTestCase(unittest.TestCase):
             pcm = struct.unpack('%dh' % (len(buffer) / struct.calcsize('h')), buffer)
 
         koala = Koala(
-            access_key=self.ACCESS_KEY,
+            access_key=self.access_key,
             library_path=default_library_path('../..'),
             model_path=default_model_path('../..'))
 
         num_frames = len(pcm) // koala.frame_length
 
         perf_results = list()
-        for i in range(self.NUM_TEST_ITERATIONS + 1):
+        for i in range(self.num_test_iterations + 1):
             start = perf_counter()
             for j in range(num_frames):
                 frame = pcm[j * koala.frame_length:(j + 1) * koala.frame_length]
@@ -72,9 +73,9 @@ class KoalaPerformanceTestCase(unittest.TestCase):
 
         koala.delete()
 
-        avg_perf = sum(perf_results) / self.NUM_TEST_ITERATIONS
+        avg_perf = sum(perf_results) / self.num_test_iterations
         print("Average proc performance: %s" % avg_perf)
-        self.assertLess(avg_perf, self.PROC_PERFORMANCE_THRESHOLD_SEC)
+        self.assertLess(avg_perf, self.proc_performance_threshold_sec)
 
 
 if __name__ == '__main__':
@@ -85,9 +86,9 @@ if __name__ == '__main__':
     parser.add_argument('--proc-performance-threshold-sec', type=float, required=True)
     args = parser.parse_args()
 
-    KoalaPerformanceTestCase.ACCESS_KEY = args.access_key
-    KoalaPerformanceTestCase.NUM_TEST_ITERATIONS = args.num_test_iterations
-    KoalaPerformanceTestCase.INIT_PERFORMANCE_THRESHOLD_SEC = args.init_performance_threshold_sec
-    KoalaPerformanceTestCase.PROC_PERFORMANCE_THRESHOLD_SEC = args.proc_performance_threshold_sec
+    KoalaPerformanceTestCase.access_key = args.access_key
+    KoalaPerformanceTestCase.num_test_iterations = args.num_test_iterations
+    KoalaPerformanceTestCase.init_performance_threshold_sec = args.init_performance_threshold_sec
+    KoalaPerformanceTestCase.proc_performance_threshold_sec = args.proc_performance_threshold_sec
 
     unittest.main(argv=sys.argv[:1])

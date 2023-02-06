@@ -29,10 +29,10 @@ def create(
     """
 
     if model_path is None:
-        model_path = default_model_path('')
+        model_path = default_model_path()
 
     if library_path is None:
-        library_path = default_library_path('')
+        library_path = default_library_path()
 
     return Koala(
         access_key=access_key,
