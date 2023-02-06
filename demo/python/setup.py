@@ -27,7 +27,7 @@ setuptools.setup(
     version="1.0.0",
     author="Picovoice",
     author_email="hello@picovoice.ai",
-    description="Koala Noise Suppression Engine Demos",
+    description="Koala Noise Suppression Engine demos",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Picovoice/koala",
