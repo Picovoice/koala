@@ -93,21 +93,18 @@ class KoalaTestCase(unittest.TestCase):
 
     def test_reset(self) -> None:
         frame_length = self.koala.frame_length
+        reference_frames = []
 
-        self.koala.process([32767 for _ in range(frame_length)])
         self.koala.reset()
-
-        fresh_koala = Koala(
-            access_key=self.access_key,
-            model_path=default_model_path('../..'),
-            library_path=default_library_path('../..'))
+        for frame_start in range(0, len(self.test_pcm) - frame_length + 1, frame_length):
+            input_frame = self.test_pcm[frame_start:frame_start + frame_length]
+            reference_frames.append(self.koala.process(input_frame))
 
         self.koala.reset()
         for frame_start in range(0, len(self.test_pcm) - frame_length + 1, frame_length):
             input_frame = self.test_pcm[frame_start:frame_start + frame_length]
             output_frame = self.koala.process(input_frame)
-            reference_frame = fresh_koala.process(input_frame)
-            self.assertTrue(all(x == y for x, y in zip(output_frame, reference_frame)))
+            self.assertTrue(all(x == y for x, y in zip(output_frame, reference_frames.pop(0))))
 
     def test_version(self) -> None:
         version = self.koala.version
