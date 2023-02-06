@@ -8,12 +8,14 @@ on:
       - '.github/workflows/python-demos.yml'
       - 'demo/python/**'
       - '!demo/python/README.md'
+      - 'resources/audio_samples/test.wav'
   pull_request:
     branches: [main, 'v[0-9]+.[0-9]+']
     paths:
       - '.github/workflows/python-demos.yml'
       - 'demo/python/**'
       - '!demo/python/README.md'
+      - 'resources/audio_samples/test.wav'
 
 defaults:
   run:
