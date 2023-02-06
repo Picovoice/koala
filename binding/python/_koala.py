@@ -168,10 +168,6 @@ class Koala(object):
         version_func.restype = c_char_p
         self._version = version_func().decode('utf-8')
 
-        self._pv_free = library.pv_free
-        self._pv_free.argtypes = [c_void_p]
-        self._pv_free.restype = None
-
     def process(self, pcm: Sequence[int]) -> Sequence[int]:
         """
         Processes a frame of audio and returns delayed enhanced audio.
@@ -188,7 +184,8 @@ class Koala(object):
         """
 
         if len(pcm) != self.frame_length:
-            raise KoalaInvalidArgumentError()
+            raise KoalaInvalidArgumentError(
+                "Length of input frame %d does not match required frame length %d" % (len(pcm), self.frame_length))
 
         frame_type = c_short * self.frame_length
         pcm = frame_type(*pcm)
@@ -198,6 +195,7 @@ class Koala(object):
         if status is not self.PicovoiceStatuses.SUCCESS:
             raise self._PICOVOICE_STATUS_TO_EXCEPTION[status]()
 
+        # noinspection PyTypeChecker
         return list(enhanced_pcm)
 
     def reset(self) -> None:
