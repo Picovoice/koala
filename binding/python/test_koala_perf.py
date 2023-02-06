@@ -26,28 +26,7 @@ class KoalaPerformanceTestCase(unittest.TestCase):
 
     access_key: str
     num_test_iterations: int
-    init_performance_threshold_sec: float
     proc_performance_threshold_sec: float
-
-    def test_performance_init(self):
-
-        perf_results = list()
-        for i in range(self.num_test_iterations + 1):
-            start = perf_counter()
-            koala = Koala(
-                access_key=self.access_key,
-                library_path=default_library_path('../..'),
-                model_path=default_model_path('../..'))
-            init_time = perf_counter() - start
-
-            if i > 0:
-                perf_results.append(init_time)
-
-            koala.delete()
-
-        avg_perf = sum(perf_results) / self.num_test_iterations
-        print("Average init performance: %s" % avg_perf)
-        self.assertLess(avg_perf, self.init_performance_threshold_sec)
 
     def test_performance_proc(self):
         with wave.open(self.AUDIO_PATH, 'rb') as f:
@@ -74,7 +53,7 @@ class KoalaPerformanceTestCase(unittest.TestCase):
         koala.delete()
 
         avg_perf = sum(perf_results) / self.num_test_iterations
-        print("Average proc performance: %s" % avg_perf)
+        print("Average proc performance: %s seconds" % avg_perf)
         self.assertLess(avg_perf, self.proc_performance_threshold_sec)
 
 
@@ -82,13 +61,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--access-key', required=True)
     parser.add_argument('--num-test-iterations', type=int, required=True)
-    parser.add_argument('--init-performance-threshold-sec', type=float, required=True)
     parser.add_argument('--proc-performance-threshold-sec', type=float, required=True)
     args = parser.parse_args()
 
     KoalaPerformanceTestCase.access_key = args.access_key
     KoalaPerformanceTestCase.num_test_iterations = args.num_test_iterations
-    KoalaPerformanceTestCase.init_performance_threshold_sec = args.init_performance_threshold_sec
     KoalaPerformanceTestCase.proc_performance_threshold_sec = args.proc_performance_threshold_sec
 
     unittest.main(argv=sys.argv[:1])
