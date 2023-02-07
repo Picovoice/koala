@@ -100,7 +100,7 @@ int picovoice_main(int argc, char *argv[]) {
     const char *output_path = NULL;
 
     int c;
-    while ((c = getopt_long(argc, argv, "l:a:i:o:", long_options, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "l:m:a:i:o:", long_options, NULL)) != -1) {
         switch (c) {
             case 'l':
                 library_path = optarg;
