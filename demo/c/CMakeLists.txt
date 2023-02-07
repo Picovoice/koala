@@ -26,7 +26,7 @@ if (NOT WIN32)
             pthread
             m
             ${COMMON_LIBS})
-#    target_link_libraries(koala_demo_file ${COMMON_LIBS})
+    target_link_libraries(koala_demo_file ${COMMON_LIBS})
     if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") AND (UNIX AND NOT APPLE))
         target_link_libraries(koala_demo_mic atomic)
     endif()
