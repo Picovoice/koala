@@ -130,16 +130,16 @@ Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
 Replace `${ACCESS_KEY}` with the AccessKey obtained from Picovoice Console, and `${MODEL_PATH}` with the path to the
 model file available under [lib/common](./lib/common).
 
-Now the `handle` can be used to process
+Now the `handle` can be used to enhance audio in real-time:
 
 ```c
 extern const int16_t *get_next_audio_frame(void);
 
 const int32_t frame_length = pv_koala_frame_length();
+int16_t *enhanced_pcm = (int16_t *) malloc(frame_length * sizeof(int16_t));
 
 while (true) {
     const int16_t *pcm = get_next_audio_frame();
-    const int16_t *enhanced_pcm = malloc(frame_length * sizeof(int16_t));
     const pv_status_t status = pv_koala_process(handle, pcm, enhanced_pcm);
     if (status != PV_STATUS_SUCCESS) {
         // error handling logic

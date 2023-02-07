@@ -60,9 +60,7 @@ default recording device. Terminate the demo with `Ctrl+C`.
 
 # File Demo
 
-The file demo passes audio stored in a `.wav` file through the Koala noise suppression engine. The result is shifted to
-compensate for the delay introduced by Koala and stored in a separate `.wav` file that will have the same length as the
-input file without any delay. This demo expects a single-channel WAV file with a sampling rate of 16000 and 16-bit
+The file demo passes audio stored in a `.wav` file through the Koala noise suppression engine. This demo expects a single-channel WAV file with a sampling rate of 16000 and 16-bit
 linear PCM encoding.
 
 **Note**: the following commands are run from the root of the repo

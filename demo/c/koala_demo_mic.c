@@ -291,13 +291,13 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    int16_t *pcm = malloc(frame_length * sizeof(int16_t));
+    int16_t *pcm = (int16_t *) malloc(frame_length * sizeof(int16_t));
     if (!pcm) {
         fprintf(stderr, "Failed to allocate pcm memory.\n");
         exit(EXIT_FAILURE);
     }
 
-    int16_t *enhanced_pcm = malloc(frame_length * sizeof(int16_t));
+    int16_t *enhanced_pcm = (int16_t *) malloc(frame_length * sizeof(int16_t));
     if (!enhanced_pcm) {
         fprintf(stderr, "Failed to allocate enhanced_pcm memory.\n");
         exit(EXIT_FAILURE);

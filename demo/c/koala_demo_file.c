@@ -238,13 +238,13 @@ int picovoice_main(int argc, char *argv[]) {
 
     const int32_t frame_length = pv_koala_frame_length_func();
 
-    int16_t *pcm = malloc(frame_length * sizeof(int16_t));
+    int16_t *pcm = (int16_t *) malloc(frame_length * sizeof(int16_t));
     if (!pcm) {
         fprintf(stderr, "Failed to allocate pcm memory.\n");
         exit(EXIT_FAILURE);
     }
 
-    int16_t *enhanced_pcm = malloc(frame_length * sizeof(int16_t));
+    int16_t *enhanced_pcm = (int16_t *) malloc(frame_length * sizeof(int16_t));
     if (!enhanced_pcm) {
         fprintf(stderr, "Failed to allocate enhanced_pcm memory.\n");
         exit(EXIT_FAILURE);
