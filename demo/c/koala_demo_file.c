@@ -118,7 +118,7 @@ int picovoice_main(int argc, char *argv[]) {
                 output_path = optarg;
                 break;
             default:
-                exit(1);
+                exit(EXIT_FAILURE);
         }
     }
 
@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
     LPWSTR *wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (wargv == NULL) {
         fprintf(stderr, "CommandLineToArgvW failed\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     char *utf8_argv[argc];

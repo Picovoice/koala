@@ -6,7 +6,8 @@ You need a C99-compatible compiler to build these demos.
 
 ## AccessKey
 
-Koala requires a valid Picovoice `AccessKey` at initialization. `AccessKey` acts as your credentials when using Koala SDKs.
+Koala requires a valid Picovoice `AccessKey` at initialization. `AccessKey` acts as your credentials when using Koala
+SDKs.
 You can get your `AccessKey` for free. Make sure to keep your `AccessKey` secret.
 Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get your `AccessKey`.
 
@@ -19,8 +20,6 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 
 The microphone demo collects audio from a microphone connected to your machine. The audio is passed through the Koala
 noise suppression engine and stored in a `.wav` file.
-
-The Koala microphone demo opens an audio stream and detects the presence of speech.
 
 **Note**: the following commands are run from the root of the repo
 
@@ -52,9 +51,10 @@ To run the Koala microphone demo:
 ./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -a ${ACCESS_KEY} -d ${AUDIO_DEVICE_INDEX} -o ${WAV_OUTPUT_PATH}
 ```
 
-Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](../../lib), `${ACCESS_KEY}` with AccessKey
+Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](../../lib), `${ACCESS_KEY}` with
+AccessKey
 obtained from [Picovoice Console](https://console.picovoice.ai/), `${AUDIO_DEVICE_INDEX}` with the index of the
-audio device  you wish to capture audio with, and `${WAV_OUTPUT_PATH}` with a path to a `.wav` file
+audio device you wish to capture audio with, and `${WAV_OUTPUT_PATH}` with a path to a `.wav` file
 where the enhanced audio will be stored. An `${AUDIO_DEVICE_INDEX}` of -1 will provide you with your system's
 default recording device. Terminate the demo with `Ctrl+C`.
 
@@ -62,7 +62,8 @@ default recording device. Terminate the demo with `Ctrl+C`.
 
 The file demo passes audio stored in a `.wav` file through the Koala noise suppression engine. The result is shifted to
 compensate for the delay introduced by Koala and stored in a separate `.wav` file that will have the same length as the
-input file without any delay. This demo expects a single-channel WAV file with a sampling rate of 16000 and 16-bit linear PCM encoding.
+input file without any delay. This demo expects a single-channel WAV file with a sampling rate of 16000 and 16-bit
+linear PCM encoding.
 
 **Note**: the following commands are run from the root of the repo
 
@@ -82,7 +83,9 @@ Run the demo:
 ./demo/c/build/Koala_demo_file -l ${LIBRARY_PATH} -a ${ACCESS_KEY} -i ${INPUT_WAV_FILE} -o ${OUTPUT_WAV_FILE}
 ```
 
-Replace `${LIBRARY_PATH}` with the path to the appropriate Koala library available under [lib](../../lib), `${ACCESS_KEY}` with a
-Picovoice AccessKey obtained from the [Picovoice Console](https://console.picovoice.ai/), `${WAV_INPUT_PATH}` with a path to a compatible
+Replace `${LIBRARY_PATH}` with the path to the appropriate Koala library available
+under [lib](../../lib), `${ACCESS_KEY}` with a
+Picovoice AccessKey obtained from the [Picovoice Console](https://console.picovoice.ai/), `${WAV_INPUT_PATH}` with a
+path to a compatible
 (single-channel, 16 kHz, 16-bit PCM) `.wav` file you wish to enhance, and `${WAV_OUTPUT_PATH}` with a path to a `.wav`
 file where the enhanced audio will be stored.

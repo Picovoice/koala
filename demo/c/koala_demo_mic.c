@@ -96,14 +96,14 @@ static struct option long_options[] = {
         {"audio_device_index", required_argument, NULL, 'd'},
         {"library_path",       required_argument, NULL, 'l'},
         {"model_path",         required_argument, NULL, 'm'},
-        {"output_path",        required_argument, NULL, 'o'},
-        {"raw_audio",          no_argument,       NULL, 'r'},
+        {"output_audio_path",        required_argument, NULL, 'o'},
+        {"reference_audio_path",          no_argument,       NULL, 'r'},
         {"show_audio_devices", no_argument,       NULL, 's'},
 };
 
 void print_usage(const char *program_name) {
     fprintf(stdout,
-            "Usage: %s [-s] [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_RAW_PATH]\n",
+            "Usage: %s [-s] [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH]\n",
             program_name);
 }
 
@@ -184,7 +184,7 @@ int picovoice_main(int argc, char *argv[]) {
                 device_index = (int32_t) strtol(optarg, NULL, 10);
                 break;
             default:
-                exit(1);
+                exit(EXIT_FAILURE);
         }
     }
 
@@ -370,7 +370,7 @@ int main(int argc, char *argv[]) {
     LPWSTR *wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (wargv == NULL) {
         fprintf(stderr, "CommandLineToArgvW failed\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     char *utf8_argv[argc];
