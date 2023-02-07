@@ -8,17 +8,16 @@ add_subdirectory(pvrecorder)
 set(COMMON_LIBS dl)
 include_directories("${PROJECT_SOURCE_DIR}/../../include")
 
-#add_executable(
-#        koala_demo_file
-#        koala_demo_file.c)
-#target_include_directories(koala_demo_file PRIVATE dr_libs)
+add_executable(
+        koala_demo_file
+        koala_demo_file.c)
+target_include_directories(koala_demo_file PRIVATE dr_libs)
 
 add_executable(
         koala_demo_mic
         koala_demo_mic.c
         $<TARGET_OBJECTS:pv_recorder_object>)
 target_include_directories(koala_demo_mic PRIVATE dr_libs pvrecorder/include)
-target_include_directories(koala_demo_mic PRIVATE pvrecorder/include)
 
 
 if (NOT WIN32)

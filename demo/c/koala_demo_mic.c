@@ -357,7 +357,7 @@ int picovoice_main(int argc, char *argv[]) {
     pv_koala_delete_func(koala);
     close_dl(koala_library);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int main(int argc, char *argv[]) {

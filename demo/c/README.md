@@ -71,7 +71,7 @@ input file without any delay. This demo expects a single-channel WAV file with a
 Use CMake to build the Koala file demo target:
 
 ```console
-cmake -S demo/c/ -B demo/c/build && cmake --build demo/c/build --target Koala_demo_file
+cmake -S demo/c/ -B demo/c/build && cmake --build demo/c/build --target koala_demo_file
 ```
 
 ## Usage

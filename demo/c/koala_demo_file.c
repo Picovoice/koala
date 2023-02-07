@@ -81,162 +81,202 @@ static void print_dl_error(const char *message) {
 }
 
 static struct option long_options[] = {
-        {"show_audio_devices",        no_argument,       NULL, 's'},
-        {"library_path",              required_argument, NULL, 'l'},
-        {"wav_path",                  required_argument, NULL, 'w'},
+        {"access_key",   required_argument, NULL, 'a'},
+        {"library_path", required_argument, NULL, 'l'},
+        {"model_path",   required_argument, NULL, 'm'},
+        {"input_path",   required_argument, NULL, 'i'},
+        {"output_path",  required_argument, NULL, 'o'},
 };
 
 void print_usage(const char *program_name) {
-    fprintf(stdout, "Usage: %s [-l LIBRARY_PATH -a ACCESS_KEY -w WAV_PATH]\n", program_name);
+    fprintf(stdout, "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n", program_name);
 }
 
 int picovoice_main(int argc, char *argv[]) {
     const char *library_path = NULL;
+    const char *model_path = NULL;
     const char *access_key = NULL;
-    const char *wav_path = NULL;
+    const char *input_path = NULL;
+    const char *output_path = NULL;
 
     int c;
-    while ((c = getopt_long(argc, argv, "l:a:w:", long_options, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "l:a:i:o:", long_options, NULL)) != -1) {
         switch (c) {
             case 'l':
                 library_path = optarg;
                 break;
+            case 'm':
+                model_path = optarg;
+                break;
             case 'a':
                 access_key = optarg;
                 break;
-            case 'w':
-                wav_path = optarg;
+            case 'i':
+                input_path = optarg;
+                break;
+            case 'o':
+                output_path = optarg;
                 break;
             default:
                 exit(1);
         }
     }
 
-    if (!library_path || !access_key || !wav_path) {
+    if (!library_path || !access_key || !input_path || !output_path) {
         print_usage(argv[0]);
-        exit(1);
+        exit(EXIT_FAILURE);
     }
-//
-//    void *cobra_library = open_dl(library_path);
-//    if (!cobra_library) {
-//        fprintf(stderr, "failed to open library at '%s'.\n", library_path);
-//        exit(1);
-//    }
-//
-//    const char *(*pv_status_to_string_func)(pv_status_t) = load_symbol(cobra_library, "pv_status_to_string");
-//    if (!pv_status_to_string_func) {
-//        print_dl_error("failed to load 'pv_status_to_string'");
-//        exit(1);
-//    }
-//
-//    int32_t(*pv_sample_rate_func)() = load_symbol(cobra_library, "pv_sample_rate");
-//    if (!pv_sample_rate_func) {
-//        print_dl_error("failed to load 'pv_sample_rate'");
-//        exit(1);
-//    }
-//
-//    pv_status_t(*pv_cobra_init_func)( const char *, pv_cobra_t * *) = load_symbol(cobra_library, "pv_cobra_init");
-//    if (!pv_cobra_init_func) {
-//        print_dl_error("failed to load 'pv_cobra_init'");
-//        exit(1);
-//    }
-//
-//    void (*pv_cobra_delete_func)(pv_cobra_t *) = load_symbol(cobra_library, "pv_cobra_delete");
-//    if (!pv_cobra_delete_func) {
-//        print_dl_error("failed to load 'pv_cobra_delete'");
-//        exit(1);
-//    }
-//
-//    pv_status_t(*pv_cobra_process_func)(pv_cobra_t * , const int16_t *, float *) =
-//    load_symbol(cobra_library, "pv_cobra_process");
-//    if (!pv_cobra_process_func) {
-//        print_dl_error("failed to load 'pv_cobra_process'");
-//        exit(1);
-//    }
-//
-//    int32_t(*pv_cobra_frame_length_func)() = load_symbol(cobra_library, "pv_cobra_frame_length");
-//    if (!pv_cobra_frame_length_func) {
-//        print_dl_error("failed to load 'pv_cobra_frame_length'");
-//        exit(1);
-//    }
-//
-//    const char *(*pv_cobra_version_func)() = load_symbol(cobra_library, "pv_cobra_version");
-//    if (!pv_cobra_version_func) {
-//        print_dl_error("failed to load 'pv_cobra_version'");
-//        exit(1);
-//    }
-//
-//    drwav f;
-//
-//    if (!drwav_init_file(&f, wav_path, NULL)) {
-//        fprintf(stderr, "failed to open wav file at '%s'.", wav_path);
-//        exit(1);
-//    }
-//
-//    if (f.sampleRate != (uint32_t) pv_sample_rate_func()) {
-//        fprintf(stderr, "audio sample rate should be %d\n.", pv_sample_rate_func());
-//        exit(1);
-//    }
-//
-//    if (f.bitsPerSample != 16) {
-//        fprintf(stderr, "audio format should be 16-bit\n.");
-//        exit(1);
-//    }
-//
-//    if (f.channels != 1) {
-//        fprintf(stderr, "audio should be single-channel.\n");
-//        exit(1);
-//    }
-//
-//    int16_t *pcm = calloc(pv_cobra_frame_length_func(), sizeof(int16_t));
-//    if (!pcm) {
-//        fprintf(stderr, "failed to allocate memory for audio frame.\n");
-//        exit(1);
-//    }
-//
-//    pv_cobra_t *cobra = NULL;
-//    pv_status_t status = pv_cobra_init_func(access_key, &cobra);
-//    if (status != PV_STATUS_SUCCESS) {
-//        fprintf(stderr, "failed to init with '%s'", pv_status_to_string_func(status));
-//        exit(1);
-//    }
-//
-//    fprintf(stdout, "V%s\n\n", pv_cobra_version_func());
-//
-//    double total_cpu_time_usec = 0;
-//    double total_processed_time_usec = 0;
-//
-//    while ((int32_t) drwav_read_pcm_frames_s16(&f, pv_cobra_frame_length_func(), pcm) == pv_cobra_frame_length_func()) {
-//        struct timeval before;
-//        gettimeofday(&before, NULL);
-//
-//        float is_voiced = 0.f;
-//        status = pv_cobra_process_func(cobra, pcm, &is_voiced);
-//        if (status != PV_STATUS_SUCCESS) {
-//            fprintf(stderr, "failed to init with '%s'", pv_status_to_string_func(status));
-//            exit(1);
-//        }
-//        fprintf(stdout, "%.2f ", is_voiced);
-//
-//        struct timeval after;
-//        gettimeofday(&after, NULL);
-//
-//        total_cpu_time_usec +=
-//                (double) (after.tv_sec - before.tv_sec) * 1e6 + (double) (after.tv_usec - before.tv_usec);
-//        total_processed_time_usec += (pv_cobra_frame_length_func() * 1e6) / pv_sample_rate_func();
-//    }
-//
-//    const double real_time_factor = total_cpu_time_usec / total_processed_time_usec;
-//    fprintf(stdout, "real time factor : %.3f\n", real_time_factor);
-//
-//    fprintf(stdout, "\n");
-//
-//    free(pcm);
-//    drwav_uninit(&f);
-//    pv_cobra_delete_func(cobra);
-//    close_dl(cobra_library);
 
-    return 0;
+    drwav_data_format format;
+    format.container = drwav_container_riff;
+    format.format = DR_WAVE_FORMAT_PCM;
+    format.channels = 1;
+    format.sampleRate = 16000;
+    format.bitsPerSample = 16;
+
+    drwav inf;
+
+    if (!drwav_init_file_write(&inf, output_path, &format, NULL)) {
+        fprintf(stderr, "failed to open the output wav file at '%s'.", output_path);
+        exit(EXIT_FAILURE);
+    }
+
+
+    void *koala_library = open_dl(library_path);
+    if (!koala_library) {
+        fprintf(stderr, "failed to open library at '%s'.\n", library_path);
+        exit(EXIT_FAILURE);
+    }
+
+    const char *(*pv_status_to_string_func)(pv_status_t) = load_symbol(koala_library, "pv_status_to_string");
+    if (!pv_status_to_string_func) {
+        print_dl_error("failed to load 'pv_status_to_string'");
+        exit(EXIT_FAILURE);
+    }
+
+    int32_t(*pv_sample_rate_func)() = load_symbol(koala_library, "pv_sample_rate");
+    if (!pv_sample_rate_func) {
+        print_dl_error("failed to load 'pv_sample_rate'");
+        exit(EXIT_FAILURE);
+    }
+
+    pv_status_t(*pv_koala_init_func)(
+    const char *, const char *, pv_koala_t * *) = load_symbol(koala_library, "pv_koala_init");
+    if (!pv_koala_init_func) {
+        print_dl_error("failed to load 'pv_koala_init'");
+        exit(EXIT_FAILURE);
+    }
+
+    void (*pv_koala_delete_func)(pv_koala_t *) = load_symbol(koala_library, "pv_koala_delete");
+    if (!pv_koala_delete_func) {
+        print_dl_error("failed to load 'pv_koala_delete'");
+        exit(EXIT_FAILURE);
+    }
+
+    pv_status_t(*pv_koala_process_func)(pv_koala_t * ,
+    const int16_t *, int16_t *) =
+    load_symbol(koala_library, "pv_koala_process");
+    if (!pv_koala_process_func) {
+        print_dl_error("failed to load 'pv_koala_process'");
+        exit(EXIT_FAILURE);
+    }
+
+    void (*pv_koala_reset_func)(pv_koala_t *) = load_symbol(koala_library, "pv_koala_reset");
+    if (!pv_koala_reset_func) {
+        print_dl_error("failed to load 'pv_koala_reset'");
+        exit(EXIT_FAILURE);
+    }
+
+    int32_t(*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
+    if (!pv_koala_frame_length_func) {
+        print_dl_error("failed to load 'pv_koala_frame_length'");
+        exit(EXIT_FAILURE);
+    }
+
+    const char *(*pv_koala_version_func)() = load_symbol(koala_library, "pv_koala_version");
+    if (!pv_koala_version_func) {
+        print_dl_error("failed to load 'pv_koala_version'");
+        exit(EXIT_FAILURE);
+    }
+
+    pv_koala_t *koala = NULL;
+    pv_status_t koala_status = pv_koala_init_func(access_key, model_path, &koala);
+    if (koala_status != PV_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to init with '%s'", pv_status_to_string_func(koala_status));
+        exit(EXIT_FAILURE);
+    }
+
+    fprintf(stdout, "V%s\n\n", pv_koala_version_func());
+
+    const int32_t frame_length = pv_koala_frame_length_func();
+    drwav f;
+
+    if (!drwav_init_file(&f, input_path, NULL)) {
+        fprintf(stderr, "failed to open wav file at '%s'.", input_path);
+        exit(EXIT_FAILURE);
+    }
+
+    if (f.sampleRate != (uint32_t) pv_sample_rate_func()) {
+        fprintf(stderr, "audio sample rate should be %d\n.", pv_sample_rate_func());
+        exit(EXIT_FAILURE);
+    }
+
+    if (f.bitsPerSample != 16) {
+        fprintf(stderr, "audio format should be 16-bit\n.");
+        exit(EXIT_FAILURE);
+    }
+
+    if (f.channels != 1) {
+        fprintf(stderr, "audio should be single-channel.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int16_t *pcm = malloc(frame_length * sizeof(int16_t));
+    if (!pcm) {
+        fprintf(stderr, "Failed to allocate pcm memory.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int16_t *enhanced_pcm = malloc(frame_length * sizeof(int16_t));
+    if (!enhanced_pcm) {
+        fprintf(stderr, "Failed to allocate enhanced_pcm memory.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    double total_cpu_time_usec = 0;
+    double total_processed_time_usec = 0;
+
+    while ((int32_t) drwav_read_pcm_frames_s16(&f, frame_length, pcm) == frame_length) {
+        struct timeval before;
+        gettimeofday(&before, NULL);
+
+        koala_status = pv_koala_process_func(koala, pcm, enhanced_pcm);
+        if (koala_status != PV_STATUS_SUCCESS) {
+            fprintf(stderr, "'pv_koala_process' failed with '%s'\n", pv_status_to_string_func(koala_status));
+            exit(EXIT_FAILURE);
+        }
+
+        struct timeval after;
+        gettimeofday(&after, NULL);
+
+        total_cpu_time_usec +=
+                (double) (after.tv_sec - before.tv_sec) * 1e6 + (double) (after.tv_usec - before.tv_usec);
+        total_processed_time_usec += (frame_length * 1e6) / pv_sample_rate_func();
+    }
+
+    const double real_time_factor = total_cpu_time_usec / total_processed_time_usec;
+    fprintf(stdout, "real time factor : %.3f\n", real_time_factor);
+
+    fprintf(stdout, "\n");
+
+    free(pcm);
+    free(enhanced_pcm);
+    drwav_uninit(&f);
+    drwav_uninit(&inf);
+    pv_koala_delete_func(koala);
+    close_dl(koala_library);
+
+    return EXIT_SUCCESS;
 }
 
 int main(int argc, char *argv[]) {
