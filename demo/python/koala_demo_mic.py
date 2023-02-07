@@ -10,6 +10,7 @@
 #
 
 import argparse
+import struct
 import wave
 
 from pvkoala import create, KoalaActivationLimitError
@@ -29,6 +30,9 @@ def main():
     parser.add_argument(
         '--library_path',
         help='Absolute path to dynamic library. Default: use the library provided by `pvkoala`')
+    parser.add_argument(
+        '--model_path',
+        help='Absolute path to Koala model. Default: use the model provided by `pvkoala`')
     parser.add_argument('--audio_device_index', type=int, default=-1, help='Index of input audio device')
     parser.add_argument('--show_audio_devices', action='store_true', help='Only list available devices and exit')
     args = parser.parse_args()
@@ -58,7 +62,7 @@ def main():
 
                 while True:
                     enhanced_pcm = koala.process(recorder.read())
-                    f.writeframes(enhanced_pcm)
+                    f.writeframes(struct.pack('%dh' % len(enhanced_pcm), *enhanced_pcm))
                     num_frames += 1
         finally:
             recorder.stop()

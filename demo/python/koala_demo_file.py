@@ -82,7 +82,7 @@ def main():
                             output_frame = output_frame[:input_length + koala.delay_sample - start_sample]
                         if start_sample < koala.delay_sample:
                             output_frame = output_frame[koala.delay_sample - start_sample:]
-                        outf.writeframes(output_frame)
+                        outf.writeframes(struct.pack('%dh' % len(output_frame), *output_frame))
 
                     start_sample = end_sample
 
