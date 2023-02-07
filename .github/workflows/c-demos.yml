@@ -107,7 +107,7 @@ jobs:
         access_key: ${{ secrets.PV_VALID_ACCESS_KEY }}
         library_path: ../../lib/${{ matrix.platform }}/${{ matrix.arch }}/libpv_koala.${{ matrix.ext }}
         model_path: ../../lib/common/koala_params.pv
-        input_path: ../../res/audio_samples/test.wav
+        input_path: ../../resources/audio_samples/test.wav
         output_path: ./output.txt
 
   build-filedemo-self-hosted:
@@ -150,5 +150,5 @@ jobs:
         access_key: ${{ secrets.PV_VALID_ACCESS_KEY }}
         library_path: ../../lib/${{ matrix.platform }}/${{ matrix.arch }}/libpv_koala.${{ matrix.ext }}
         model_path: ../../lib/common/koala_params.pv
-        input_path: ../../res/audio_samples/test.wav
+        input_path: ../../resources/audio_samples/test.wav
         output_path: ./output.txt
