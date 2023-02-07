@@ -5,7 +5,7 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_BUILD_TYPE Release)
 add_subdirectory(pvrecorder)
 
-set(COMMON_LIBS dl)
+set(COMMON_LIBS dl m)
 include_directories("${PROJECT_SOURCE_DIR}/../../include")
 
 add_executable(
@@ -24,10 +24,9 @@ if (NOT WIN32)
     target_link_libraries(
             koala_demo_mic
             pthread
-            m
             ${COMMON_LIBS})
     target_link_libraries(koala_demo_file ${COMMON_LIBS})
-    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") AND (UNIX AND NOT APPLE))
+    if ((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") AND (UNIX AND NOT APPLE))
         target_link_libraries(koala_demo_mic atomic)
-    endif()
-endif()
+    endif ()
+endif ()

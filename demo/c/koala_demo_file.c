@@ -8,6 +8,7 @@
 */
 
 #include <getopt.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -89,8 +90,22 @@ static struct option long_options[] = {
 };
 
 void print_usage(const char *program_name) {
-    fprintf(stdout, "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n", program_name);
+    fprintf(stdout, "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n",
+            program_name);
 }
+
+static void print_progress_bar(size_t num_total_samples, size_t num_processed_samples) {
+    float ratio = (float) num_processed_samples / (float) num_total_samples;
+    int32_t percentage = (int32_t) roundf(ratio * 100);
+    int32_t bar_length = ((int32_t) roundf(ratio * 20)) * 3;
+    int32_t empty_length = 20 - (bar_length / 3);
+    fprintf(stdout,
+            "\r[%3d%%]%.*s%.*s|", percentage,
+            bar_length, "████████████████████",
+            empty_length, "                    ");
+    fflush(stdout);
+}
+
 
 int picovoice_main(int argc, char *argv[]) {
     const char *library_path = NULL;
@@ -127,28 +142,14 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    drwav_data_format format;
-    format.container = drwav_container_riff;
-    format.format = DR_WAVE_FORMAT_PCM;
-    format.channels = 1;
-    format.sampleRate = 16000;
-    format.bitsPerSample = 16;
-
-    drwav inf;
-
-    if (!drwav_init_file_write(&inf, output_path, &format, NULL)) {
-        fprintf(stderr, "failed to open the output wav file at '%s'.", output_path);
-        exit(EXIT_FAILURE);
-    }
-
-
     void *koala_library = open_dl(library_path);
     if (!koala_library) {
         fprintf(stderr, "failed to open library at '%s'.\n", library_path);
         exit(EXIT_FAILURE);
     }
 
-    const char *(*pv_status_to_string_func)(pv_status_t) = load_symbol(koala_library, "pv_status_to_string");
+    const char *(*pv_status_to_string_func)(pv_status_t) =
+            load_symbol(koala_library, "pv_status_to_string");
     if (!pv_status_to_string_func) {
         print_dl_error("failed to load 'pv_status_to_string'");
         exit(EXIT_FAILURE);
@@ -160,8 +161,8 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t(*pv_koala_init_func)(
-    const char *, const char *, pv_koala_t * *) = load_symbol(koala_library, "pv_koala_init");
+    pv_status_t(*pv_koala_init_func)(const char *, const char *, pv_koala_t * *) =
+            load_symbol(koala_library, "pv_koala_init");
     if (!pv_koala_init_func) {
         print_dl_error("failed to load 'pv_koala_init'");
         exit(EXIT_FAILURE);
@@ -173,17 +174,10 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t(*pv_koala_process_func)(pv_koala_t * ,
-    const int16_t *, int16_t *) =
-    load_symbol(koala_library, "pv_koala_process");
+    pv_status_t(*pv_koala_process_func)(pv_koala_t * , const int16_t *, int16_t *) =
+            load_symbol(koala_library, "pv_koala_process");
     if (!pv_koala_process_func) {
         print_dl_error("failed to load 'pv_koala_process'");
-        exit(EXIT_FAILURE);
-    }
-
-    void (*pv_koala_reset_func)(pv_koala_t *) = load_symbol(koala_library, "pv_koala_reset");
-    if (!pv_koala_reset_func) {
-        print_dl_error("failed to load 'pv_koala_reset'");
         exit(EXIT_FAILURE);
     }
 
@@ -205,31 +199,44 @@ int picovoice_main(int argc, char *argv[]) {
         fprintf(stderr, "failed to init with '%s'", pv_status_to_string_func(koala_status));
         exit(EXIT_FAILURE);
     }
-
     fprintf(stdout, "V%s\n\n", pv_koala_version_func());
 
-    const int32_t frame_length = pv_koala_frame_length_func();
-    drwav f;
+    drwav input_file;
 
-    if (!drwav_init_file(&f, input_path, NULL)) {
+    if (!drwav_init_file(&input_file, input_path, NULL)) {
         fprintf(stderr, "failed to open wav file at '%s'.", input_path);
         exit(EXIT_FAILURE);
     }
 
-    if (f.sampleRate != (uint32_t) pv_sample_rate_func()) {
+    if (input_file.sampleRate != (uint32_t) pv_sample_rate_func()) {
         fprintf(stderr, "audio sample rate should be %d\n.", pv_sample_rate_func());
         exit(EXIT_FAILURE);
     }
 
-    if (f.bitsPerSample != 16) {
+    if (input_file.bitsPerSample != 16) {
         fprintf(stderr, "audio format should be 16-bit\n.");
         exit(EXIT_FAILURE);
     }
 
-    if (f.channels != 1) {
+    if (input_file.channels != 1) {
         fprintf(stderr, "audio should be single-channel.\n");
         exit(EXIT_FAILURE);
     }
+
+    drwav output_file;
+    drwav_data_format format;
+    format.container = drwav_container_riff;
+    format.format = DR_WAVE_FORMAT_PCM;
+    format.channels = 1;
+    format.sampleRate = 16000;
+    format.bitsPerSample = 16;
+
+    if (!drwav_init_file_write(&output_file, output_path, &format, NULL)) {
+        fprintf(stderr, "failed to open the output file at '%s'.", output_path);
+        exit(EXIT_FAILURE);
+    }
+
+    const int32_t frame_length = pv_koala_frame_length_func();
 
     int16_t *pcm = malloc(frame_length * sizeof(int16_t));
     if (!pcm) {
@@ -246,7 +253,11 @@ int picovoice_main(int argc, char *argv[]) {
     double total_cpu_time_usec = 0;
     double total_processed_time_usec = 0;
 
-    while ((int32_t) drwav_read_pcm_frames_s16(&f, frame_length, pcm) == frame_length) {
+    fprintf(stdout, "Processing audio...\n");
+
+    size_t total_samples = input_file.totalPCMFrameCount;
+    size_t processed_samples = 0;
+    while ((int32_t) drwav_read_pcm_frames_s16(&input_file, frame_length, pcm) == frame_length) {
         struct timeval before;
         gettimeofday(&before, NULL);
 
@@ -262,17 +273,24 @@ int picovoice_main(int argc, char *argv[]) {
         total_cpu_time_usec +=
                 (double) (after.tv_sec - before.tv_sec) * 1e6 + (double) (after.tv_usec - before.tv_usec);
         total_processed_time_usec += (frame_length * 1e6) / pv_sample_rate_func();
+
+        if ((int32_t) drwav_write_pcm_frames(&output_file, frame_length, pcm) != frame_length) {
+            fprintf(stderr, "Failed to write to output file.\n");
+            exit(EXIT_FAILURE);
+        }
+        processed_samples += frame_length;
+        print_progress_bar(total_samples, processed_samples);
     }
 
     const double real_time_factor = total_cpu_time_usec / total_processed_time_usec;
-    fprintf(stdout, "real time factor : %.3f\n", real_time_factor);
+    fprintf(stdout, "\nreal time factor : %.3f\n", real_time_factor);
 
     fprintf(stdout, "\n");
 
     free(pcm);
     free(enhanced_pcm);
-    drwav_uninit(&f);
-    drwav_uninit(&inf);
+    drwav_uninit(&output_file);
+    drwav_uninit(&input_file);
     pv_koala_delete_func(koala);
     close_dl(koala_library);
 
