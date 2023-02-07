@@ -51,7 +51,10 @@ koala_demo_mic --access_key ${ACCESS_KEY} --output_path ${WAV_OUTPUT_PATH}
 ```
 
 ```console
-koala_demo_file --access_key ${ACCESS_KEY} --input_path ${WAV_INPUT_PATH} --output_path ${WAV_OUTPUT_PATH}
+koala_demo_file \
+    --access_key ${ACCESS_KEY} \
+    --input_path ${WAV_INPUT_PATH} \
+    --output_path ${WAV_OUTPUT_PATH}
 ```
 
 Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
