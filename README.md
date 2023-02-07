@@ -20,7 +20,9 @@ Koala is an on-device noise suppression engine. Koala is:
     - [Table of Contents](#table-of-contents)
     - [AccessKey](#accesskey)
     - [Demos](#demos)
+        - [Python](#python-demos)
     - [SDKs](#sdks)
+        - [Python](#python)
     - [Releases](#releases)
 
 ## AccessKey
@@ -36,6 +38,48 @@ AccessKey also verifies that your usage is within the limits of your account. Ev
 
 ## Demos
 
+### Python Demos
+
+Install the demo package:
+
+```console
+pip3 install pvkoalademo
+```
+
+```console
+koala_demo_mic --access_key ${ACCESS_KEY} --output_path ${WAV_OUTPUT_PATH}
+```
+
+```console
+koala_demo_file --access_key ${ACCESS_KEY} --input_path ${WAV_INPUT_PATH} --output_path ${WAV_OUTPUT_PATH}
+```
+
+Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
+
 ## SDKs
+
+### Python
+
+Install the Python SDK:
+
+```console
+pip3 install pvkoala
+```
+
+Create an instance of the engine and enhance audio in real-time:
+
+```python
+import pvkoala
+
+koala = pvkoala.create(access_key='${ACCESS_KEY}')
+
+def get_next_audio_frame():
+    pass
+
+while True:
+    enhanced_audio = koala.process(get_next_audio_frame())
+```
+
+Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
 
 ## Releases
