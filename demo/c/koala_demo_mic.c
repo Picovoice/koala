@@ -136,147 +136,147 @@ static void print_analog(float is_voiced) {
 }
 
 int picovoice_main(int argc, char *argv[]) {
-    signal(SIGINT, interrupt_handler);
-
-    const char *library_path = NULL;
-    const char *access_key = NULL;
-    int32_t device_index = -1;
-
-    int c;
-    while ((c = getopt_long(argc, argv, "hsl:a:d:", long_options, NULL)) != -1) {
-        switch (c) {
-            case 's':
-                show_audio_devices();
-                return 0;
-            case 'l':
-                library_path = optarg;
-                break;
-            case 'a':
-                access_key = optarg;
-                break;
-            case 'd':
-                device_index = (int32_t) strtol(optarg, NULL, 10);
-                break;
-            default:
-                exit(1);
-        }
-    }
-
-    if (!library_path || !access_key) {
-        print_usage(argv[0]);
-        exit(1);
-    }
-
-    void *cobra_library = open_dl(library_path);
-    if (!cobra_library) {
-        fprintf(stderr, "failed to open library at '%s'.\n", library_path);
-        exit(1);
-    }
-
-    const char *(*pv_status_to_string_func)(pv_status_t) = load_symbol(cobra_library, "pv_status_to_string");
-    if (!pv_status_to_string_func) {
-        print_dl_error("failed to load 'pv_status_to_string'");
-        exit(1);
-    }
-
-    int32_t(*pv_sample_rate_func)() = load_symbol(cobra_library, "pv_sample_rate");
-    if (!pv_sample_rate_func) {
-        print_dl_error("failed to load 'pv_sample_rate'");
-        exit(1);
-    }
-
-    pv_status_t(*pv_cobra_init_func)(const char *, pv_cobra_t **) = load_symbol(cobra_library, "pv_cobra_init");
-    if (!pv_cobra_init_func) {
-        print_dl_error("failed to load 'pv_cobra_init'");
-        exit(1);
-    }
-
-    void (*pv_cobra_delete_func)(pv_cobra_t *) = load_symbol(cobra_library, "pv_cobra_delete");
-    if (!pv_cobra_delete_func) {
-        print_dl_error("failed to load 'pv_cobra_delete'");
-        exit(1);
-    }
-
-    pv_status_t(*pv_cobra_process_func)(pv_cobra_t *, const int16_t *, float *) =
-    load_symbol(cobra_library, "pv_cobra_process");
-    if (!pv_cobra_process_func) {
-        print_dl_error("failed to load 'pv_cobra_process'");
-        exit(1);
-    }
-
-    int32_t(*pv_cobra_frame_length_func)() = load_symbol(cobra_library, "pv_cobra_frame_length");
-    if (!pv_cobra_frame_length_func) {
-        print_dl_error("failed to load 'pv_cobra_frame_length'");
-        exit(1);
-    }
-
-    const char *(*pv_cobra_version_func)() = load_symbol(cobra_library, "pv_cobra_version");
-    if (!pv_cobra_version_func) {
-        print_dl_error("failed to load 'pv_cobra_version'");
-        exit(1);
-    }
-
-    pv_cobra_t *cobra = NULL;
-    pv_status_t cobra_status = pv_cobra_init_func(access_key, &cobra);
-    if (cobra_status != PV_STATUS_SUCCESS) {
-        fprintf(stderr, "failed to init with '%s'", pv_status_to_string_func(cobra_status));
-        exit(1);
-    }
-
-    fprintf(stdout, "V%s\n\n", pv_cobra_version_func());
-
-    const int32_t frame_length = 512;
-    pv_recorder_t *recorder = NULL;
-    pv_recorder_status_t recorder_status = pv_recorder_init(device_index, frame_length, 100, true, true, &recorder);
-    if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
-        fprintf(stderr, "Failed to initialize device with %s.\n", pv_recorder_status_to_string(recorder_status));
-        exit(1);
-    }
-
-    const char *selected_device = pv_recorder_get_selected_device(recorder);
-    fprintf(stdout, "Selected device: %s.\n", selected_device);
-
-    fprintf(stdout, "Start recording...\n");
-    recorder_status = pv_recorder_start(recorder);
-    if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
-        fprintf(stderr, "Failed to start device with %s.\n", pv_recorder_status_to_string(recorder_status));
-        exit(1);
-    }
-
-    int16_t *pcm = malloc(frame_length * sizeof(int16_t));
-    if (!pcm) {
-        fprintf(stderr, "Failed to allocate pcm memory.\n");
-        exit(1);
-    }
-
-    while (!is_interrupted) {
-        recorder_status = pv_recorder_read(recorder, pcm);
-        if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
-            fprintf(stderr, "Failed to read with %s.\n", pv_recorder_status_to_string(recorder_status));
-            exit(1);
-        }
-
-        float is_voiced = 0.f;
-        cobra_status = pv_cobra_process_func(cobra, pcm, &is_voiced);
-        if (cobra_status != PV_STATUS_SUCCESS) {
-            fprintf(stderr, "'pv_cobra_process' failed with '%s'\n", pv_status_to_string_func(cobra_status));
-            exit(1);
-        }
-
-        print_analog(is_voiced);
-    }
-    fprintf(stdout, "\n");
-
-    recorder_status = pv_recorder_stop(recorder);
-    if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
-        fprintf(stderr, "Failed to stop device with %s.\n", pv_recorder_status_to_string(recorder_status));
-        exit(1);
-    }
-
-    free(pcm);
-    pv_recorder_delete(recorder);
-    pv_cobra_delete_func(cobra);
-    close_dl(cobra_library);
+//    signal(SIGINT, interrupt_handler);
+//
+//    const char *library_path = NULL;
+//    const char *access_key = NULL;
+//    int32_t device_index = -1;
+//
+//    int c;
+//    while ((c = getopt_long(argc, argv, "hsl:a:d:", long_options, NULL)) != -1) {
+//        switch (c) {
+//            case 's':
+//                show_audio_devices();
+//                return 0;
+//            case 'l':
+//                library_path = optarg;
+//                break;
+//            case 'a':
+//                access_key = optarg;
+//                break;
+//            case 'd':
+//                device_index = (int32_t) strtol(optarg, NULL, 10);
+//                break;
+//            default:
+//                exit(1);
+//        }
+//    }
+//
+//    if (!library_path || !access_key) {
+//        print_usage(argv[0]);
+//        exit(1);
+//    }
+//
+//    void *cobra_library = open_dl(library_path);
+//    if (!cobra_library) {
+//        fprintf(stderr, "failed to open library at '%s'.\n", library_path);
+//        exit(1);
+//    }
+//
+//    const char *(*pv_status_to_string_func)(pv_status_t) = load_symbol(cobra_library, "pv_status_to_string");
+//    if (!pv_status_to_string_func) {
+//        print_dl_error("failed to load 'pv_status_to_string'");
+//        exit(1);
+//    }
+//
+//    int32_t(*pv_sample_rate_func)() = load_symbol(cobra_library, "pv_sample_rate");
+//    if (!pv_sample_rate_func) {
+//        print_dl_error("failed to load 'pv_sample_rate'");
+//        exit(1);
+//    }
+//
+//    pv_status_t(*pv_cobra_init_func)(const char *, pv_cobra_t **) = load_symbol(cobra_library, "pv_cobra_init");
+//    if (!pv_cobra_init_func) {
+//        print_dl_error("failed to load 'pv_cobra_init'");
+//        exit(1);
+//    }
+//
+//    void (*pv_cobra_delete_func)(pv_cobra_t *) = load_symbol(cobra_library, "pv_cobra_delete");
+//    if (!pv_cobra_delete_func) {
+//        print_dl_error("failed to load 'pv_cobra_delete'");
+//        exit(1);
+//    }
+//
+//    pv_status_t(*pv_cobra_process_func)(pv_cobra_t *, const int16_t *, float *) =
+//    load_symbol(cobra_library, "pv_cobra_process");
+//    if (!pv_cobra_process_func) {
+//        print_dl_error("failed to load 'pv_cobra_process'");
+//        exit(1);
+//    }
+//
+//    int32_t(*pv_cobra_frame_length_func)() = load_symbol(cobra_library, "pv_cobra_frame_length");
+//    if (!pv_cobra_frame_length_func) {
+//        print_dl_error("failed to load 'pv_cobra_frame_length'");
+//        exit(1);
+//    }
+//
+//    const char *(*pv_cobra_version_func)() = load_symbol(cobra_library, "pv_cobra_version");
+//    if (!pv_cobra_version_func) {
+//        print_dl_error("failed to load 'pv_cobra_version'");
+//        exit(1);
+//    }
+//
+//    pv_cobra_t *cobra = NULL;
+//    pv_status_t cobra_status = pv_cobra_init_func(access_key, &cobra);
+//    if (cobra_status != PV_STATUS_SUCCESS) {
+//        fprintf(stderr, "failed to init with '%s'", pv_status_to_string_func(cobra_status));
+//        exit(1);
+//    }
+//
+//    fprintf(stdout, "V%s\n\n", pv_cobra_version_func());
+//
+//    const int32_t frame_length = 512;
+//    pv_recorder_t *recorder = NULL;
+//    pv_recorder_status_t recorder_status = pv_recorder_init(device_index, frame_length, 100, true, true, &recorder);
+//    if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
+//        fprintf(stderr, "Failed to initialize device with %s.\n", pv_recorder_status_to_string(recorder_status));
+//        exit(1);
+//    }
+//
+//    const char *selected_device = pv_recorder_get_selected_device(recorder);
+//    fprintf(stdout, "Selected device: %s.\n", selected_device);
+//
+//    fprintf(stdout, "Start recording...\n");
+//    recorder_status = pv_recorder_start(recorder);
+//    if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
+//        fprintf(stderr, "Failed to start device with %s.\n", pv_recorder_status_to_string(recorder_status));
+//        exit(1);
+//    }
+//
+//    int16_t *pcm = malloc(frame_length * sizeof(int16_t));
+//    if (!pcm) {
+//        fprintf(stderr, "Failed to allocate pcm memory.\n");
+//        exit(1);
+//    }
+//
+//    while (!is_interrupted) {
+//        recorder_status = pv_recorder_read(recorder, pcm);
+//        if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
+//            fprintf(stderr, "Failed to read with %s.\n", pv_recorder_status_to_string(recorder_status));
+//            exit(1);
+//        }
+//
+//        float is_voiced = 0.f;
+//        cobra_status = pv_cobra_process_func(cobra, pcm, &is_voiced);
+//        if (cobra_status != PV_STATUS_SUCCESS) {
+//            fprintf(stderr, "'pv_cobra_process' failed with '%s'\n", pv_status_to_string_func(cobra_status));
+//            exit(1);
+//        }
+//
+//        print_analog(is_voiced);
+//    }
+//    fprintf(stdout, "\n");
+//
+//    recorder_status = pv_recorder_stop(recorder);
+//    if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
+//        fprintf(stderr, "Failed to stop device with %s.\n", pv_recorder_status_to_string(recorder_status));
+//        exit(1);
+//    }
+//
+//    free(pcm);
+//    pv_recorder_delete(recorder);
+//    pv_cobra_delete_func(cobra);
+//    close_dl(cobra_library);
 
     return 0;
 }

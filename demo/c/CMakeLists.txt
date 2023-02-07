@@ -21,7 +21,7 @@ target_include_directories(koala_demo_mic PRIVATE pvrecorder/include)
 
 if (NOT WIN32)
     target_link_libraries(
-            cobra_demo_mic
+            koala_demo_mic
             pthread
             m
             ${COMMON_LIBS})
