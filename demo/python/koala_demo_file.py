@@ -15,6 +15,8 @@ import wave
 
 from pvkoala import create, KoalaActivationLimitError
 
+PROGRESS_BAR_LENGTH = 30
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -93,7 +95,20 @@ def main():
                         length_sec += len(output_frame) / koala.sample_rate
 
                     start_sample = end_sample
+                    progress = start_sample / (input_length + koala.delay_sample)
+                    bar_length = int(progress * PROGRESS_BAR_LENGTH)
+                    print(
+                        '\r[%3d%%]|%s%s|' % (
+                            progress * 100,
+                            '█' * bar_length,
+                            ' ' * (PROGRESS_BAR_LENGTH - bar_length)),
+                        end='',
+                        flush=True)
 
+                print()
+
+    except KeyboardInterrupt:
+        print()
     except KoalaActivationLimitError:
         print('AccessKey has reached its processing limit')
     finally:
