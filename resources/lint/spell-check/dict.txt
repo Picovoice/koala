@@ -1,4 +1,5 @@
 LPWSTR
+MODLE
 Makefiles
 aarch
 armv
@@ -13,6 +14,7 @@ irfft
 jetson
 libpv
 linalg
+malloc
 ndarray
 numpy
 outf
