@@ -1,8 +1,11 @@
+LPWSTR
+Makefiles
 aarch
 armv
 astype
 calcsize
 denoising
+drwav
 dtype
 frombuffer
 hanning
@@ -14,6 +17,7 @@ ndarray
 numpy
 outf
 picovoice
+pthread
 pvkoala
 pvkoalademo
 pvrecorder
@@ -21,3 +25,4 @@ randn
 rfft
 rfftfreq
 signup
+wargv
