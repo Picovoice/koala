@@ -81,8 +81,8 @@ To run the demo:
 ./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODLE_PATH} -a ${ACCESS_KEY} -o ${WAV_OUTPUT_PATH}
 ```
 
-Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](../../lib), `${MODEL_PATH}` with path
-to the model file available under [lib/common](../../lib/common), `${ACCESS_KEY}` with AccessKey
+Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](./lib), `${MODEL_PATH}` with path
+to the model file available under [lib/common](./lib/common), `${ACCESS_KEY}` with AccessKey
 obtained from [Picovoice Console](https://console.picovoice.ai/), and `${WAV_OUTPUT_PATH}` with a path to a `.wav` file
 where the enhanced audio will be stored. Terminate the demo with `Ctrl+C`.
 
