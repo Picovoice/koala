@@ -24,7 +24,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
 
 setuptools.setup(
     name="pvkoalademo",
-    version="1.0.0",
+    version="1.0.1",
     author="Picovoice",
     author_email="hello@picovoice.ai",
     description="Koala Noise Suppression Engine demos",
@@ -49,5 +49,5 @@ setuptools.setup(
         ],
     ),
     python_requires='>=3.5',
-    keywords="Noise Cancellation, Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
+    keywords="Noise Suppression, Noise Removal, Noise Cancellation, Speech Enhancement, Speech Denoising",
 )
