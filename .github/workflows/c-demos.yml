@@ -5,27 +5,29 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'demo/c/**'
       - '!demo/c/README.md'
-      - 'lib/beaglebone/**'
+      - '.github/workflows/c-demos.yml'
+      - 'demo/c/**'
+      - 'lib/common/**'
       - 'lib/jetson/**'
       - 'lib/linux/**'
       - 'lib/mac/**'
       - 'lib/raspberry-pi/**'
       - 'lib/windows/**'
-      - '.github/workflows/c-demos.yml'
+      - 'resources/audio_samples/test.wav'
   pull_request:
     branches: [ main, 'v[0-9]+.[0-9]+' ]
     paths:
-      - 'demo/c/**'
       - '!demo/c/README.md'
-      - 'lib/beaglebone/**'
+      - '.github/workflows/c-demos.yml'
+      - 'demo/c/**'
+      - 'lib/common/**'
       - 'lib/jetson/**'
       - 'lib/linux/**'
       - 'lib/mac/**'
       - 'lib/raspberry-pi/**'
       - 'lib/windows/**'
-      - '.github/workflows/c-demos.yml'
+      - 'resources/audio_samples/test.wav'
 
 defaults:
   run:
@@ -40,7 +42,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
 
@@ -55,10 +57,10 @@ jobs:
 
     strategy:
       matrix:
-        machine: [rpi2, rpi3-32, rpi3-64, rpi4-32, rpi4-64, jetson, beaglebone]
+        machine: [rpi3-32, rpi3-64, rpi4-32, rpi4-64, jetson]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
 
@@ -66,7 +68,7 @@ jobs:
       run: cmake -B ./build
 
     - name: Build micdemo
-      run: cmake --build ./build --target cobra_demo_mic
+      run: cmake --build ./build --target koala_demo_mic
 
   build-filedemo-github-hosted:
     runs-on: ${{ matrix.os }}
@@ -89,7 +91,7 @@ jobs:
           ext: dylib
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
 
@@ -104,18 +106,17 @@ jobs:
       with:
         access_key: ${{ secrets.PV_VALID_ACCESS_KEY }}
         library_path: ../../lib/${{ matrix.platform }}/${{ matrix.arch }}/libpv_koala.${{ matrix.ext }}
-        audio_path: ../../res/audio/sample.wav
+        model_path: ../../lib/common/koala_params.pv
+        input_path: ../../res/audio_samples/test.wav
+        output_path: ./output.txt
 
   build-filedemo-self-hosted:
     runs-on: ${{ matrix.machine }}
 
     strategy:
       matrix:
-        machine: [rpi2, rpi3-32, rpi3-64, rpi4-32, rpi4-64, jetson, beaglebone]
+        machine: [rpi3-32, rpi3-64, rpi4-32, rpi4-64, jetson]
         include:
-        - machine: rpi2
-          platform: raspberry-pi
-          arch: cortex-a7
         - machine: rpi3-32
           platform: raspberry-pi
           arch: cortex-a53
@@ -131,12 +132,9 @@ jobs:
         - machine: jetson
           platform: jetson
           arch: cortex-a57-aarch64
-        - machine: beaglebone
-          platform: beaglebone
-          arch: ''
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
 
@@ -150,5 +148,7 @@ jobs:
       name: Run filedemo
       with:
         access_key: ${{ secrets.PV_VALID_ACCESS_KEY }}
-        library_path: ../../lib/${{ matrix.platform }}/${{ matrix.arch }}/libpv_koala.so
-        audio_path: ../../res/audio/sample.wav
+        library_path: ../../lib/${{ matrix.platform }}/${{ matrix.arch }}/libpv_koala.${{ matrix.ext }}
+        model_path: ../../lib/common/koala_params.pv
+        input_path: ../../res/audio_samples/test.wav
+        output_path: ./output.txt
