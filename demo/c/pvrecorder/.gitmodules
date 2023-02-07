@@ -1,3 +1,0 @@
-[submodule "src/miniaudio"]
-    path = src/miniaudio
-    url = ../../mackron/miniaudio.git
