@@ -22,6 +22,6 @@ runs:
       -l ${{ inputs.library_path }}
       -m ${{ inputs.model_path }}
       -i ${{ inputs.input_path }}
-        -o ${{ inputs.output_path }}
+      -o ${{ inputs.output_path }}
     working-directory: demo/c
     shell: bash
