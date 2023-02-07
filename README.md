@@ -24,11 +24,13 @@ Koala is an on-device noise suppression engine. Koala is:
         - [iOS](#ios-demo)
         - [C](#c-demos)
         - [Web](#web-demo)
+        - [Android](#android-demos)
     - [SDKs](#sdks)
         - [Python](#python)
         - [iOS](#ios)
         - [C](#c)
         - [Web](#web)
+        - [Android](#android)
     - [Releases](#releases)
 
 ## AccessKey
@@ -122,6 +124,13 @@ npm run start
 ```
 
 Open `http://localhost:5000` in your browser to try the demo.
+
+### Android Demos
+
+Using [Android Studio](https://developer.android.com/studio/index.html), open
+[demo/android/Activity](./demo/android/Activity) as an Android project and then run the application.
+
+Replace `"${YOUR_ACCESS_KEY_HERE}"` in the file [MainActivity.java](./demo/android/Activity/koala-activity-demo-app/src/main/java/ai/picovoice/koalaactivitydemo/MainActivity.java) with your `AccessKey`.
 
 ## SDKs
 
@@ -265,6 +274,41 @@ for (;;) {
 
 Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://console.picovoice.ai/). Finally, when done release the resources using `koala.release()`.
 
+### Android
+
+To include the package in your Android project, ensure you have included `mavenCentral()` in your top-level `build.gradle` file and then add the following to your app's `build.gradle`:
+
+```groovy
+dependencies {
+    implementation 'ai.picovoice:koala-android:${LATEST_VERSION}'
+}
+```
+
+Create an instance of the engine and enhance audio in real-time:
+
+```java
+import ai.picovoice.koala.*;
+
+final String accessKey = "${ACCESS_KEY}"; // AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)
+
+short[] getNextAudioFrame() {
+    // .. get audioFrame
+    return audioFrame;
+}
+
+try {
+    Koala koala = new Koala.Builder()
+        .setAccessKey(accessKey)
+        .build(appContext);
+
+    while true {
+        short[] enhancedFrame = koala.process(getNextAudioFrame());
+    };
+
+} catch (KoalaException ex) { }
+```
+
+Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console and `${MODEL_FILE}` with the default or custom trained model from [console](https://console.picovoice.ai/).
 
 ## Releases
 

@@ -1,0 +1,2 @@
+rootProject.name = "KoalaActivityDemo"
+include ':koala-activity-demo-app'

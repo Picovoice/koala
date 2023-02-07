@@ -1,11 +1,10 @@
-LPWSTR
-MODLE
-Makefiles
 aarch
+androidx
 armv
 astype
 calcsize
 camelcase
+compat
 copywasm
 denoising
 downsample
@@ -17,10 +16,14 @@ hanning
 iife
 irfft
 jetson
+koalaactivitydemo
 koalafied
 libpv
 linalg
+LPWSTR
+Makefiles
 malloc
+MODLE
 ndarray
 numpy
 outf
@@ -37,6 +40,7 @@ rfft
 rfftfreq
 signup
 sqrtf
+styleable
 wargv
 wchars
 xcworkspace
