@@ -49,7 +49,7 @@ To list the available audio input devices:
 To run the Koala microphone demo:
 
 ```console
-./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -a ${ACCESS_KEY} -d ${AUDIO_DEVICE_INDEX} --output-path ${WAV_OUTPUT_PATH}
+./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -a ${ACCESS_KEY} -d ${AUDIO_DEVICE_INDEX} -o ${WAV_OUTPUT_PATH}
 ```
 
 Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](/lib), `${ACCESS_KEY}` with AccessKey
