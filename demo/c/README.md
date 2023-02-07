@@ -13,7 +13,7 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 ## Requirements
 
 - The demo requires [CMake](https://cmake.org/) version 3.4 or higher.
-- **For Windows Only**: [MinGW](http://mingw-w64.org/doku.php) is required to build the demo.
+- **For Windows Only**: [MinGW](https://www.mingw-w64.org/) is required to build the demo.
 
 # Microphone Demo
 
@@ -52,7 +52,7 @@ To run the Koala microphone demo:
 ./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -a ${ACCESS_KEY} -d ${AUDIO_DEVICE_INDEX} -o ${WAV_OUTPUT_PATH}
 ```
 
-Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](/lib), `${ACCESS_KEY}` with AccessKey
+Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](../../lib), `${ACCESS_KEY}` with AccessKey
 obtained from [Picovoice Console](https://console.picovoice.ai/), `${AUDIO_DEVICE_INDEX}` with the index of the
 audio device  you wish to capture audio with, and `${WAV_OUTPUT_PATH}` with a path to a `.wav` file
 where the enhanced audio will be stored. An `${AUDIO_DEVICE_INDEX}` of -1 will provide you with your system's
@@ -82,7 +82,7 @@ Run the demo:
 ./demo/c/build/Koala_demo_file -l ${LIBRARY_PATH} -a ${ACCESS_KEY} -i ${INPUT_WAV_FILE} -o ${OUTPUT_WAV_FILE}
 ```
 
-Replace `${LIBRARY_PATH}` with the path to the appropriate Koala library available under [lib](/lib), `${ACCESS_KEY}` with a
+Replace `${LIBRARY_PATH}` with the path to the appropriate Koala library available under [lib](../../lib), `${ACCESS_KEY}` with a
 Picovoice AccessKey obtained from the [Picovoice Console](https://console.picovoice.ai/), `${WAV_INPUT_PATH}` with a path to a compatible
 (single-channel, 16 kHz, 16-bit PCM) `.wav` file you wish to enhance, and `${WAV_OUTPUT_PATH}` with a path to a `.wav`
 file where the enhanced audio will be stored.

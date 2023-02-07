@@ -85,7 +85,7 @@ Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib]
 AccessKey obtained from [Picovoice Console](https://console.picovoice.ai/), and `${INPUT_AUDIO_DEVICE}` with the index of
 your  microphone device.
 
-For more information about C demos go to [demo/c](/demo/c).
+For more information about C demos go to [demo/c](./demo/c).
 
 ## SDKs
 
@@ -115,7 +115,7 @@ Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
 
 ### C
 
-[include/pv_koala.h](/include/pv_koala.h) header file contains relevant information. Build an instance of the object:
+[include/pv_koala.h](./include/pv_koala.h) header file contains relevant information. Build an instance of the object:
 
 ```c
     pv_cobra_t *handle = NULL;
