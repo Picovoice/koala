@@ -51,9 +51,6 @@ jobs:
         --input_path ../../resources/audio_samples/test.wav
         --output_path ./tmp.wav
 
-    - name: Cleanup
-      run: rm -f ./tmp.wav
-
   build-self-hosted:
     runs-on: ${{ matrix.machine }}
 
@@ -73,6 +70,3 @@ jobs:
         --access_key ${{secrets.PV_VALID_ACCESS_KEY}}
         --input_path ../../resources/audio_samples/test.wav
         --output_path ./tmp.wav
-
-    - name: Cleanup
-      run: rm -f ./tmp.wav
