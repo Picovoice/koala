@@ -89,16 +89,15 @@ static void print_dl_error(const char *message) {
 }
 
 static volatile bool is_interrupted = false;
-static const float alpha = 0.15f;
 
 static struct option long_options[] = {
-        {"access_key",         required_argument, NULL, 'a'},
-        {"audio_device_index", required_argument, NULL, 'd'},
-        {"library_path",       required_argument, NULL, 'l'},
-        {"model_path",         required_argument, NULL, 'm'},
-        {"output_audio_path",        required_argument, NULL, 'o'},
-        {"reference_audio_path",          no_argument,       NULL, 'r'},
-        {"show_audio_devices", no_argument,       NULL, 's'},
+        {"access_key",           required_argument, NULL, 'a'},
+        {"audio_device_index",   required_argument, NULL, 'd'},
+        {"library_path",         required_argument, NULL, 'l'},
+        {"model_path",           required_argument, NULL, 'm'},
+        {"output_audio_path",    required_argument, NULL, 'o'},
+        {"reference_audio_path", no_argument,       NULL, 'r'},
+        {"show_audio_devices",   no_argument,       NULL, 's'},
 };
 
 void print_usage(const char *program_name) {
@@ -119,7 +118,7 @@ void show_audio_devices(void) {
     pv_recorder_status_t status = pv_recorder_get_audio_devices(&count, &devices);
     if (status != PV_RECORDER_STATUS_SUCCESS) {
         fprintf(stderr, "Failed to get audio devices with: %s.\n", pv_recorder_status_to_string(status));
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     fprintf(stdout, "Printing devices...\n");
@@ -135,7 +134,7 @@ static void print_vu_meter(const int16_t *pcm_buffer, int32_t num_samples) {
     for (uint32_t i = 0; i < num_samples; i++) {
         sum += (float) pcm_buffer[i] * (float) pcm_buffer[i];
     }
-    float volume_db = 10 * log10f((sum + FLT_EPSILON) / num_samples / (float)(SHRT_MAX * SHRT_MAX));
+    float volume_db = 10 * log10f((sum + FLT_EPSILON) / (float) num_samples / (float)(SHRT_MAX * SHRT_MAX));
 
     float volume = (volume_db + 50) / 50;
     volume = volume < 0 ? 0 : volume;
@@ -155,7 +154,7 @@ int picovoice_main(int argc, char *argv[]) {
     const char *access_key = NULL;
     const char *library_path = NULL;
     const char *output_path = NULL;
-    const char *raw_path = NULL;
+    const char *reference_path = NULL;
     const char *model_path = NULL;
     int32_t device_index = -1;
 
@@ -175,7 +174,7 @@ int picovoice_main(int argc, char *argv[]) {
                 output_path = optarg;
                 break;
             case 'r':
-                raw_path = optarg;
+                reference_path = optarg;
                 break;
             case 'm':
                 model_path = optarg;
@@ -200,17 +199,16 @@ int picovoice_main(int argc, char *argv[]) {
     format.sampleRate = 16000;
     format.bitsPerSample = 16;
 
-    drwav enchanced_f;
-    drwav original_f;
-
-    if (!drwav_init_file_write(&enchanced_f, output_path, &format, NULL)) {
+    drwav output_file;
+    if (!drwav_init_file_write(&output_file, output_path, &format, NULL)) {
         fprintf(stderr, "failed to open the output wav file at '%s'.", output_path);
         exit(EXIT_FAILURE);
     }
 
-    if (raw_path) {
-        if (!drwav_init_file_write(&original_f, raw_path, &format, NULL)) {
-            fprintf(stderr, "failed to open the output wav file at '%s'.", raw_path);
+    drwav reference_file;
+    if (reference_path) {
+        if (!drwav_init_file_write(&reference_file, reference_path, &format, NULL)) {
+            fprintf(stderr, "failed to open the reference wav file at '%s'.", reference_path);
             exit(EXIT_FAILURE);
         }
     }
@@ -254,12 +252,6 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    void (*pv_koala_reset_func)(pv_koala_t *) = load_symbol(koala_library, "pv_koala_reset");
-    if (!pv_koala_reset_func) {
-        print_dl_error("failed to load 'pv_koala_reset'");
-        exit(EXIT_FAILURE);
-    }
-
     int32_t(*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
     if (!pv_koala_frame_length_func) {
         print_dl_error("failed to load 'pv_koala_frame_length'");
@@ -292,8 +284,7 @@ int picovoice_main(int argc, char *argv[]) {
     const char *selected_device = pv_recorder_get_selected_device(recorder);
     fprintf(stdout, "Selected device: %s.\n", selected_device);
 
-    fprintf(stdout, "Start recording...\n");
-    fprintf(stdout, "Press Ctrl+C to stop.\n\n");
+    fprintf(stdout, "Start recording (press Ctrl+C to stop)...\n");
     recorder_status = pv_recorder_start(recorder);
     if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
         fprintf(stderr, "Failed to start device with %s.\n", pv_recorder_status_to_string(recorder_status));
@@ -325,13 +316,13 @@ int picovoice_main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        if ((int32_t) drwav_write_pcm_frames(&enchanced_f, frame_length, enhanced_pcm) != frame_length) {
+        if ((int32_t) drwav_write_pcm_frames(&output_file, frame_length, enhanced_pcm) != frame_length) {
             fprintf(stderr, "Failed to write to wav file.\n");
             exit(EXIT_FAILURE);
         }
 
-        if (raw_path) {
-            if ((int32_t) drwav_write_pcm_frames(&original_f, frame_length, pcm) != frame_length) {
+        if (reference_path) {
+            if ((int32_t) drwav_write_pcm_frames(&reference_file, frame_length, pcm) != frame_length) {
                 fprintf(stderr, "Failed to write to raw wav file.\n");
                 exit(EXIT_FAILURE);
             }
@@ -349,9 +340,9 @@ int picovoice_main(int argc, char *argv[]) {
 
     free(pcm);
     free(enhanced_pcm);
-    drwav_uninit(&enchanced_f);
-    if (raw_path) {
-        drwav_uninit(&original_f);
+    drwav_uninit(&output_file);
+    if (reference_path) {
+        drwav_uninit(&reference_file);
     }
     pv_recorder_delete(recorder);
     pv_koala_delete_func(koala);

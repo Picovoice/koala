@@ -78,12 +78,13 @@ To list the available audio input devices:
 To run the demo:
 
 ```console
-./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -a ${ACCESS_KEY} -d ${AUDIO_DEVICE_INDEX}
+./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODLE_PATH} -a ${ACCESS_KEY} -o ${WAV_OUTPUT_PATH}
 ```
 
-Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](/lib), Replace `${ACCESS_KEY}` with 
-AccessKey obtained from [Picovoice Console](https://console.picovoice.ai/), and `${INPUT_AUDIO_DEVICE}` with the index of
-your  microphone device.
+Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](../../lib), `${MODEL_PATH}` with path
+to the model file available under [lib/common](../../lib/common), `${ACCESS_KEY}` with AccessKey
+obtained from [Picovoice Console](https://console.picovoice.ai/), and `${WAV_OUTPUT_PATH}` with a path to a `.wav` file
+where the enhanced audio will be stored. Terminate the demo with `Ctrl+C`.
 
 For more information about C demos go to [demo/c](./demo/c).
 
@@ -119,24 +120,27 @@ Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
 
 ```c
     pv_cobra_t *handle = NULL;
-    pv_status_t status = pv_koala_init(${ACCESS_KEY}, &handle);
+    const char *model_path = "${MODEL_PATH}";
+    pv_status_t status = pv_koala_init(${ACCESS_KEY}, model_path, &handle);
     if (status != PV_STATUS_SUCCESS) {
         // error handling logic
     }
 ```
 
-Replace `${ACCESS_KEY}` with the AccessKey obtained from Picovoice Console. Now the `handle` can be used to monitor
-incoming audio stream. Cobra accepts single channel, 16-bit linearly-encoded  PCM audio. The sample rate can be
-retrieved using `pv_sample_rate()`. Finally, Cobra accepts input audio in  consecutive chunks (aka frames) the length of
-each frame can be retrieved using `pv_cobra_frame_length()`.
+Replace `${ACCESS_KEY}` with the AccessKey obtained from Picovoice Console, and `${MODEL_PATH}` with the path to the
+model file available under [lib/common](./lib/common).
+
+Now the `handle` can be used to process
 
 ```c
 extern const int16_t *get_next_audio_frame(void);
 
+const int32_t frame_length = pv_koala_frame_length();
+
 while (true) {
     const int16_t *pcm = get_next_audio_frame();
-    float is_voiced = 0.f;
-    const pv_status_t status = pv_cobra_process(handle, pcm, &is_voiced);
+    const int16_t *enhanced_pcm = malloc(frame_length * sizeof(int16_t));
+    const pv_status_t status = pv_koala_process(handle, pcm, enhanced_pcm);
     if (status != PV_STATUS_SUCCESS) {
         // error handling logic
     }
