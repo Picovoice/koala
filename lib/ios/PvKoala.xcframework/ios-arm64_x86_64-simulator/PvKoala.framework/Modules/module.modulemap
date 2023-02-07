@@ -1,0 +1,7 @@
+framework module PvKoala {
+  umbrella header "PvKoala.h"
+  header "pv_koala.h"
+  header "picovoice.h"
+  export *
+  module * {export *}
+}
