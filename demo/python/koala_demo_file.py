@@ -100,7 +100,7 @@ def main():
                     print(
                         '\r[%3d%%]|%s%s|' % (
                             progress * 100,
-                            '█' * bar_length,
+                            '\u2588' * bar_length,
                             ' ' * (PROGRESS_BAR_LENGTH - bar_length)),
                         end='',
                         flush=True)

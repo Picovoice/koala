@@ -102,7 +102,7 @@ def main():
                     print(
                         '\r[%3d%%]%s%s|' % (
                             input_volume * 100,
-                            '█' * bar_length,
+                            '\u2588' * bar_length,
                             ' ' * (VU_MAX_BAR_LENGTH - bar_length)),
                         end='',
                         flush=True)
