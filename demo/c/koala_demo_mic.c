@@ -293,7 +293,7 @@ int picovoice_main(int argc, char *argv[]) {
     fprintf(stdout, "Selected device: %s.\n", selected_device);
 
     fprintf(stdout, "Start recording...\n");
-    fprintf(stdout, "Press Ctrl+C to stop.\n\n")
+    fprintf(stdout, "Press Ctrl+C to stop.\n\n");
     recorder_status = pv_recorder_start(recorder);
     if (recorder_status != PV_RECORDER_STATUS_SUCCESS) {
         fprintf(stderr, "Failed to start device with %s.\n", pv_recorder_status_to_string(recorder_status));
