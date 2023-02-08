@@ -21,7 +21,7 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 The microphone demo collects audio from a microphone connected to your machine. The audio is passed through the Koala
 noise suppression engine and stored in a `.wav` file.
 
-**Note**: the following commands are run from the root of the repo
+**Note**: the following commands are run from the root of the repo.
 
 ## Build
 
@@ -63,7 +63,7 @@ default recording device. Terminate the demo with `Ctrl+C`.
 The file demo passes audio stored in a `.wav` file through the Koala noise suppression engine. This demo expects a single-channel WAV file with a sampling rate of 16000 and 16-bit
 linear PCM encoding.
 
-**Note**: the following commands are run from the root of the repo
+**Note**: the following commands are run from the root of the repo.
 
 ## Build
 

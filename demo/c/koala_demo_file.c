@@ -17,6 +17,9 @@
 
 #include <windows.h>
 
+#define UTF8_COMPOSITION_FLAG (0)
+#define NULL_TERMINATED       (-1)
+
 #else
 
 #include <dlfcn.h>
@@ -203,7 +206,20 @@ int picovoice_main(int argc, char *argv[]) {
 
     drwav input_file;
 
-    if (!drwav_init_file(&input_file, input_path, NULL)) {
+#if defined(_WIN32) || defined(_WIN64)
+
+    int input_path_wchars_num = MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, input_path, NULL_TERMINATED, NULL, 0);
+    wchar_t input_path_w[input_path_wchars_num];
+    MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, input_path, NULL_TERMINATED, input_path_w, input_path_wchars_num);
+    int drwav_init_file_status = drwav_init_file_w(&input_file, input_path_w, NULL);
+
+#else
+
+    int drwav_init_file_status = drwav_init_file(&input_file, input_path, NULL);
+
+#endif
+
+    if (!drwav_init_file_status) {
         fprintf(stderr, "failed to open wav file at '%s'.", input_path);
         exit(EXIT_FAILURE);
     }
@@ -231,7 +247,20 @@ int picovoice_main(int argc, char *argv[]) {
     format.sampleRate = 16000;
     format.bitsPerSample = 16;
 
-    if (!drwav_init_file_write(&output_file, output_path, &format, NULL)) {
+#if defined(_WIN32) || defined(_WIN64)
+
+    int output_path_wchars_num = MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, NULL, 0);
+    wchar_t output_path_w[output_path_wchars_num];
+    MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, output_path_w, output_path_wchars_num);
+    drwav_init_file_status = (int) drwav_init_file_write(&output_file, output_path_w, &format, NULL);
+
+#else
+
+    drwav_init_file_status = (int) drwav_init_file_write(&output_file, output_path, &format, NULL);
+
+#endif
+
+    if (!drwav_init_file_status) {
         fprintf(stderr, "failed to open the output file at '%s'.", output_path);
         exit(EXIT_FAILURE);
     }

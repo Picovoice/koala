@@ -104,7 +104,11 @@ Create an instance of the engine and enhance audio in real-time:
 import pvkoala
 
 koala = pvkoala.create(access_key='${ACCESS_KEY}')
+```
 
+Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
+
+```python
 def get_next_audio_frame():
     pass
 
@@ -112,14 +116,14 @@ while True:
     enhanced_audio = koala.process(get_next_audio_frame())
 ```
 
-Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
+Finally, when done be sure to explicitly release the resources using `koala.delete()`.
 
 ### C
 
 [include/pv_koala.h](./include/pv_koala.h) header file contains relevant information. Build an instance of the object:
 
 ```c
-    pv_cobra_t *handle = NULL;
+    pv_koala_t *handle = NULL;
     const char *model_path = "${MODEL_PATH}";
     pv_status_t status = pv_koala_init(${ACCESS_KEY}, model_path, &handle);
     if (status != PV_STATUS_SUCCESS) {
