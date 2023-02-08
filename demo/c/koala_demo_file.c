@@ -344,7 +344,6 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    printf("pcm_to_write_length %d\n", pcm_to_write_length);
     if ((int32_t) drwav_write_pcm_frames(&output_file, pcm_to_write_length, pcm_to_write) != pcm_to_write_length) {
         fprintf(stderr, "Failed to write to output file.\n");
         exit(EXIT_FAILURE);
