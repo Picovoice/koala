@@ -108,7 +108,7 @@ jobs:
         library_path: ../../lib/${{ matrix.platform }}/${{ matrix.arch }}/libpv_koala.${{ matrix.ext }}
         model_path: ../../lib/common/koala_params.pv
         input_path: ../../resources/audio_samples/test.wav
-        output_path: ./output.txt
+        output_path: ./output.wav
 
   build-filedemo-self-hosted:
     runs-on: ${{ matrix.machine }}
@@ -151,4 +151,4 @@ jobs:
         library_path: ../../lib/${{ matrix.platform }}/${{ matrix.arch }}/libpv_koala.so
         model_path: ../../lib/common/koala_params.pv
         input_path: ../../resources/audio_samples/test.wav
-        output_path: ./output.txt
+        output_path: ./output.wav
