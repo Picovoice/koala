@@ -21,6 +21,9 @@
 
 #include <windows.h>
 
+#define UTF8_COMPOSITION_FLAG (0)
+#define NULL_TERMINATED (-1)
+
 #else
 
 #include <dlfcn.h>
@@ -206,7 +209,7 @@ int picovoice_main(int argc, char *argv[]) {
     int output_path_wchars_num = MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, NULL, 0);
     wchar_t output_path_w[output_path_wchars_num];
     MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, output_path_w, input_path_wchars_num);
-    unsigned int drwav_init_file_status = drwav_init_file_write(&output_file, output_path_w, &format, NULL);
+    unsigned int drwav_init_file_status = drwav_init_file_write_w(&output_file, output_path_w, &format, NULL);
 
 #else
 
@@ -228,7 +231,7 @@ int picovoice_main(int argc, char *argv[]) {
         int reference_path_wchars_num = MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, reference_path, NULL_TERMINATED, NULL, 0);
         wchar_t reference_path_w[reference_path_wchars_num];
         MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, reference_path, NULL_TERMINATED, reference_path_w, reference_path_wchars_num);
-        unsigned int drwav_init_file_status = drwav_init_file_write(&reference_file, reference_path_w, &format, NULL);
+        unsigned int drwav_init_file_status = drwav_init_file_write_w(&reference_file, reference_path_w, &format, NULL);
 
 #else
 
@@ -383,9 +386,6 @@ int picovoice_main(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
 
 #if defined(_WIN32) || defined(_WIN64)
-
-#define UTF8_COMPOSITION_FLAG (0)
-#define NULL_TERMINATED (-1)
 
     LPWSTR *wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (wargv == NULL) {

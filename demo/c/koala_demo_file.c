@@ -184,6 +184,13 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    pv_status_t(*pv_koala_delay_sample_func)(pv_koala_t * , int32_t *) =
+            load_symbol(koala_library, "pv_koala_delay_sample");
+    if (!pv_koala_delay_sample_func) {
+        print_dl_error("failed to load 'pv_koala_delay_sample'");
+        exit(EXIT_FAILURE);
+    }
+
     int32_t(*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
     if (!pv_koala_frame_length_func) {
         print_dl_error("failed to load 'pv_koala_frame_length'");
@@ -252,7 +259,7 @@ int picovoice_main(int argc, char *argv[]) {
     int output_path_wchars_num = MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, NULL, 0);
     wchar_t output_path_w[output_path_wchars_num];
     MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, output_path_w, output_path_wchars_num);
-    drwav_init_file_status = (int) drwav_init_file_write(&output_file, output_path_w, &format, NULL);
+    drwav_init_file_status = (int) drwav_init_file_write_w(&output_file, output_path_w, &format, NULL);
 
 #else
 
@@ -266,6 +273,12 @@ int picovoice_main(int argc, char *argv[]) {
     }
 
     const int32_t frame_length = pv_koala_frame_length_func();
+    int32_t delay_samples = 0;
+    koala_status = pv_koala_delay_sample_func(koala, &delay_samples);
+    if (koala_status != PV_STATUS_SUCCESS) {
+        fprintf(stderr, "failed to get delay sample with '%s'", pv_status_to_string_func(koala_status));
+        exit(EXIT_FAILURE);
+    }
 
     int16_t *pcm = (int16_t *) malloc(frame_length * sizeof(int16_t));
     if (!pcm) {
@@ -278,6 +291,8 @@ int picovoice_main(int argc, char *argv[]) {
         fprintf(stderr, "Failed to allocate enhanced_pcm memory.\n");
         exit(EXIT_FAILURE);
     }
+    int16_t *pcm_to_write = NULL;
+    size_t pcm_to_write_length = 0;
 
     double total_cpu_time_usec = 0;
     double total_processed_time_usec = 0;
@@ -286,6 +301,7 @@ int picovoice_main(int argc, char *argv[]) {
 
     size_t total_samples = input_file.totalPCMFrameCount;
     size_t processed_samples = 0;
+    int32_t remaining_delay_samples = delay_samples;
     while ((int32_t) drwav_read_pcm_frames_s16(&input_file, frame_length, pcm) == frame_length) {
         struct timeval before;
         gettimeofday(&before, NULL);
@@ -299,17 +315,41 @@ int picovoice_main(int argc, char *argv[]) {
         struct timeval after;
         gettimeofday(&after, NULL);
 
+        processed_samples += frame_length;
+
         total_cpu_time_usec +=
                 (double) (after.tv_sec - before.tv_sec) * 1e6 + (double) (after.tv_usec - before.tv_usec);
         total_processed_time_usec += (frame_length * 1e6) / pv_sample_rate_func();
 
-        if ((int32_t) drwav_write_pcm_frames(&output_file, frame_length, pcm) != frame_length) {
+        print_progress_bar(total_samples, processed_samples);
+
+        if (processed_samples <= remaining_delay_samples) {
+            continue;
+        } else {
+            pcm_to_write = enhanced_pcm + ((processed_samples - remaining_delay_samples) % frame_length);
+            pcm_to_write_length = frame_length - ((processed_samples - remaining_delay_samples) % frame_length);
+            remaining_delay_samples = 0;
+        }
+
+        if ((int32_t) drwav_write_pcm_frames(&output_file, pcm_to_write_length, pcm_to_write) != pcm_to_write_length) {
             fprintf(stderr, "Failed to write to output file.\n");
             exit(EXIT_FAILURE);
         }
-        processed_samples += frame_length;
-        print_progress_bar(total_samples, processed_samples);
     }
+
+    pcm_to_write = calloc(delay_samples, sizeof(int16_t));
+    if (!pcm_to_write) {
+        fprintf(stderr, "Failed to allocate pcm_to_write memory.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    pcm_to_write_length = delay_samples;
+    if ((int32_t) drwav_write_pcm_frames(&output_file, pcm_to_write_length, pcm_to_write) != pcm_to_write_length) {
+        fprintf(stderr, "Failed to write to output file.\n");
+        exit(EXIT_FAILURE);
+    }
+    free(pcm_to_write);
+
 
     const double real_time_factor = total_cpu_time_usec / total_processed_time_usec;
     fprintf(stdout, "\nreal time factor : %.3f\n", real_time_factor);
@@ -329,9 +369,6 @@ int picovoice_main(int argc, char *argv[]) {
 int main(int argc, char *argv[]) {
 
 #if defined(_WIN32) || defined(_WIN64)
-
-#define UTF8_COMPOSITION_FLAG (0)
-#define NULL_TERMINATED (-1)
 
     LPWSTR *wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (wargv == NULL) {
