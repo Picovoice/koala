@@ -103,9 +103,6 @@ jobs:
     - name: Build filedemo
       run: cmake --build ./build --target koala_demo_file
 
-    - name: Install dependencies
-      run: pip install -r test/requirements.txt
-
     - name: Test
       run: python test/test_koala_c.py ${{secrets.PV_VALID_ACCESS_KEY}} ${{ matrix.platform }} ${{ matrix.arch }}
 
@@ -142,9 +139,6 @@ jobs:
 
     - name: Build filedemo
       run: cmake --build ./build --target koala_demo_file
-
-    - name: Install dependencies
-      run: pip install -r test/requirements.txt
 
     - name: Test
       run: python test/test_koala_c.py ${{secrets.PV_VALID_ACCESS_KEY}} ${{ matrix.platform }} ${{ matrix.arch }}
