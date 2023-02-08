@@ -337,7 +337,7 @@ int picovoice_main(int argc, char *argv[]) {
         }
     }
 
-    pcm_to_write_length = delay_samples;
+    pcm_to_write_length = total_samples - processed_samples + delay_samples;
     pcm_to_write = calloc(pcm_to_write_length, sizeof(int16_t));
     if (!pcm_to_write) {
         fprintf(stderr, "Failed to allocate pcm_to_write memory.\n");
