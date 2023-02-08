@@ -11,7 +11,6 @@
 
 import argparse
 import struct
-import sys
 import wave
 
 from pvkoala import create, KoalaActivationLimitError
@@ -98,11 +97,13 @@ def main():
                     start_sample = end_sample
                     progress = start_sample / (input_length + koala.delay_sample)
                     bar_length = int(progress * PROGRESS_BAR_LENGTH)
-                    sys.stdout.write('\r[%3d%%]|%s%s|' % (
+                    print(
+                        '\r[%3d%%]|%s%s|' % (
                             progress * 100,
-                            '\u2588' * bar_length,
-                            ' ' * (PROGRESS_BAR_LENGTH - bar_length)))
-                    sys.stdout.flush()
+                            '#' * bar_length,
+                            ' ' * (PROGRESS_BAR_LENGTH - bar_length)),
+                        end='',
+                        flush=True)
 
                 print()
 

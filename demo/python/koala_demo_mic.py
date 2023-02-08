@@ -100,11 +100,13 @@ def main():
                     input_volume = sum((x / 32768.0) ** 2 for x in input_frame) / koala.frame_length
                     input_volume = max(min(1 + 10 * math.log10(input_volume + 1e-10) / VU_DYNAMIC_RANGE_DB, 1), 0)
                     bar_length = int(input_volume * VU_MAX_BAR_LENGTH)
-                    sys.stdout.write('\r[%3d%%]%s%s|' % (
-                        input_volume * 100,
-                        '\u2588' * bar_length,
-                        ' ' * (VU_MAX_BAR_LENGTH - bar_length)))
-                    sys.stdout.flush()
+                    print(
+                        '\r[%3d%%]%s%s|' % (
+                            input_volume * 100,
+                            '#' * bar_length,
+                            ' ' * (VU_MAX_BAR_LENGTH - bar_length)),
+                        end='',
+                        flush=True)
 
         finally:
             recorder.stop()
