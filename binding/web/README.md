@@ -4,11 +4,9 @@
 
 Made in Vancouver, Canada by [Picovoice](https://picovoice.ai)
 
-Koala is an on-device streaming speech-to-text engine. Koala is:
+Koala is an on-device noise suppression engine. Koala is:
 
 - Private; All voice processing runs locally.
-- [Accurate](https://picovoice.ai/docs/benchmark/stt/)
-- [Compact and Computationally-Efficient](https://github.com/Picovoice/speech-to-text-benchmark#rtf)
 - Cross-Platform:
     - Linux (x86_64), macOS (x86_64, arm64), and Windows (x86_64)
     - Android and iOS
@@ -33,13 +31,13 @@ IndexedDB is required to use `Koala` in a worker thread. Browsers without Indexe
 Using `Yarn`:
 
 ```console
-yarn add @picovoice/cheetah-web
+yarn add @picovoice/koala-web
 ```
 
 or using `npm`:
 
 ```console
-npm install --save @picovoice/cheetah-web
+npm install --save @picovoice/koala-web
 ```
 
 ### AccessKey
@@ -50,8 +48,6 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 
 ### Usage
 
-Create a model in [Picovoice Console](https://console.picovoice.ai/) or use the [default model](https://github.com/Picovoice/cheetah/tree/master/lib/common).
-
 For the web packages, there are two methods to initialize Koala.
 
 #### Public Directory
@@ -61,7 +57,7 @@ For the web packages, there are two methods to initialize Koala.
 This method fetches the model file from the public directory and feeds it to Koala. Copy the model file into the public directory:
 
 ```console
-cp ${CHEETAH_MODEL_FILE} ${PATH_TO_PUBLIC_DIRECTORY}
+cp ${KOALA_MODEL_FILE} ${PATH_TO_PUBLIC_DIRECTORY}
 ```
 
 #### Base64
@@ -72,7 +68,7 @@ This method uses a base64 string of the model file and feeds it to Koala. Use th
 base64 your model file:
 
 ```console
-npx pvbase64 -i ${CHEETAH_MODEL_FILE} -o ${OUTPUT_DIRECTORY}/${MODEL_NAME}.js
+npx pvbase64 -i ${KOALA_MODEL_FILE} -o ${OUTPUT_DIRECTORY}/${MODEL_NAME}.js
 ```
 
 The output will be a js file which you can import into any file of your project. For detailed information about `pvbase64`,
@@ -90,13 +86,13 @@ to hold multiple models and set the `forceWrite` value to true to force re-save 
 Either `base64` or `publicPath` must be set to instantiate Koala. If both are set, Koala will use the `base64` model.
 
 ```typescript
-const cheetahModel = {
+const koalaModel = {
   publicPath: ${MODEL_RELATIVE_PATH},
   // or
   base64: ${MODEL_BASE64_STRING},
 
   // Optionals
-  customWritePath: "cheetah_model",
+  customWritePath: "koala_model",
   forceWrite: false,
   version: 1,
 }
@@ -104,31 +100,22 @@ const cheetahModel = {
 
 #### Init options
 
-Set `endpointDurationSec` value to 0 if you do not with to detect endpoint (moment of silence). Set `enableAutomaticPunctuation` to
-true to enable  punctuation in transcript. Set `processErrorCallback` to handle errors if an error occurs while transcribing.
+Set `processErrorCallback` to handle errors if an error occurs while enhancing audio.
 
 ```typescript
-// Optional, these are default
+// Optional
 const options = {
-  endpointDurationSec: 1.0,
-  enableAutomaticPunctuation: true,
   processErrorCallback: (error) => {}
 }
 ```
 
 #### Initialize Koala
 
-Create a `transcriptCallback` function to get the streaming results
-from the engine:
+Create a `processCallback` function to get the streaming results from the engine:
 
 ```typescript
-let transcript = "";
-
-function transcriptCallback(cheetahTranscript: CheetahTranscript) {
-  transcript += cheetahTranscript.transcript;
-  if (cheetahTranscript.isEndpoint) {
-    transcript += "\n";
-  }
+function processCallback(enhancedPcm: Int16Array) {
+  // do something with enhancedPcm
 }
 ```
 
@@ -137,8 +124,8 @@ Create an instance of `Koala` on the main thread:
 ```typescript
 const handle = await Koala.create(
   ${ACCESS_KEY},
-  transcriptCallback,
-  cheetahModel,
+  processCallback,
+  koalaModel,
   options // optional options
 );
 ```
@@ -146,10 +133,10 @@ const handle = await Koala.create(
 Or create an instance of `Koala` in a worker thread:
 
 ```typescript
-const handle = await CheetahWorker.create(
+const handle = await KoalaWorker.create(
   ${ACCESS_KEY},
-  transcriptCallback,
-  cheetahModel,
+  processCallback,
+  koalaModel,
   options // optional options
 );
 ```
@@ -157,7 +144,8 @@ const handle = await CheetahWorker.create(
 #### Process Audio Frames
 
 The `process` function will send the input frames to the engine.
-The transcript is received from `transcriptCallback` as mentioned above.
+The enhanced audio is received from `processCallback` as mentioned above.
+In case the next audio frame does not follow the previous one, call `reset` before calling `process`.
 
 ```typescript
 function getAudioData(): Int16Array {
@@ -165,16 +153,16 @@ function getAudioData(): Int16Array {
   return new Int16Array();
 }
 
+await handle.reset();
 for (;;) {
-  handle.process(getAudioData());
+  await handle.process(getAudioData());
   // break on some condition
 }
-handle.flush(); // runs transcriptCallback on remaining data.
 ```
 
 #### Clean Up
 
-Clean up used resources by `Koala` or `CheetahWorker`:
+Clean up used resources by `Koala` or `KaoalaWorker`:
 
 ```typescript
 await handle.release();
@@ -182,7 +170,7 @@ await handle.release();
 
 #### Terminate (Worker only)
 
-Terminate `CheetahWorker` instance:
+Terminate `KoalaWorker` instance:
 
 ```typescript
 await handle.terminate();
@@ -190,4 +178,4 @@ await handle.terminate();
 
 ## Demo
 
-For example usage refer to our [Web demo application](https://github.com/Picovoice/cheetah/tree/master/demo/web).
+For example usage refer to our [Web demo application](https://github.com/Picovoice/koala/tree/main/demo/web).

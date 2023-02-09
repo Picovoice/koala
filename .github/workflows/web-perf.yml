@@ -1,0 +1,58 @@
+name: Web Performance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]
+    paths:
+      - 'lib/wasm/**'
+      - 'lib/common/**'
+      - '.github/workflows/web-perf.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'lib/wasm/**'
+      - 'lib/common/**'
+      - '.github/workflows/web-perf.yml'
+
+defaults:
+  run:
+    working-directory: binding/web
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: [3.8]
+        node-version: [lts/*]
+        include:
+          - python-version: 3.8
+            procPerformanceThresholdSec: 1.2
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Pre-build dependencies
+        run: npm install yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Copy libs
+        run: yarn copywasm
+
+      - name: Build
+        run: yarn build
+
+      - name: Prepare Test
+        run: yarn setup-test
+
+      - name: Test
+        run: yarn test --env ACCESS_KEY=${{secrets.PV_VALID_ACCESS_KEY}},NUM_TEST_ITERATIONS=20,PROC_PERFORMANCE_THRESHOLD_SEC=0.8

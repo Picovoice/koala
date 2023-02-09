@@ -68,9 +68,9 @@ async function runTest(
       }
     );
 
-    numFrames = Math.round(inputPcm.length / koala.frameLength);
+    numFrames = Math.round(inputPcm.length / koala.frameLength) - 1;
     await koala.reset();
-    for (let i = 0; i < inputPcm.length; i += koala.frameLength) {
+    for (let i = 0; i < (inputPcm.length - koala.frameLength + 1); i += koala.frameLength) {
       await koala.process(inputPcm.slice(i, i + koala.frameLength));
     }
   });
@@ -82,188 +82,189 @@ async function runTest(
   }
 }
 
-async function getProcessOutput(
-  koala: Koala | KoalaWorker,
+async function testReset(
+  instance: typeof Koala | typeof KoalaWorker,
   inputPcm: Int16Array
 ): Promise<void> {
-  const frames: Int16Array[] = [];
+  let frames: Int16Array[] = [];
+  let numFrames = 0;
 
+  const koala = await Koala.create(
+    ACCESS_KEY,
+    enhancedPcm => {
+      frames.push(enhancedPcm);
+    },
+    { publicPath: '/test/koala_params.pv', forceWrite: true }
+  );
 
+  numFrames = Math.round(inputPcm.length / koala.frameLength) - 1;
+  await koala.reset();
+  for (let i = 0; i < (inputPcm.length - koala.frameLength + 1); i += koala.frameLength) {
+    await koala.process(inputPcm.slice(i, i + koala.frameLength));
+  }
+
+  const waitUntil = (): Promise<void> => new Promise(resolve => {
+    setInterval(() => {
+      if (numFrames === frames.length) {
+        resolve();
+      }
+    }, 100);
+  });
+
+  await waitUntil();
+  const originalFrames = [...frames];
+  frames = [];
+
+  await koala.reset();
+  for (let i = 0; i < (inputPcm.length - koala.frameLength + 1); i += koala.frameLength) {
+    await koala.process(inputPcm.slice(i, i + koala.frameLength));
+  }
+
+  await waitUntil();
+
+  for (let i = 0; i < originalFrames.length; i++) {
+    expect(originalFrames[i]).to.deep.eq(frames[i]);
+  }
+
+  if (koala instanceof KoalaWorker) {
+    koala.terminate();
+  } else {
+    await koala.release();
+  }
 }
 
 describe('Koala Binding', function () {
-  // it('should be able to init with public path', async () => {
-  //   try {
-  //     const koala = await Koala.create(
-  //       ACCESS_KEY,
-  //       _ => {},
-  //       { publicPath: '/test/koala_params.pv', forceWrite: true }
-  //     );
-  //     expect(koala).to.not.be.undefined;
-  //     expect(koala.frameLength).to.be.greaterThan(0);
-  //     expect(koala.delaySample).to.be.gte(0);
-  //     expect(typeof koala.version).to.eq('string');
-  //     expect(koala.version).length.to.be.greaterThan(0);
-  //     await koala.release();
-  //   } catch (e) {
-  //     expect(e).to.be.undefined;
-  //   }
-  // });
-  //
-  // it('should be able to init with public path (worker)', async () => {
-  //   try {
-  //     const koala = await KoalaWorker.create(
-  //       ACCESS_KEY,
-  //       _ => {},
-  //       { publicPath: '/test/koala_params.pv', forceWrite: true }
-  //     );
-  //     expect(koala).to.not.be.undefined;
-  //     expect(koala.frameLength).to.be.greaterThan(0);
-  //     expect(koala.delaySample).to.be.gte(0);
-  //     expect(typeof koala.version).to.eq('string');
-  //     expect(koala.version).length.to.be.greaterThan(0);
-  //     await koala.terminate();
-  //   } catch (e) {
-  //     expect(e).to.be.undefined;
-  //   }
-  // });
-  //
-  // it('should be able to init with base64', async () => {
-  //   try {
-  //     const koala = await Koala.create(
-  //       ACCESS_KEY,
-  //       _ => {},
-  //       { base64: koalaParams, forceWrite: true }
-  //     );
-  //     expect(koala).to.not.be.undefined;
-  //     expect(koala.frameLength).to.be.greaterThan(0);
-  //     expect(koala.delaySample).to.be.gte(0);
-  //     expect(typeof koala.version).to.eq('string');
-  //     expect(koala.version).length.to.be.greaterThan(0);
-  //     await koala.release();
-  //   } catch (e) {
-  //     expect(e).to.be.undefined;
-  //   }
-  // });
-  //
-  // it('should be able to init with base64 (worker)', async () => {
-  //   try {
-  //     const koala = await KoalaWorker.create(
-  //       ACCESS_KEY,
-  //       _ => {},
-  //       { base64: koalaParams, forceWrite: true }
-  //     );
-  //     expect(koala).to.not.be.undefined;
-  //     expect(koala.frameLength).to.be.greaterThan(0);
-  //     expect(koala.delaySample).to.be.gte(0);
-  //     expect(typeof koala.version).to.eq('string');
-  //     expect(koala.version).length.to.be.greaterThan(0);
-  //     await koala.release();
-  //   } catch (e) {
-  //     expect(e).to.be.undefined;
-  //   }
-  // });
-  //
-  // it('should be able to process pure speech', () => {
-  //   cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
-  //     await runTest(Koala, inputPcm, inputPcm);
-  //   });
-  // });
-  //
-  // it('should be able to process pure speech (worker)', () => {
-  //   cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
-  //     await runTest(KoalaWorker, inputPcm, inputPcm);
-  //   });
-  // });
-  //
-  // it('should be able to process noise speech', () => {
-  //   cy.getFramesFromFile('audio_samples/noise.wav').then( async inputPcm => {
-  //     await runTest(Koala, inputPcm);
-  //   });
-  // });
-  //
-  // it('should be able to process noise speech (worker)', () => {
-  //   cy.getFramesFromFile('audio_samples/noise.wav').then( async inputPcm => {
-  //     await runTest(KoalaWorker, inputPcm);
-  //   });
-  // });
-  //
-  // it('should be able to process mixed speech', () => {
-  //   cy.getFramesFromFile('audio_samples/noise.wav').then( inputPcm => {
-  //     cy.getFramesFromFile('audio_samples/test.wav').then(async referencePcm => {
-  //       const noisyPcm = new Int16Array(inputPcm.length);
-  //       for (let i = 0; i < inputPcm.length; i++) {
-  //         noisyPcm[i] = inputPcm[i] + referencePcm[i];
-  //       }
-  //
-  //       await runTest(Koala, noisyPcm, referencePcm);
-  //     });
-  //   });
-  // });
-  //
-  // it('should be able to process mixed speech (worker)', () => {
-  //   cy.getFramesFromFile('audio_samples/noise.wav').then( inputPcm => {
-  //     cy.getFramesFromFile('audio_samples/test.wav').then(async referencePcm => {
-  //       const noisyPcm = new Int16Array(inputPcm.length);
-  //       for (let i = 0; i < inputPcm.length; i++) {
-  //         noisyPcm[i] = inputPcm[i] + referencePcm[i];
-  //       }
-  //
-  //       await runTest(KoalaWorker, noisyPcm, referencePcm);
-  //     });
-  //   });
-  // });
-  //
-  it('should be able to reset', () => {
-    cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
-      const frames: Int16Array[] = [];
-      let numFrames = 0;
-
+  it('should be able to init with public path', async () => {
+    try {
       const koala = await Koala.create(
         ACCESS_KEY,
-        enhancedPcm => {
-          frames.push(enhancedPcm);
-        },
+        _ => {},
         { publicPath: '/test/koala_params.pv', forceWrite: true }
       );
+      expect(koala).to.not.be.undefined;
+      expect(koala.frameLength).to.be.greaterThan(0);
+      expect(koala.delaySample).to.be.gte(0);
+      expect(typeof koala.version).to.eq('string');
+      expect(koala.version).length.to.be.greaterThan(0);
+      await koala.release();
+    } catch (e) {
+      expect(e).to.be.undefined;
+    }
+  });
 
-      numFrames = Math.round(inputPcm.length / koala.frameLength);
-      await koala.reset();
-      for (let i = 0; i < inputPcm.length; i += koala.frameLength) {
-        await koala.process(inputPcm.slice(i, i + koala.frameLength));
-      }
+  it('should be able to init with public path (worker)', async () => {
+    try {
+      const koala = await KoalaWorker.create(
+        ACCESS_KEY,
+        _ => {},
+        { publicPath: '/test/koala_params.pv', forceWrite: true }
+      );
+      expect(koala).to.not.be.undefined;
+      expect(koala.frameLength).to.be.greaterThan(0);
+      expect(koala.delaySample).to.be.gte(0);
+      expect(typeof koala.version).to.eq('string');
+      expect(koala.version).length.to.be.greaterThan(0);
+      await koala.terminate();
+    } catch (e) {
+      expect(e).to.be.undefined;
+    }
+  });
 
+  it('should be able to init with base64', async () => {
+    try {
+      const koala = await Koala.create(
+        ACCESS_KEY,
+        _ => {},
+        { base64: koalaParams, forceWrite: true }
+      );
+      expect(koala).to.not.be.undefined;
+      expect(koala.frameLength).to.be.greaterThan(0);
+      expect(koala.delaySample).to.be.gte(0);
+      expect(typeof koala.version).to.eq('string');
+      expect(koala.version).length.to.be.greaterThan(0);
+      await koala.release();
+    } catch (e) {
+      expect(e).to.be.undefined;
+    }
+  });
 
+  it('should be able to init with base64 (worker)', async () => {
+    try {
+      const koala = await KoalaWorker.create(
+        ACCESS_KEY,
+        _ => {},
+        { base64: koalaParams, forceWrite: true }
+      );
+      expect(koala).to.not.be.undefined;
+      expect(koala.frameLength).to.be.greaterThan(0);
+      expect(koala.delaySample).to.be.gte(0);
+      expect(typeof koala.version).to.eq('string');
+      expect(koala.version).length.to.be.greaterThan(0);
+      await koala.release();
+    } catch (e) {
+      expect(e).to.be.undefined;
+    }
+  });
+
+  it('should be able to process pure speech', () => {
+    cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
+      await runTest(Koala, inputPcm, inputPcm);
     });
   });
 
-  // it('should be able to reset (worker)', () => {
-  //   cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
-  //     let referenceFrames: Int16Array[] = [];
-  //
-  //     const koala = await KoalaWorker.create(
-  //       ACCESS_KEY,
-  //       enhancedPcm => {
-  //         referenceFrames.push(enhancedPcm);
-  //       },
-  //       { publicPath: '/test/koala_params.pv', forceWrite: true }
-  //     );
-  //     await koala.reset();
-  //     for (let i = 0; i < inputPcm.length; i += koala.frameLength) {
-  //       await koala.process(inputPcm.slice(i, i + koala.frameLength));
-  //     }
-  //
-  //     const copy = referenceFrames;
-  //     referenceFrames = [];
-  //     await koala.reset();
-  //     for (let i = 0; i < inputPcm.length; i += koala.frameLength) {
-  //       await koala.process(inputPcm.slice(i, i + koala.frameLength));
-  //     }
-  //
-  //     for (let i = 0; i < copy.length; i++) {
-  //       expect(copy[i]).to.deep.eq(referenceFrames[i]);
-  //     }
-  //     await koala.terminate();
-  //   });
-  // });
+  it('should be able to process pure speech (worker)', () => {
+    cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
+      await runTest(KoalaWorker, inputPcm, inputPcm);
+    });
+  });
+
+  it('should be able to process noise speech', () => {
+    cy.getFramesFromFile('audio_samples/noise.wav').then( async inputPcm => {
+      await runTest(Koala, inputPcm);
+    });
+  });
+
+  it('should be able to process noise speech (worker)', () => {
+    cy.getFramesFromFile('audio_samples/noise.wav').then( async inputPcm => {
+      await runTest(KoalaWorker, inputPcm);
+    });
+  });
+
+  it('should be able to process mixed speech', () => {
+    cy.getFramesFromFile('audio_samples/noise.wav').then( inputPcm => {
+      cy.getFramesFromFile('audio_samples/test.wav').then(async referencePcm => {
+        const noisyPcm = new Int16Array(inputPcm.length);
+        for (let i = 0; i < inputPcm.length; i++) {
+          noisyPcm[i] = inputPcm[i] + referencePcm[i];
+        }
+
+        await runTest(Koala, noisyPcm, referencePcm);
+      });
+    });
+  });
+
+  it('should be able to process mixed speech (worker)', () => {
+    cy.getFramesFromFile('audio_samples/noise.wav').then( inputPcm => {
+      cy.getFramesFromFile('audio_samples/test.wav').then(async referencePcm => {
+        const noisyPcm = new Int16Array(inputPcm.length);
+        for (let i = 0; i < inputPcm.length; i++) {
+          noisyPcm[i] = inputPcm[i] + referencePcm[i];
+        }
+
+        await runTest(KoalaWorker, noisyPcm, referencePcm);
+      });
+    });
+  });
+
+  it('should be able to reset', () => {
+    cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
+      await testReset(Koala, inputPcm);
+    });
+  });
+
+  it('should be able to reset (worker)', () => {
+    cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
+      await testReset(KoalaWorker, inputPcm);
+    });
+  });
 });
