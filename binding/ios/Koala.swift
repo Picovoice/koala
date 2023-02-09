@@ -133,7 +133,7 @@ public class Koala {
             throw KoalaInvalidArgumentError("Frame of audio data must contain \(Koala.frameLength) samples - given frame contained \(pcm.count)")
         }
 
-        var enhancedPcm: [Int16] = Array(repeating: 0, count: Koala.frameLength)
+        var enhancedPcm = [Int16](repeating: 0, count: Koala.frameLength)
         let status = pv_koala_process(self.handle, pcm, &enhancedPcm[0])
         if status != PV_STATUS_SUCCESS {
             throw pvStatusToKoalaError(status, "Koala process failed")

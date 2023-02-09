@@ -1,0 +1,858 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		02574DBD299569BB003FC0FA /* test.wav in Resources */ = {isa = PBXBuildFile; fileRef = 02574DBB299569BB003FC0FA /* test.wav */; };
+		02574DBE299569BB003FC0FA /* test.wav in Resources */ = {isa = PBXBuildFile; fileRef = 02574DBB299569BB003FC0FA /* test.wav */; };
+		02574DBF299569BB003FC0FA /* noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = 02574DBC299569BB003FC0FA /* noise.wav */; };
+		02574DC0299569BB003FC0FA /* noise.wav in Resources */ = {isa = PBXBuildFile; fileRef = 02574DBC299569BB003FC0FA /* noise.wav */; };
+		1E00655827CFF7EB006FF6E9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E00655727CFF7EB006FF6E9 /* AppDelegate.swift */; };
+		1E00655C27CFF7EB006FF6E9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E00655B27CFF7EB006FF6E9 /* ViewController.swift */; };
+		1E00655F27CFF7EB006FF6E9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E00655D27CFF7EB006FF6E9 /* Main.storyboard */; };
+		1E00656127CFF7EC006FF6E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E00656027CFF7EC006FF6E9 /* Assets.xcassets */; };
+		1E00656427CFF7EC006FF6E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E00656227CFF7EC006FF6E9 /* LaunchScreen.storyboard */; };
+		1E00657927CFF7EC006FF6E9 /* KoalaAppTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E00657827CFF7EC006FF6E9 /* KoalaAppTestUITests.swift */; };
+		1E5B7B332800F75900F8BDDB /* PerformanceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5B7B322800F75900F8BDDB /* PerformanceTest.swift */; };
+		415638DBF440AE6FEF275134 /* libPods-KoalaAppTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E6008986406F64E64E5AABC /* libPods-KoalaAppTest.a */; };
+		BB55D37F1F5EF113CFE49288 /* libPods-KoalaAppTestUITests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6F71AF1715132C4FD3C9473 /* libPods-KoalaAppTestUITests.a */; };
+		DB30F23C393A77EF898A27A3 /* libPods-PerformanceTest.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DE6FA71D6A578FD4B0CD0897 /* libPods-PerformanceTest.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1E00657527CFF7EC006FF6E9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1E00654C27CFF7EB006FF6E9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1E00655327CFF7EB006FF6E9;
+			remoteInfo = KoalaAppTest;
+		};
+		1E5B7B232800F6FE00F8BDDB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1E00654C27CFF7EB006FF6E9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1E00655327CFF7EB006FF6E9;
+			remoteInfo = KoalaAppTest;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		02574DBB299569BB003FC0FA /* test.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = test.wav; path = ../../../resources/audio_samples/test.wav; sourceTree = "<group>"; };
+		02574DBC299569BB003FC0FA /* noise.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = noise.wav; path = ../../../resources/audio_samples/noise.wav; sourceTree = "<group>"; };
+		19841E7C8EA384D98ED7251B /* Pods-KoalaAppTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoalaAppTest.release.xcconfig"; path = "Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest.release.xcconfig"; sourceTree = "<group>"; };
+		1E00655427CFF7EB006FF6E9 /* KoalaAppTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KoalaAppTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E00655727CFF7EB006FF6E9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		1E00655B27CFF7EB006FF6E9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		1E00655E27CFF7EB006FF6E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		1E00656027CFF7EC006FF6E9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1E00656327CFF7EC006FF6E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		1E00656527CFF7EC006FF6E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1E00657427CFF7EC006FF6E9 /* KoalaAppTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KoalaAppTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E00657827CFF7EC006FF6E9 /* KoalaAppTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoalaAppTestUITests.swift; sourceTree = "<group>"; };
+		1E00658827CFFA3C006FF6E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1E5B7B302800F6FE00F8BDDB /* PerformanceTest.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PerformanceTest.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		1E5B7B322800F75900F8BDDB /* PerformanceTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerformanceTest.swift; sourceTree = "<group>"; };
+		1E5B7B342800F76700F8BDDB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3E6008986406F64E64E5AABC /* libPods-KoalaAppTest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KoalaAppTest.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5CCA3A5EB9F44528BD989C77 /* Pods-PerformanceTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PerformanceTest.debug.xcconfig"; path = "Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest.debug.xcconfig"; sourceTree = "<group>"; };
+		7EED4351F3353A9995259861 /* Pods-KoalaAppTestUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoalaAppTestUITests.release.xcconfig"; path = "Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests.release.xcconfig"; sourceTree = "<group>"; };
+		808A1A007913D8DFAD0BF784 /* Pods-KoalaAppTestUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoalaAppTestUITests.debug.xcconfig"; path = "Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		A6F71AF1715132C4FD3C9473 /* libPods-KoalaAppTestUITests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-KoalaAppTestUITests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B34F5016447834B47F0B5E27 /* Pods-PerformanceTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PerformanceTest.release.xcconfig"; path = "Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest.release.xcconfig"; sourceTree = "<group>"; };
+		DE6FA71D6A578FD4B0CD0897 /* libPods-PerformanceTest.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PerformanceTest.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FB4347876E9364A46E319585 /* Pods-KoalaAppTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KoalaAppTest.debug.xcconfig"; path = "Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1E00655127CFF7EB006FF6E9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				415638DBF440AE6FEF275134 /* libPods-KoalaAppTest.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E00657127CFF7EC006FF6E9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BB55D37F1F5EF113CFE49288 /* libPods-KoalaAppTestUITests.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E5B7B272800F6FE00F8BDDB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DB30F23C393A77EF898A27A3 /* libPods-PerformanceTest.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1E00654B27CFF7EB006FF6E9 = {
+			isa = PBXGroup;
+			children = (
+				02574DBC299569BB003FC0FA /* noise.wav */,
+				02574DBB299569BB003FC0FA /* test.wav */,
+				1E5B7B312800F71E00F8BDDB /* PerformanceTest */,
+				1E00655627CFF7EB006FF6E9 /* KoalaAppTest */,
+				1E00657727CFF7EC006FF6E9 /* KoalaAppTestUITests */,
+				1E00655527CFF7EB006FF6E9 /* Products */,
+				9CBC7522C4FCFE2940BFA42C /* Pods */,
+				5F91207C263F7A97417BE8CD /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		1E00655527CFF7EB006FF6E9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1E00655427CFF7EB006FF6E9 /* KoalaAppTest.app */,
+				1E00657427CFF7EC006FF6E9 /* KoalaAppTestUITests.xctest */,
+				1E5B7B302800F6FE00F8BDDB /* PerformanceTest.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1E00655627CFF7EB006FF6E9 /* KoalaAppTest */ = {
+			isa = PBXGroup;
+			children = (
+				1E00655727CFF7EB006FF6E9 /* AppDelegate.swift */,
+				1E00655B27CFF7EB006FF6E9 /* ViewController.swift */,
+				1E00655D27CFF7EB006FF6E9 /* Main.storyboard */,
+				1E00656027CFF7EC006FF6E9 /* Assets.xcassets */,
+				1E00656227CFF7EC006FF6E9 /* LaunchScreen.storyboard */,
+				1E00656527CFF7EC006FF6E9 /* Info.plist */,
+			);
+			path = KoalaAppTest;
+			sourceTree = "<group>";
+		};
+		1E00657727CFF7EC006FF6E9 /* KoalaAppTestUITests */ = {
+			isa = PBXGroup;
+			children = (
+				1E00657827CFF7EC006FF6E9 /* KoalaAppTestUITests.swift */,
+				1E00658827CFFA3C006FF6E9 /* Info.plist */,
+			);
+			path = KoalaAppTestUITests;
+			sourceTree = "<group>";
+		};
+		1E5B7B312800F71E00F8BDDB /* PerformanceTest */ = {
+			isa = PBXGroup;
+			children = (
+				1E5B7B322800F75900F8BDDB /* PerformanceTest.swift */,
+				1E5B7B342800F76700F8BDDB /* Info.plist */,
+			);
+			path = PerformanceTest;
+			sourceTree = "<group>";
+		};
+		5F91207C263F7A97417BE8CD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3E6008986406F64E64E5AABC /* libPods-KoalaAppTest.a */,
+				DE6FA71D6A578FD4B0CD0897 /* libPods-PerformanceTest.a */,
+				A6F71AF1715132C4FD3C9473 /* libPods-KoalaAppTestUITests.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9CBC7522C4FCFE2940BFA42C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				FB4347876E9364A46E319585 /* Pods-KoalaAppTest.debug.xcconfig */,
+				19841E7C8EA384D98ED7251B /* Pods-KoalaAppTest.release.xcconfig */,
+				808A1A007913D8DFAD0BF784 /* Pods-KoalaAppTestUITests.debug.xcconfig */,
+				7EED4351F3353A9995259861 /* Pods-KoalaAppTestUITests.release.xcconfig */,
+				5CCA3A5EB9F44528BD989C77 /* Pods-PerformanceTest.debug.xcconfig */,
+				B34F5016447834B47F0B5E27 /* Pods-PerformanceTest.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1E00655327CFF7EB006FF6E9 /* KoalaAppTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E00657E27CFF7EC006FF6E9 /* Build configuration list for PBXNativeTarget "KoalaAppTest" */;
+			buildPhases = (
+				F3A4A1CCABD4718530D6587F /* [CP] Check Pods Manifest.lock */,
+				1E00655027CFF7EB006FF6E9 /* Sources */,
+				1E00655127CFF7EB006FF6E9 /* Frameworks */,
+				1E00655227CFF7EB006FF6E9 /* Resources */,
+				213525BC8D3CB460A44F22DA /* [CP] Embed Pods Frameworks */,
+				16D34B5BE8C83F35C92D3707 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = KoalaAppTest;
+			productName = KoalaAppTest;
+			productReference = 1E00655427CFF7EB006FF6E9 /* KoalaAppTest.app */;
+			productType = "com.apple.product-type.application";
+		};
+		1E00657327CFF7EC006FF6E9 /* KoalaAppTestUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E00658427CFF7EC006FF6E9 /* Build configuration list for PBXNativeTarget "KoalaAppTestUITests" */;
+			buildPhases = (
+				5205C1A9524E55350205706E /* [CP] Check Pods Manifest.lock */,
+				1E00657027CFF7EC006FF6E9 /* Sources */,
+				1E00657127CFF7EC006FF6E9 /* Frameworks */,
+				1E00657227CFF7EC006FF6E9 /* Resources */,
+				330620338C86D4B471102B40 /* [CP] Embed Pods Frameworks */,
+				721D2B31E3B9E61DA1364874 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1E00657627CFF7EC006FF6E9 /* PBXTargetDependency */,
+			);
+			name = KoalaAppTestUITests;
+			productName = KoalaAppTestUITests;
+			productReference = 1E00657427CFF7EC006FF6E9 /* KoalaAppTestUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		1E5B7B212800F6FE00F8BDDB /* PerformanceTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1E5B7B2D2800F6FE00F8BDDB /* Build configuration list for PBXNativeTarget "PerformanceTest" */;
+			buildPhases = (
+				1E5B7B242800F6FE00F8BDDB /* [CP] Check Pods Manifest.lock */,
+				1E5B7B252800F6FE00F8BDDB /* Sources */,
+				1E5B7B272800F6FE00F8BDDB /* Frameworks */,
+				1E5B7B292800F6FE00F8BDDB /* Resources */,
+				1E5B7B2C2800F6FE00F8BDDB /* [CP] Embed Pods Frameworks */,
+				41DEB299D99FB5970A8A4667 /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1E5B7B222800F6FE00F8BDDB /* PBXTargetDependency */,
+			);
+			name = PerformanceTest;
+			productName = KoalaAppTestUITests;
+			productReference = 1E5B7B302800F6FE00F8BDDB /* PerformanceTest.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1E00654C27CFF7EB006FF6E9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1320;
+				LastUpgradeCheck = 1320;
+				TargetAttributes = {
+					1E00655327CFF7EB006FF6E9 = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+					1E00657327CFF7EC006FF6E9 = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 1E00655327CFF7EB006FF6E9;
+					};
+					1E5B7B212800F6FE00F8BDDB = {
+						LastSwiftMigration = 1320;
+						TestTargetID = 1E00655327CFF7EB006FF6E9;
+					};
+				};
+			};
+			buildConfigurationList = 1E00654F27CFF7EB006FF6E9 /* Build configuration list for PBXProject "KoalaAppTest" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1E00654B27CFF7EB006FF6E9;
+			productRefGroup = 1E00655527CFF7EB006FF6E9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1E00655327CFF7EB006FF6E9 /* KoalaAppTest */,
+				1E00657327CFF7EC006FF6E9 /* KoalaAppTestUITests */,
+				1E5B7B212800F6FE00F8BDDB /* PerformanceTest */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1E00655227CFF7EB006FF6E9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E00656427CFF7EC006FF6E9 /* LaunchScreen.storyboard in Resources */,
+				1E00656127CFF7EC006FF6E9 /* Assets.xcassets in Resources */,
+				1E00655F27CFF7EB006FF6E9 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E00657227CFF7EC006FF6E9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02574DBF299569BB003FC0FA /* noise.wav in Resources */,
+				02574DBD299569BB003FC0FA /* test.wav in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E5B7B292800F6FE00F8BDDB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02574DC0299569BB003FC0FA /* noise.wav in Resources */,
+				02574DBE299569BB003FC0FA /* test.wav in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		16D34B5BE8C83F35C92D3707 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1E5B7B242800F6FE00F8BDDB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-PerformanceTest-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		1E5B7B2C2800F6FE00F8BDDB /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		213525BC8D3CB460A44F22DA /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTest/Pods-KoalaAppTest-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		330620338C86D4B471102B40 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		41DEB299D99FB5970A8A4667 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PerformanceTest/Pods-PerformanceTest-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5205C1A9524E55350205706E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KoalaAppTestUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		721D2B31E3B9E61DA1364874 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-KoalaAppTestUITests/Pods-KoalaAppTestUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F3A4A1CCABD4718530D6587F /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-KoalaAppTest-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1E00655027CFF7EB006FF6E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E00655C27CFF7EB006FF6E9 /* ViewController.swift in Sources */,
+				1E00655827CFF7EB006FF6E9 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E00657027CFF7EC006FF6E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E00657927CFF7EC006FF6E9 /* KoalaAppTestUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1E5B7B252800F6FE00F8BDDB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1E5B7B332800F75900F8BDDB /* PerformanceTest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1E00657627CFF7EC006FF6E9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1E00655327CFF7EB006FF6E9 /* KoalaAppTest */;
+			targetProxy = 1E00657527CFF7EC006FF6E9 /* PBXContainerItemProxy */;
+		};
+		1E5B7B222800F6FE00F8BDDB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1E00655327CFF7EB006FF6E9 /* KoalaAppTest */;
+			targetProxy = 1E5B7B232800F6FE00F8BDDB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		1E00655D27CFF7EB006FF6E9 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1E00655E27CFF7EB006FF6E9 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		1E00656227CFF7EC006FF6E9 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1E00656327CFF7EC006FF6E9 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1E00657C27CFF7EC006FF6E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1E00657D27CFF7EC006FF6E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1E00657F27CFF7EC006FF6E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FB4347876E9364A46E319585 /* Pods-KoalaAppTest.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65723695GD;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KoalaAppTest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.picovoice.KoalaAppTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		1E00658027CFF7EC006FF6E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 19841E7C8EA384D98ED7251B /* Pods-KoalaAppTest.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65723695GD;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KoalaAppTest/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.picovoice.KoalaAppTest;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		1E00658527CFF7EC006FF6E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 808A1A007913D8DFAD0BF784 /* Pods-KoalaAppTestUITests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65723695GD;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.picovoice.KoalaAppTestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KoalaAppTest;
+			};
+			name = Debug;
+		};
+		1E00658627CFF7EC006FF6E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7EED4351F3353A9995259861 /* Pods-KoalaAppTestUITests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65723695GD;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.picovoice.KoalaAppTestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KoalaAppTest;
+			};
+			name = Release;
+		};
+		1E5B7B2E2800F6FE00F8BDDB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5CCA3A5EB9F44528BD989C77 /* Pods-PerformanceTest.debug.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65723695GD;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.picovoice.KoalaAppTestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KoalaAppTest;
+			};
+			name = Debug;
+		};
+		1E5B7B2F2800F6FE00F8BDDB /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B34F5016447834B47F0B5E27 /* Pods-PerformanceTest.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 65723695GD;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = ai.picovoice.KoalaAppTestUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = KoalaAppTest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1E00654F27CFF7EB006FF6E9 /* Build configuration list for PBXProject "KoalaAppTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E00657C27CFF7EC006FF6E9 /* Debug */,
+				1E00657D27CFF7EC006FF6E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1E00657E27CFF7EC006FF6E9 /* Build configuration list for PBXNativeTarget "KoalaAppTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E00657F27CFF7EC006FF6E9 /* Debug */,
+				1E00658027CFF7EC006FF6E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1E00658427CFF7EC006FF6E9 /* Build configuration list for PBXNativeTarget "KoalaAppTestUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E00658527CFF7EC006FF6E9 /* Debug */,
+				1E00658627CFF7EC006FF6E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1E5B7B2D2800F6FE00F8BDDB /* Build configuration list for PBXNativeTarget "PerformanceTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1E5B7B2E2800F6FE00F8BDDB /* Debug */,
+				1E5B7B2F2800F6FE00F8BDDB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1E00654C27CFF7EB006FF6E9 /* Project object */;
+}
