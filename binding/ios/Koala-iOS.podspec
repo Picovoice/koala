@@ -22,6 +22,11 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '11.0'
   s.swift_version = '5.0'
   s.vendored_frameworks = 'lib/ios/PvKoala.xcframework'
+  s.resource_bundles = {
+    'KoalaResources' => [
+      'lib/common/koala_params.pv'
+    ]
+  }
   s.source_files = 'binding/ios/*.{swift}'
   s.exclude_files = 'binding/ios/KoalaAppTest/**'
 end
