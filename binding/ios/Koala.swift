@@ -32,17 +32,17 @@ public class Koala {
     private var handle: OpaquePointer?
 
     /// The number of audio samples per frame.
-    public static let frameLength = Int(pv_koala_frame_length())
+    public static let frameLength = UInt32(pv_koala_frame_length())
 
     /// Audio sample rate accepted by Koala.
-    public static let sampleRate = Int(pv_sample_rate())
+    public static let sampleRate = UInt32(pv_sample_rate())
 
     /// Current Koala version.
     public static let version = String(cString: pv_koala_version())
 
     ///  Delay in samples. If the input and output of consecutive calls to `.process()` are viewed as two contiguous
     ///  streams of audio data, this delay specifies the time shift between the input and output stream.
-    public var delaySample: Int = 0
+    public var delaySample: UInt32 = 0
 
     /// Constructor.
     ///
@@ -83,7 +83,7 @@ public class Koala {
         if status != PV_STATUS_SUCCESS {
             throw pvStatusToKoalaError(status, "Failed to get Koala delay sample")
         }
-        self.delaySample = Int(cDelaySample)
+        self.delaySample = UInt32(cDelaySample)
     }
 
     deinit {
@@ -133,7 +133,7 @@ public class Koala {
             throw KoalaInvalidArgumentError("Frame of audio data must contain \(Koala.frameLength) samples - given frame contained \(pcm.count)")
         }
 
-        var enhancedPcm = [Int16](repeating: 0, count: Koala.frameLength)
+        var enhancedPcm = [Int16](repeating: 0, count: Int(Koala.frameLength))
         let status = pv_koala_process(self.handle, pcm, &enhancedPcm[0])
         if status != PV_STATUS_SUCCESS {
             throw pvStatusToKoalaError(status, "Koala process failed")
