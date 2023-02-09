@@ -3,13 +3,13 @@ name: Web Codestyle
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths:
       - '**/web/*.js'
       - '**/web/*.ts'
       - '.github/workflows/web-codestyle.yml'
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
     paths:
       - '**/web/*.js'
       - '**/web/*.ts'
