@@ -1,8 +1,12 @@
+LPWSTR
+MODLE
+Makefiles
 aarch
 armv
 astype
 calcsize
 denoising
+drwav
 dtype
 frombuffer
 hanning
@@ -10,10 +14,12 @@ irfft
 jetson
 libpv
 linalg
+malloc
 ndarray
 numpy
 outf
 picovoice
+pthread
 pvkoala
 pvkoalademo
 pvrecorder
@@ -21,3 +27,5 @@ randn
 rfft
 rfftfreq
 signup
+wargv
+wchars

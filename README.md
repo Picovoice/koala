@@ -21,8 +21,10 @@ Koala is an on-device noise suppression engine. Koala is:
     - [AccessKey](#accesskey)
     - [Demos](#demos)
         - [Python](#python-demos)
+        - [C](#c-demos)
     - [SDKs](#sdks)
         - [Python](#python)
+        - [C](#c)
     - [Releases](#releases)
 
 ## AccessKey
@@ -59,6 +61,33 @@ koala_demo_file \
 
 Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
 
+### C Demos
+
+Build the demo:
+
+```console
+cmake -S demo/c/ -B demo/c/build && cmake --build demo/c/build --target koala_demo_mic
+```
+
+To list the available audio input devices:
+
+```console
+./demo/c/build/koala_demo_mic -s
+```
+
+To run the demo:
+
+```console
+./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODLE_PATH} -a ${ACCESS_KEY} -o ${WAV_OUTPUT_PATH}
+```
+
+Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](./lib), `${MODEL_PATH}` with path
+to the model file available under [lib/common](./lib/common), `${ACCESS_KEY}` with AccessKey
+obtained from [Picovoice Console](https://console.picovoice.ai/), and `${WAV_OUTPUT_PATH}` with a path to a `.wav` file
+where the enhanced audio will be stored. Terminate the demo with `Ctrl+C`.
+
+For more information about C demos go to [demo/c](./demo/c).
+
 ## SDKs
 
 ### Python
@@ -75,7 +104,11 @@ Create an instance of the engine and enhance audio in real-time:
 import pvkoala
 
 koala = pvkoala.create(access_key='${ACCESS_KEY}')
+```
 
+Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
+
+```python
 def get_next_audio_frame():
     pass
 
@@ -83,6 +116,49 @@ while True:
     enhanced_audio = koala.process(get_next_audio_frame())
 ```
 
-Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
+Finally, when done be sure to explicitly release the resources using `koala.delete()`.
+
+### C
+
+[include/pv_koala.h](./include/pv_koala.h) header file contains relevant information. Build an instance of the object:
+
+```c
+    pv_koala_t *handle = NULL;
+    const char *model_path = "${MODEL_PATH}";
+    pv_status_t status = pv_koala_init(${ACCESS_KEY}, model_path, &handle);
+    if (status != PV_STATUS_SUCCESS) {
+        // error handling logic
+    }
+```
+
+Replace `${ACCESS_KEY}` with the AccessKey obtained from Picovoice Console, and `${MODEL_PATH}` with the path to the
+model file available under [lib/common](./lib/common).
+
+Now the `handle` can be used to enhance audio in real-time:
+
+```c
+extern const int16_t *get_next_audio_frame(void);
+
+const int32_t frame_length = pv_koala_frame_length();
+int16_t *enhanced_pcm = (int16_t *) malloc(frame_length * sizeof(int16_t));
+
+while (true) {
+    const int16_t *pcm = get_next_audio_frame();
+    const pv_status_t status = pv_koala_process(handle, pcm, enhanced_pcm);
+    if (status != PV_STATUS_SUCCESS) {
+        // error handling logic
+    }
+}
+```
+
+Finally, when done be sure to release the acquired resources:
+
+```c
+pv_koala_delete(handle);
+```
 
 ## Releases
+
+### v1.0.0 February 7th, 2023
+
+- Initial release.
