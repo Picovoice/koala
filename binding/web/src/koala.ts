@@ -263,6 +263,17 @@ export class Koala {
       }
     }
 
+    if (pcm.length !== this.frameLength) {
+      const error = new Error(`Koala process requires frames of length ${this.frameLength}. 
+        Received frame of size ${pcm.length}.`);
+      if (this._processErrorCallback) {
+        this._processErrorCallback(error.toString());
+      } else {
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
+    }
+
     this._processMutex
       .runExclusive(async () => {
         if (this._wasmMemory === undefined) {
@@ -333,6 +344,8 @@ export class Koala {
               `${msg}\nDetails: ${this._pvError.getErrorString()}`
             );
           }
+
+          resolve();
         })
         .catch((error: any) => {
           reject(error);
@@ -483,7 +496,7 @@ export class Koala {
       Int16Array.BYTES_PER_ELEMENT,
       frameLength * Int16Array.BYTES_PER_ELEMENT,
     );
-    if (inputBufferAddress === 0) {
+    if (outputBufferAddress === 0) {
       throw new Error('malloc failed: Cannot allocate memory');
     }
 

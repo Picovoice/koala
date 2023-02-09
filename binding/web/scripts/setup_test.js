@@ -5,24 +5,35 @@ const modelFiles = ['koala_params.pv'];
 
 console.log('Copying the koala model...');
 
-const sourceDirectory = join(
-  __dirname,
-  '..',
-  '..',
-  '..',
-  'lib',
-  'common',
+const fixturesDirectory = join(__dirname, '..', 'cypress', 'fixtures')
+const testDirectory = join(__dirname, '..', 'test');
+
+const paramsSourceDirectory = join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'lib',
+    'common',
 );
 
-const outputDirectory = join(__dirname, '..', 'test');
+const sourceDirectory = join(
+    __dirname,
+    "..",
+    "..",
+    "..",
+    "resources",
+);
 
 try {
-  fs.mkdirSync(outputDirectory, { recursive: true });
   modelFiles.forEach(file => {
-    fs.copyFileSync(join(sourceDirectory, file), join(outputDirectory, file));
+    fs.copyFileSync(join(paramsSourceDirectory, file), join(testDirectory, file));
+  });
+
+  fs.mkdirSync(join(fixturesDirectory, 'audio_samples'), { recursive: true });
+  fs.readdirSync(join(sourceDirectory, 'audio_samples')).forEach(file => {
+    fs.copyFileSync(join(sourceDirectory, 'audio_samples', file), join(fixturesDirectory, 'audio_samples', file));
   });
 } catch (error) {
   console.error(error);
 }
-
-console.log('... Done!');
