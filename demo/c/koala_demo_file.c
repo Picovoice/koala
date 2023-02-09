@@ -300,9 +300,14 @@ int picovoice_main(int argc, char *argv[]) {
     fprintf(stdout, "Processing audio...\n");
 
     size_t total_samples = input_file.totalPCMFrameCount;
-    size_t processed_samples = 0;
-    int32_t remaining_delay_samples = delay_samples;
-    while ((int32_t) drwav_read_pcm_frames_s16(&input_file, frame_length, pcm) == frame_length) {
+
+    int32_t start_sample = 0;
+    while (start_sample < total_samples + delay_samples) {
+        int32_t end_sample = start_sample + frame_length;
+
+        memset(pcm, 0, frame_length * sizeof(int16_t));
+        drwav_read_pcm_frames_s16(&input_file, frame_length, pcm);
+
         struct timeval before;
         gettimeofday(&before, NULL);
 
@@ -315,41 +320,31 @@ int picovoice_main(int argc, char *argv[]) {
         struct timeval after;
         gettimeofday(&after, NULL);
 
-        processed_samples += frame_length;
-
         total_cpu_time_usec +=
                 (double) (after.tv_sec - before.tv_sec) * 1e6 + (double) (after.tv_usec - before.tv_usec);
         total_processed_time_usec += (frame_length * 1e6) / pv_sample_rate_func();
 
-        print_progress_bar(total_samples, processed_samples);
+        pcm_to_write = enhanced_pcm;
+        pcm_to_write_length = frame_length;
+        if (end_sample > delay_samples) {
+            if (end_sample > total_samples + delay_samples) {
+                pcm_to_write_length = (total_samples + delay_samples - start_sample);
+            }
+            if (start_sample < delay_samples) {
+                pcm_to_write += (delay_samples - start_sample);
+                pcm_to_write_length -= (delay_samples - start_sample);
+            }
 
-        if (processed_samples <= remaining_delay_samples) {
-            continue;
-        } else {
-            pcm_to_write = enhanced_pcm + ((processed_samples - remaining_delay_samples) % frame_length);
-            pcm_to_write_length = frame_length - ((processed_samples - remaining_delay_samples) % frame_length);
-            remaining_delay_samples = 0;
+            if ((int32_t) drwav_write_pcm_frames(&output_file, pcm_to_write_length, pcm_to_write) != pcm_to_write_length) {
+                fprintf(stderr, "Failed to write to output file.\n");
+                exit(EXIT_FAILURE);
+            }
         }
 
-        if ((int32_t) drwav_write_pcm_frames(&output_file, pcm_to_write_length, pcm_to_write) != pcm_to_write_length) {
-            fprintf(stderr, "Failed to write to output file.\n");
-            exit(EXIT_FAILURE);
-        }
-    }
+        start_sample = end_sample;
 
-    pcm_to_write_length = total_samples - processed_samples + delay_samples;
-    pcm_to_write = calloc(pcm_to_write_length, sizeof(int16_t));
-    if (!pcm_to_write) {
-        fprintf(stderr, "Failed to allocate pcm_to_write memory.\n");
-        exit(EXIT_FAILURE);
+        print_progress_bar(total_samples, end_sample);
     }
-
-    if ((int32_t) drwav_write_pcm_frames(&output_file, pcm_to_write_length, pcm_to_write) != pcm_to_write_length) {
-        fprintf(stderr, "Failed to write to output file.\n");
-        exit(EXIT_FAILURE);
-    }
-    free(pcm_to_write);
-
 
     const double real_time_factor = total_cpu_time_usec / total_processed_time_usec;
     fprintf(stdout, "\nreal time factor : %.3f\n", real_time_factor);
