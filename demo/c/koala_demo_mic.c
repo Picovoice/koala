@@ -139,14 +139,14 @@ static void print_vu_meter(const int16_t *pcm_buffer, int32_t num_samples) {
     }
     float volume_db = 10 * log10f((sum + FLT_EPSILON) / (float) num_samples / (float)(SHRT_MAX * SHRT_MAX));
 
-    float volume = (volume_db + 50) / 50;
+    float volume = (volume_db + 45) / 45;
     volume = volume < 0 ? 0 : volume;
     int32_t percentage = (int32_t) roundf(volume * 100);
-    int32_t bar_length = ((int32_t) roundf(volume * 20)) * 3;
-    int32_t empty_length = 20 - (bar_length / 3);
+    int32_t bar_length = ((int32_t) roundf(volume * 20));
+    int32_t empty_length = 20 - (bar_length);
     fprintf(stdout,
             "\r[%3d%%]%.*s%.*s|", percentage,
-            bar_length, "████████████████████",
+            bar_length, "####################",
             empty_length, "                    ");
     fflush(stdout);
 }
@@ -208,7 +208,7 @@ int picovoice_main(int argc, char *argv[]) {
 
     int output_path_wchars_num = MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, NULL, 0);
     wchar_t output_path_w[output_path_wchars_num];
-    MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, output_path_w, input_path_wchars_num);
+    MultiByteToWideChar(CP_UTF8, UTF8_COMPOSITION_FLAG, output_path, NULL_TERMINATED, output_path_w, output_path_wchars_num);
     unsigned int drwav_init_file_status = drwav_init_file_write_w(&output_file, output_path_w, &format, NULL);
 
 #else

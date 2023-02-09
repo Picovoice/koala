@@ -100,11 +100,11 @@ void print_usage(const char *program_name) {
 static void print_progress_bar(size_t num_total_samples, size_t num_processed_samples) {
     float ratio = (float) num_processed_samples / (float) num_total_samples;
     int32_t percentage = (int32_t) roundf(ratio * 100);
-    int32_t bar_length = ((int32_t) roundf(ratio * 20)) * 3;
-    int32_t empty_length = 20 - (bar_length / 3);
+    int32_t bar_length = ((int32_t) roundf(ratio * 20));
+    int32_t empty_length = 20 - (bar_length);
     fprintf(stdout,
             "\r[%3d%%]%.*s%.*s|", percentage,
-            bar_length, "████████████████████",
+            bar_length, "####################",
             empty_length, "                    ");
     fflush(stdout);
 }
@@ -337,13 +337,14 @@ int picovoice_main(int argc, char *argv[]) {
         }
     }
 
-    pcm_to_write = calloc(delay_samples, sizeof(int16_t));
+    pcm_to_write_length = delay_samples;
+    pcm_to_write = calloc(pcm_to_write_length, sizeof(int16_t));
     if (!pcm_to_write) {
         fprintf(stderr, "Failed to allocate pcm_to_write memory.\n");
         exit(EXIT_FAILURE);
     }
 
-    pcm_to_write_length = delay_samples;
+    printf("pcm_to_write_length %d\n", pcm_to_write_length);
     if ((int32_t) drwav_write_pcm_frames(&output_file, pcm_to_write_length, pcm_to_write) != pcm_to_write_length) {
         fprintf(stderr, "Failed to write to output file.\n");
         exit(EXIT_FAILURE);
