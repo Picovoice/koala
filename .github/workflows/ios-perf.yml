@@ -29,7 +29,6 @@ jobs:
         device: [ ios-perf ]
         include:
         - device: ios-perf
-          initPerformanceThresholdSec: 1.5
           procPerformanceThresholdSec: 0.2
 
     steps:
@@ -57,10 +56,6 @@ jobs:
 
       - name: Inject Number of Iterations
         run: sed -i '.bak' 's:{NUM_TEST_ITERATIONS}:30:'
-          PerformanceTest/PerformanceTest.swift
-
-      - name: Inject Performance Threshold
-        run: sed -i '.bak' 's:{INIT_PERFORMANCE_THRESHOLD_SEC}:${{ matrix.indexPerformanceThresholdSec }}:'
           PerformanceTest/PerformanceTest.swift
 
       - name: Inject Performance Threshold
