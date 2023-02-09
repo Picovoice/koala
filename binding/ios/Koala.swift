@@ -12,20 +12,37 @@ import PvKoala
 /// iOS binding for Koala Noise Suppression Engine. Provides a Swift interface to the Koala library.
 public class Koala {
 
+    static let resourceBundle: Bundle = {
+        let myBundle = Bundle(for: Koala.self)
+
+        guard let resourceBundleURL = myBundle.url(
+                forResource: "KoalaResources", withExtension: "bundle")
+                else {
+            fatalError("KoalaResources.bundle not found")
+        }
+
+        guard let resourceBundle = Bundle(url: resourceBundleURL)
+                else {
+            fatalError("Could not open KoalaResources.bundle")
+        }
+
+        return resourceBundle
+    }()
+
     private var handle: OpaquePointer?
 
     /// The number of audio samples per frame.
-    public static let frameLength = UInt32(pv_koala_frame_length())
+    public static let frameLength = Int(pv_koala_frame_length())
 
     /// Audio sample rate accepted by Koala.
-    public static let sampleRate = UInt32(pv_sample_rate())
+    public static let sampleRate = Int(pv_sample_rate())
 
     /// Current Koala version.
     public static let version = String(cString: pv_koala_version())
 
     ///  Delay in samples. If the input and output of consecutive calls to `.process()` are viewed as two contiguous
     ///  streams of audio data, this delay specifies the time shift between the input and output stream.
-    public var delaySample: UInt32
+    public var delaySample: Int = 0
 
     /// Constructor.
     ///
@@ -35,15 +52,22 @@ public class Koala {
     /// - Throws: KoalaError
     public init(
             accessKey: String,
-            modelPath: String) throws {
+            modelPath: String? = nil) throws {
 
         if accessKey.count == 0 {
             throw KoalaInvalidArgumentError("AccessKey is required for Koala initialization")
         }
 
         var modelPathArg = modelPath
-        if !FileManager().fileExists(atPath: modelPathArg) {
-            modelPathArg = try getResourcePath(modelPathArg)
+        if (modelPathArg == nil) {
+            modelPathArg = Koala.resourceBundle.path(forResource: "koala_params", ofType: "pv")
+            if modelPathArg == nil {
+                throw KoalaIOError("Could not find default model file in app bundle.")
+            }
+        }
+
+        if !FileManager().fileExists(atPath: modelPathArg!) {
+            modelPathArg = try getResourcePath(modelPathArg!)
         }
 
         var status = pv_koala_init(
@@ -54,10 +78,12 @@ public class Koala {
             throw pvStatusToKoalaError(status, "Koala init failed")
         }
 
-        status = pv_koala_delay_sample(self.handle, &delaySample)
+        var cDelaySample: Int32 = 0
+        status = pv_koala_delay_sample(self.handle, &cDelaySample)
         if status != PV_STATUS_SUCCESS {
             throw pvStatusToKoalaError(status, "Failed to get Koala delay sample")
         }
+        self.delaySample = Int(cDelaySample)
     }
 
     deinit {
@@ -107,8 +133,8 @@ public class Koala {
             throw KoalaInvalidArgumentError("Frame of audio data must contain \(Koala.frameLength) samples - given frame contained \(pcm.count)")
         }
 
-        var enhancedPcm: [Int16] = [Koala.frameLength]
-        let status = pv_koala_process(self.handle, pcm, enhancedPcm)
+        var enhancedPcm: [Int16] = Array(repeating: 0, count: Koala.frameLength)
+        let status = pv_koala_process(self.handle, pcm, &enhancedPcm[0])
         if status != PV_STATUS_SUCCESS {
             throw pvStatusToKoalaError(status, "Koala process failed")
         }

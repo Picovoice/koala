@@ -1,0 +1,86 @@
+name: iOS Performance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/ios-perf.yml'
+      - 'binding/ios/KoalaAppTest/PerformanceTest/PerformanceTest.swift'
+      - 'binding/ios/KoalaAppTest/Podfile.lock'
+  pull_request:
+    branches: [ main, 'v[0-9]+.[0-9]+' ]
+    paths:
+      - '.github/workflows/ios-perf.yml'
+      - 'binding/ios/KoalaAppTest/PerformanceTest/PerformanceTest.swift'
+      - 'binding/ios/KoalaAppTest/Podfile.lock'
+
+defaults:
+  run:
+    working-directory: binding/ios/KoalaAppTest
+
+jobs:
+  build:
+    name: Run iOS Tests on AppCenter
+    runs-on: macos-latest
+
+    strategy:
+      matrix:
+        device: [ ios-perf ]
+        include:
+        - device: ios-perf
+          initPerformanceThresholdSec: 1.5
+          procPerformanceThresholdSec: 0.2
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.4.0
+
+      - name: Install Cocoapods
+        run: gem install cocoapods
+
+      - name: Install AppCenter CLI
+        run: npm install -g appcenter-cli
+
+      - name: Make build dir
+        run: mkdir ddp
+
+      - name: Run Cocoapods
+        run: pod install
+
+      - name: Inject AppID
+        run: sed -i '.bak' 's:{TESTING_ACCESS_KEY_HERE}:${{secrets.PV_VALID_ACCESS_KEY}}:'
+          PerformanceTest/PerformanceTest.swift
+
+      - name: Inject Number of Iterations
+        run: sed -i '.bak' 's:{NUM_TEST_ITERATIONS}:30:'
+          PerformanceTest/PerformanceTest.swift
+
+      - name: Inject Performance Threshold
+        run: sed -i '.bak' 's:{INIT_PERFORMANCE_THRESHOLD_SEC}:${{ matrix.indexPerformanceThresholdSec }}:'
+          PerformanceTest/PerformanceTest.swift
+
+      - name: Inject Performance Threshold
+        run: sed -i '.bak' 's:{PROC_PERFORMANCE_THRESHOLD_SEC}:${{ matrix.searchPerformanceThresholdSec }}:'
+          PerformanceTest/PerformanceTest.swift
+
+      - name: XCode Build
+        run: xcrun xcodebuild build-for-testing
+          -configuration Debug
+          -workspace KoalaAppTest.xcworkspace
+          -sdk iphoneos
+          -scheme PerformanceTest
+          -derivedDataPath ddp
+          CODE_SIGNING_ALLOWED=NO
+
+      - name: Run Tests on AppCenter
+        run: appcenter test run xcuitest
+          --token ${{secrets.APPCENTERAPITOKEN}}
+          --app "Picovoice/Koala-iOS"
+          --devices "Picovoice/${{ matrix.device }}"
+          --test-series "koala-ios"
+          --locale "en_US"
+          --build-dir ddp/Build/Products/Debug-iphoneos
