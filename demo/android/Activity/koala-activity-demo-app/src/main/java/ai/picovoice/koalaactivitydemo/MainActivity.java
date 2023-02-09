@@ -14,6 +14,7 @@
 package ai.picovoice.koalaactivitydemo;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         };
 
         try {
-            koala = new Koala(ACCESS_KEY);
+            koala = new Koala.Builder().setAccessKey(ACCESS_KEY).build(getApplicationContext());
         } catch (KoalaInvalidArgumentException e) {
             onKoalaInitError(String.format("AccessKey '%s' is invalid", ACCESS_KEY));
         } catch (KoalaActivationException e) {
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         koala.delete();
     }
 
-    private void onKoalaInitError(String error){
+    private void onKoalaInitError(String error) {
         TextView errorMessage = findViewById(R.id.errorMessage);
         errorMessage.setText(error);
         errorMessage.setVisibility(View.VISIBLE);
@@ -177,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             stopped.set(false);
         }
 
+        @SuppressLint("MissingPermission")
         private void read() throws KoalaException {
             final int minBufferSize = AudioRecord.getMinBufferSize(
                     koala.getSampleRate(),
@@ -199,7 +201,8 @@ public class MainActivity extends AppCompatActivity {
 
                 while (!stop.get()) {
                     if (audioRecord.read(buffer, 0, buffer.length) == buffer.length) {
-                        final float voiceProbability = koala.process(buffer);
+                        final short[] enhancedPcm = koala.process(buffer);
+                        final float voiceProbability = enhancedPcm[0] / 1000;
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

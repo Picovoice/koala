@@ -12,6 +12,7 @@
 package ai.picovoice.koala;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,6 +25,8 @@ import java.io.OutputStream;
  * Android binding for Koala Noise Suppression engine.
  */
 public class Koala {
+
+    private static String defaultModelPath;
 
     static {
         System.loadLibrary("pv_koala");
@@ -41,6 +44,18 @@ public class Koala {
      */
     private Koala(String accessKey, String modelPath) throws KoalaException {
         handle = KoalaNative.init(accessKey, modelPath);
+    }
+
+    private static void extractPackageResources(Context context) throws KoalaException {
+        final Resources resources = context.getResources();
+
+        try {
+            defaultModelPath = extractResource(context,
+                    resources.openRawResource(R.raw.koala_params),
+                    resources.getResourceEntryName(R.raw.koala_params) + ".pv");
+        } catch (IOException ex) {
+            throw new KoalaIOException(ex);
+        }
     }
 
     private static String extractResource(Context context, InputStream srcFileStream, String dstFilename) throws IOException {
@@ -83,7 +98,7 @@ public class Koala {
      *
      * @throws KoalaException if there is an error while processing the audio frame.
      */
-    public KoalaTranscript process(short[] pcm) throws KoalaException {
+    public short[] process(short[] pcm) throws KoalaException {
         if (handle == 0) {
             throw new KoalaInvalidStateException("Attempted to call Koala process after delete.");
         }
@@ -112,7 +127,7 @@ public class Koala {
         if (handle == 0) {
             throw new KoalaInvalidStateException("Attempted to call Koala reset after delete.");
         }
-        return KoalaNative.reset(handle);
+        KoalaNative.reset(handle);
     }
 
     /**
@@ -173,14 +188,16 @@ public class Koala {
             }
 
             if (modelPath == null) {
-                throw new KoalaInvalidArgumentException("ModelPath must not be null");
+                if (defaultModelPath == null) {
+                    extractPackageResources(context);
+                }
+                modelPath = defaultModelPath;
             } else {
                 File modelFile = new File(modelPath);
                 String modelFilename = modelFile.getName();
                 if (!modelFile.exists() && !modelFilename.equals("")) {
                     try {
-                        modelPath = extractResource(
-                                context,
+                        modelPath = extractResource(context,
                                 context.getAssets().open(modelPath),
                                 modelFilename);
                     } catch (IOException ex) {
