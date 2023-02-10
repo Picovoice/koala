@@ -23,5 +23,17 @@
     "**/*.wasm",
     "**/*.wav",
     "../../../lib/ios/**/*"
+
+    // java
+    "**/build.gradle",
+    "**/gradle-wrapper.properties",
+    "**/gradle.properties",
+    "**/gradlew",
+    "**/gradlew.bat",
+    "**/proguard-rules.pro",
+
+    // android
+    "**/AndroidManifest.xml",
+    "**/activity_main.xml",
   ]
 }
