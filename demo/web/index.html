@@ -166,16 +166,12 @@
             enhancedAudioSource = audioContext.createBufferSource();
 
             originalAudioSource.buffer = originalBuffer;
+            originalAudioSource.loop = true;
             originalAudioSource.connect(originalAudioGain);
             originalAudioSource.start(current_time + 0.2);
-            originalAudioSource.onended = () => {
-              if (isPlaying) {
-                playAudio.innerHTML = "Start";
-                isPlaying = false;
-              }
-            }
 
             enhancedAudioSource.buffer = enhancedBuffer;
+            enhancedAudioSource.loop = true;
             enhancedAudioSource.connect(enhancedAudioGain);
             enhancedAudioSource.start(current_time + 0.2);
 
@@ -310,9 +306,9 @@
     <br>
     <div id="result" style="display: none">
       <label>
-        Noisy
+        Original
         <input type="range" id="volumeControl" min="0" max="1" value="1" step="0.01" />
-        Koala Processed
+        Koalafied
         <br>
         <br>
         <button id="playAudio">Play</button>
