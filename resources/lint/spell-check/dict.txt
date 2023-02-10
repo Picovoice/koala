@@ -5,6 +5,7 @@ aarch
 armv
 astype
 calcsize
+camelcase
 copywasm
 denoising
 downsample
