@@ -5,11 +5,13 @@ aarch
 armv
 astype
 calcsize
+copywasm
 denoising
 drwav
 dtype
 frombuffer
 hanning
+iife
 irfft
 jetson
 libpv
@@ -19,7 +21,9 @@ ndarray
 numpy
 outf
 picovoice
+pluginutils
 pthread
+pvbase
 pvkoala
 pvkoalademo
 pvrecorder

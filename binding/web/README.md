@@ -162,7 +162,7 @@ for (;;) {
 
 #### Clean Up
 
-Clean up used resources by `Koala` or `KaoalaWorker`:
+Clean up used resources by `Koala` or `KoalaWorker`:
 
 ```typescript
 await handle.release();
