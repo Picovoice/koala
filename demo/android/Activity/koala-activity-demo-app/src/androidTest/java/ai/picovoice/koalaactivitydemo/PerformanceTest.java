@@ -1,5 +1,6 @@
 package ai.picovoice.koalaactivitydemo;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
@@ -72,8 +73,8 @@ public class PerformanceTest {
         } catch (NumberFormatException ignored) {}
         double performanceThresholdSec = Double.parseDouble(thresholdString);
 
-        Koala koala = new Koala(accessKey);
-        File testAudio = new File(testResourcesPath, "audio/sample.wav");
+        Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
+        File testAudio = new File(testResourcesPath, "audio/test.wav");
 
         long totalNSec = 0;
         for (int i = 0; i < numTestIterations; i++) {

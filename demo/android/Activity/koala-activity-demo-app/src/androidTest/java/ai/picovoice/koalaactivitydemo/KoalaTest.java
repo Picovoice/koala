@@ -10,6 +10,8 @@
 
 package ai.picovoice.koalaactivitydemo;
 
+import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
+
 import android.content.Context;
 import android.content.res.AssetManager;
 
@@ -20,7 +22,6 @@ import com.microsoft.appcenter.espresso.Factory;
 import com.microsoft.appcenter.espresso.ReportHelper;
 
 import org.junit.After;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,13 +37,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ai.picovoice.koala.Koala;
 import ai.picovoice.koala.KoalaException;
 
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 
@@ -74,57 +76,94 @@ public class KoalaTest {
         accessKey = appContext.getString(R.string.pvTestingAccessKey);
     }
 
-    @Test
-    public void testProcess() throws KoalaException {
-        Koala koala = new Koala(accessKey);
+    private List<Short> loadPcm(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+        inputStream.skip(44);
 
-        File testAudio = new File(testResourcesPath, "audio/sample.wav");
-        ArrayList<Float> detectionResults = new ArrayList<>();
+        List<Short> output = new ArrayList<>();
 
-        List<Float> probs = new ArrayList<>();
+        byte[] buffer = new byte[512 * 2];
+        ByteBuffer pcmBuff = ByteBuffer.wrap(buffer).order(ByteOrder.LITTLE_ENDIAN);
 
-        try {
-            FileInputStream audioInputStream = new FileInputStream(testAudio);
-
-            byte[] rawData = new byte[koala.getFrameLength() * 2];
-            short[] pcm = new short[koala.getFrameLength()];
-            ByteBuffer pcmBuff = ByteBuffer.wrap(rawData).order(ByteOrder.LITTLE_ENDIAN);
-
-            audioInputStream.skip(44);
-
-            while (audioInputStream.available() > 0) {
-                int numRead = audioInputStream.read(pcmBuff.array());
-                if (numRead == koala.getFrameLength() * 2) {
-                    pcmBuff.asShortBuffer().get(pcm);
-                    probs.add(koala.process(pcm));
-                }
+        while (inputStream.available() > 0) {
+            int numRead = inputStream.read(pcmBuff.array());
+            ShortBuffer pcmShortBuffer = pcmBuff.asShortBuffer();
+            for (int i = 0; i < (numRead / 2); i ++) {
+                output.add(pcmShortBuffer.get(i));
             }
-        } catch (Exception e) {
-            throw new KoalaException(e);
         }
+        return output;
+    }
 
-        koala.delete();
-
-        float[] labels = {
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        };
-
-        assertSame(labels.length, probs.size());
-
-        float error = 0.f;
-
-        for (int i = 0; i < probs.size(); i++) {
-            error -= (labels[i] * Math.log(probs.get(i))) + ((1 - labels[i]) * Math.log(1 - probs.get(i)));
+    private double pcmRootMeanSquare(short[] frame) {
+        double sumOfSquares = 0;
+        for (short x : frame) {
+            sumOfSquares += Math.pow((x / 32768f), 2);
         }
+        return Math.sqrt((sumOfSquares / frame.length));
+    }
 
-        error /= probs.size();
-        assertTrue(error < 0.1);
+    private short[] frameFromList(List<Short> inputList, int start, int count) {
+        short[] output = new short[count];
+        for(int i = 0; i < count; i++) {
+            output[i] = inputList.get(start + i);
+        }
+        return output;
+    }
+
+    private void runTest(List<Short> inputPcm, List<Short> referencePcm, double tolerance) throws KoalaException {
+        Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
+
+        for (int i = 0; i < (inputPcm.size() - koala.getFrameLength()); i += koala.getFrameLength()) {
+            short[] frame = frameFromList(inputPcm, i, koala.getFrameLength());
+            short[] enhancedFrame = koala.process(frame);
+
+            double energyDeviation;
+            double enhancedFrameEnergy = pcmRootMeanSquare(enhancedFrame);
+            if (referencePcm == null || i < koala.getDelaySample()) {
+                energyDeviation = enhancedFrameEnergy;
+            } else {
+                short[] referenceFrame = frameFromList(referencePcm, i - koala.getDelaySample(), koala.getFrameLength());
+                double referenceFrameEnergy = pcmRootMeanSquare(referenceFrame);
+                energyDeviation = Math.abs(enhancedFrameEnergy - referenceFrameEnergy);
+            }
+            assertTrue(energyDeviation < tolerance);
+        }
+    }
+
+    @Test
+    public void testPureSpeech() throws KoalaException, IOException {
+        List<Short> testPcm = loadPcm(new File(testResourcesPath, "audio/test.wav"));
+        runTest(testPcm, testPcm, 0.02);
+    }
+
+    @Test
+    public void testPureNoise() throws KoalaException, IOException {
+        List<Short> noisePcm = loadPcm(new File(testResourcesPath, "audio/noise.wav"));
+        runTest(noisePcm, null, 0.02);
+    }
+
+    @Test
+    public void testMixed() throws KoalaException, IOException {
+        List<Short> testPcm = loadPcm(new File(testResourcesPath, "audio/test.wav"));
+        List<Short> noisePcm = loadPcm(new File(testResourcesPath, "audio/noise.wav"));
+        List<Short> mixedPcm = new ArrayList<>();
+        for (int i = 0; i < testPcm.size(); i++) {
+            Short mixed = (short) (testPcm.get(i) + noisePcm.get(i));
+            mixedPcm.add(mixed);
+        }
+        runTest(mixedPcm, testPcm, 0.02);
+    }
+
+    @Test
+    public void testReset() throws KoalaException {
+        Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
+        assertTrue(koala.getVersion().length() > 0);
     }
 
     @Test
     public void testVersion() throws KoalaException {
-        Koala koala = new Koala(accessKey);
+        Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
         assertTrue(koala.getVersion().length() > 0);
     }
 
