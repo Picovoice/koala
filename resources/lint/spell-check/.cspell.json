@@ -11,6 +11,7 @@
     }
   ],
   "ignorePaths": [
+    // binaries
     "**/*.a",
     "**/*.dll",
     "**/*.dylib",
@@ -22,6 +23,17 @@
     "**/*.so",
     "**/*.wasm",
     "**/*.wav",
-    "../../../lib/ios/**/*"
+    "../../../lib/ios/**/*",
+
+    // ios
+    "**/*.xcconfig",
+    "**/*.podspec",
+    "**/Podfile",
+    "**/*.plist",
+    "**/contents.xcworkspacedata",
+    "**/*.storyboard",
+    "**/*.pbxproj",
+    "**/*.xcscheme",
+    "**/*.m"
   ]
 }
