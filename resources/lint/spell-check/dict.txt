@@ -12,6 +12,7 @@ frombuffer
 hanning
 irfft
 jetson
+koalafied
 libpv
 linalg
 malloc
@@ -19,6 +20,7 @@ ndarray
 numpy
 outf
 picovoice
+podfile
 pthread
 pvkoala
 pvkoalademo
@@ -27,5 +29,7 @@ randn
 rfft
 rfftfreq
 signup
+sqrtf
 wargv
 wchars
+xcworkspace
