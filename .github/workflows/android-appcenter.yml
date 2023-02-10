@@ -5,15 +5,17 @@ on:
   push:
     branches: [ master ]
     paths:
+      - '.github/workflows/android-appcenter.yml'
       - 'demo/android/Activity/**'
       - '!demo/android/Activity/README.md'
-      - '.github/workflows/android-appcenter.yml'
+      - 'resources/test/**'
   pull_request:
     branches: [ master ]
     paths:
+      - '.github/workflows/android-appcenter.yml'
       - 'demo/android/Activity/**'
       - '!demo/android/Activity/README.md'
-      - '.github/workflows/android-appcenter.yml'
+      - 'resources/test/**'
 
 defaults:
   run:

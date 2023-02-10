@@ -5,15 +5,17 @@ on:
   push:
     branches: [ master ]
     paths:
+      - '.github/workflows/android-perf.yml'
       - 'lib/android/**'
       - 'lib/common/**'
-      - '.github/workflows/android-perf.yml'
+      - 'resources/test/**'
   pull_request:
     branches: [ master ]
     paths:
+      - '.github/workflows/android-perf.yml'
       - 'lib/android/**'
       - 'lib/common/**'
-      - '.github/workflows/android-perf.yml'
+      - 'resources/test/**'
 
 defaults:
   run:
