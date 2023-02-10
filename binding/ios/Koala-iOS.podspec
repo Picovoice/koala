@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   <<-DESC
   Koala is an on-device noise suppression engine.
 
-  Koala
+  Koala is:
     - Private; All voice processing runs locally.
     - Cross-Platform:
       - Linux (x86_64), macOS (x86_64, arm64), Windows (x86_64)
