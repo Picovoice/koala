@@ -16,39 +16,53 @@ package ai.picovoice.koalaactivitydemo;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Process;
 import android.view.View;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ai.picovoice.koala.*;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnSeekBarChangeListener {
     private final MicrophoneReader microphoneReader = new MicrophoneReader();
     public Koala koala;
 
     private static final String ACCESS_KEY = "${YOUR_ACCESS_KEY_HERE}";
 
     private ToggleButton recordButton;
-    private TextView detectedText;
-    private Needle needleView;
+    private ToggleButton playStopButton;
+    private SeekBar faderSlider;
+    private ConstraintLayout playbackArea;
 
-    private CountDownTimer visibilityTimer;
+    private String referenceFilepath;
+    private String enhancedFilepath;
+    private MediaPlayer referenceMediaPlayer;
+    private MediaPlayer enhancedMediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,20 +70,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.koala_activity_demo);
 
         recordButton = findViewById(R.id.startButton);
-        needleView = findViewById(R.id.needle);
-        detectedText = findViewById(R.id.detectedText);
+        playStopButton = findViewById(R.id.playStopButton);
+        playbackArea = findViewById(R.id.playbackArea);
 
-        visibilityTimer = new CountDownTimer(750, 750) {
-            @Override
-            public void onTick(long l) {
-                detectedText.setVisibility(View.VISIBLE);
-            }
+        faderSlider = findViewById(R.id.faderSlider);
+        faderSlider.setOnSeekBarChangeListener(this);
 
-            @Override
-            public void onFinish() {
-                detectedText.setVisibility(View.INVISIBLE);
-            }
-        };
+        playbackArea.setVisibility(View.INVISIBLE);
 
         try {
             koala = new Koala.Builder().setAccessKey(ACCESS_KEY).build(getApplicationContext());
@@ -86,11 +93,22 @@ public class MainActivity extends AppCompatActivity {
         } catch (KoalaException e) {
             onKoalaInitError("Failed to initialize Koala " + e.getMessage());
         }
+
+        referenceFilepath = getApplicationContext().getFileStreamPath("reference.wav").getAbsolutePath();
+        enhancedFilepath = getApplicationContext().getFileStreamPath("enhanced.wav").getAbsolutePath();
+        referenceMediaPlayer = new MediaPlayer();
+        enhancedMediaPlayer = new MediaPlayer();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (referenceMediaPlayer != null) {
+            referenceMediaPlayer.release();
+        }
+        if (enhancedMediaPlayer != null) {
+            enhancedMediaPlayer.release();
+        }
         koala.delete();
     }
 
@@ -122,13 +140,20 @@ public class MainActivity extends AppCompatActivity {
             ToggleButton toggleButton = findViewById(R.id.startButton);
             toggleButton.toggle();
         } else {
-            microphoneReader.start();
+            try {
+                microphoneReader.start();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    public void onClick(View view) {
+    public void onClickRecord(View view) {
         try {
             if (recordButton.isChecked()) {
+                playbackArea.setVisibility(View.INVISIBLE);
+                playStopButton.setChecked(false);
+
                 if (hasRecordPermission()) {
                     microphoneReader.start();
                 } else {
@@ -136,9 +161,58 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 microphoneReader.stop();
+
+                resetMediaPlayer(referenceMediaPlayer, referenceFilepath);
+                resetMediaPlayer(enhancedMediaPlayer, enhancedFilepath);
+
+                playbackArea.setVisibility(View.VISIBLE);
             }
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | IOException e) {
             displayError("Audio stop command interrupted\n" + e.getMessage());
+        }
+    }
+
+    private void resetMediaPlayer(MediaPlayer mediaPlayer, String audioFile) throws IOException {
+        mediaPlayer.reset();
+        mediaPlayer.setAudioAttributes(
+                new AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+        );
+        mediaPlayer.setDataSource(audioFile);
+        mediaPlayer.prepare();
+    }
+
+    public void onClickPlay(View view) {
+        if (playStopButton.isChecked()) {
+            referenceMediaPlayer.start();
+            enhancedMediaPlayer.start();
+        } else {
+            referenceMediaPlayer.pause();
+            enhancedMediaPlayer.pause();
+            referenceMediaPlayer.seekTo(0);
+            enhancedMediaPlayer.seekTo(0);
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if(seekBar.getId() == R.id.faderSlider){
+            float progressFloat = (float) progress;
+            float referenceVol = (100f - progressFloat) / 100f;
+            float enhancedVol = progressFloat / 100f;
+
+            referenceMediaPlayer.setVolume(referenceVol, referenceVol);
+            enhancedMediaPlayer.setVolume(enhancedVol, enhancedVol);
         }
     }
 
@@ -147,11 +221,22 @@ public class MainActivity extends AppCompatActivity {
         private final AtomicBoolean stop = new AtomicBoolean(false);
         private final AtomicBoolean stopped = new AtomicBoolean(false);
 
-        void start() {
+        final int wavHeaderLength = 44;
+        private RandomAccessFile referenceFile;
+        private RandomAccessFile enhancedFile;
+        private int totalSamplesWritten;
+
+
+        void start() throws IOException {
 
             if (started.get()) {
                 return;
             }
+
+            referenceFile = new RandomAccessFile(referenceFilepath, "rws");
+            enhancedFile = new RandomAccessFile(enhancedFilepath, "rws");
+            writeWavHeader(referenceFile, (short) 1, (short) 16, 16000, 0);
+            writeWavHeader(enhancedFile, (short) 1, (short) 16, 16000, 0);
 
             started.set(true);
 
@@ -162,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        void stop() throws InterruptedException {
+        void stop() throws InterruptedException, IOException {
             if (!started.get()) {
                 return;
             }
@@ -172,6 +257,11 @@ public class MainActivity extends AppCompatActivity {
             while (!stopped.get()) {
                 Thread.sleep(10);
             }
+
+            writeWavHeader(referenceFile, (short) 1, (short) 16, 16000, totalSamplesWritten);
+            writeWavHeader(enhancedFile, (short) 1, (short) 16, 16000, totalSamplesWritten);
+            referenceFile.close();
+            enhancedFile.close();
 
             started.set(false);
             stop.set(false);
@@ -188,7 +278,7 @@ public class MainActivity extends AppCompatActivity {
 
             AudioRecord audioRecord = null;
 
-            short[] buffer = new short[koala.getFrameLength()];
+            short[] frameBuffer = new short[koala.getFrameLength()];
 
             try {
                 audioRecord = new AudioRecord(
@@ -199,41 +289,72 @@ public class MainActivity extends AppCompatActivity {
                         bufferSize);
                 audioRecord.startRecording();
 
+                final int koalaDelay = koala.getDelaySample();
+
+                totalSamplesWritten = 0;
+                int enhancedSamplesWritten = 0;
                 while (!stop.get()) {
-                    if (audioRecord.read(buffer, 0, buffer.length) == buffer.length) {
-                        final short[] enhancedPcm = koala.process(buffer);
-                        final float voiceProbability = enhancedPcm[0] / 1000;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                needleView.setValue(voiceProbability);
-                                if (needleView.isDetected()) {
-                                    visibilityTimer.cancel();
-                                    visibilityTimer.start();
-                                }
-                            }
-                        });
+                    if (audioRecord.read(frameBuffer, 0, frameBuffer.length) == frameBuffer.length) {
+                        final short[] frameBufferEnhanced = koala.process(frameBuffer);
+
+                        writeFrame(referenceFile, frameBuffer);
+                        totalSamplesWritten += frameBuffer.length;
+                        if (totalSamplesWritten >= koalaDelay) {
+                            writeFrame(enhancedFile, frameBufferEnhanced);
+                            enhancedSamplesWritten += frameBufferEnhanced.length;
+                        }
                     }
                 }
 
                 audioRecord.stop();
-            } catch (IllegalArgumentException | IllegalStateException e) {
+
+                short[] emptyFrame = new short[koala.getFrameLength()];
+                Arrays.fill(emptyFrame, (short) 0);
+                while (enhancedSamplesWritten < totalSamplesWritten) {
+                    final short[] frameBufferEnhanced = koala.process(emptyFrame);
+                    writeFrame(enhancedFile, frameBufferEnhanced);
+                    enhancedSamplesWritten += frameBufferEnhanced.length;
+                }
+            } catch (IllegalArgumentException | IllegalStateException | IOException e) {
                 throw new KoalaException(e);
             } finally {
                 if (audioRecord != null) {
                     audioRecord.release();
                 }
-
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        visibilityTimer.cancel();
-                        needleView.reset();
-                        detectedText.setVisibility(View.INVISIBLE);
-                    }
-                });
                 stopped.set(true);
             }
+        }
+
+        private void writeFrame(RandomAccessFile outputFile, short[] frame) throws IOException {
+            ByteBuffer byteBuf = ByteBuffer.allocate(2 * frame.length);
+            byteBuf.order(ByteOrder.LITTLE_ENDIAN);
+
+            for (short s : frame) {
+                byteBuf.putShort(s);
+            }
+            outputFile.write(byteBuf.array());
+        }
+
+        private void writeWavHeader(RandomAccessFile outputFile, short channelCount, short bitDepth, int sampleRate, int totalSampleCount) throws IOException {
+            ByteBuffer byteBuf = ByteBuffer.allocate(wavHeaderLength);
+            byteBuf.order(ByteOrder.LITTLE_ENDIAN);
+
+            byteBuf.put("RIFF".getBytes(StandardCharsets.US_ASCII));
+            byteBuf.putInt((bitDepth / 8 * totalSampleCount) + 36);
+            byteBuf.put("WAVE".getBytes(StandardCharsets.US_ASCII));
+            byteBuf.put("fmt ".getBytes(StandardCharsets.US_ASCII));
+            byteBuf.putInt(16);
+            byteBuf.putShort((short) 1);
+            byteBuf.putShort(channelCount);
+            byteBuf.putInt(sampleRate);
+            byteBuf.putInt(sampleRate * channelCount * bitDepth / 8);
+            byteBuf.putShort((short) (channelCount * bitDepth / 8));
+            byteBuf.putShort(bitDepth);
+            byteBuf.put("data".getBytes(StandardCharsets.US_ASCII));
+            byteBuf.putInt(bitDepth / 8 * totalSampleCount);
+
+            outputFile.seek(0);
+            outputFile.write(byteBuf.array());
         }
     }
 }

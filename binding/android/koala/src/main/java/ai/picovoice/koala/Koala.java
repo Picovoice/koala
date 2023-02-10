@@ -157,6 +157,15 @@ public class Koala {
         return KoalaNative.getVersion();
     }
 
+    /**
+     * Getter for Koala delaySample.
+     *
+     * @return Koala delaySample.
+     */
+    public int getDelaySample() throws KoalaException {
+        return KoalaNative.delaySample(handle);
+    }
+
     public static class Builder {
 
         private String accessKey = null;

@@ -7,63 +7,74 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Probability of Voice"
-        android:textSize="24sp"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@id/guidelineStart"
-        app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
-        app:layout_constraintBottom_toTopOf="@id/analog"/>
-
-    <FrameLayout
-        android:id="@+id/analog"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/playbackArea"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="@id/guidelineStart"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/guidelineAnalogY"
         app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
-        app:layout_constraintTop_toTopOf="@id/guidelineTop"
-        app:layout_constraintBottom_toTopOf="@id/guidelineAnalogY">
-        <ai.picovoice.koalaactivitydemo.Gauge
-            android:id="@+id/gauge"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:startAngle="180"
-            app:sweepAngle="180"
-            app:threshold="0.8"/>
-
-        <ai.picovoice.koalaactivitydemo.Needle
-            android:id="@+id/needle"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:threshold="0.8" />
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/detectedText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/voice_detected"
-        android:textSize="24sp"
-        android:visibility="invisible"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/guidelineStart"
-        app:layout_constraintEnd_toEndOf="@id/guidelineEnd"
-        app:layout_constraintTop_toBottomOf="@id/guidelineAnalogY"
-        app:layout_constraintBottom_toTopOf="@id/startButton"/>
+        app:layout_constraintTop_toTopOf="@id/guidelineTop">
+
+        <TextView
+            android:id="@+id/referenceTextTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/reference_text_title"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/faderSlider"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <SeekBar
+            android:id="@+id/faderSlider"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:max="100"
+            android:progress="100"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/enhancedTextTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/enhanced_text_title"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/faderSlider"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ToggleButton
+            android:id="@+id/playStopButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:onClick="onClickPlay"
+            android:text="PLAY/STOP"
+            android:textOff="PLAY"
+            android:textOn="STOP"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/faderSlider" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ToggleButton
         android:id="@+id/startButton"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/button_background"
-        android:onClick="onClick"
+        android:onClick="onClickRecord"
         android:textColor="@android:color/white"
         android:textOff="Start"
         android:textOn="Stop"
@@ -71,8 +82,7 @@
         app:layout_constraintBottom_toTopOf="@id/errorMessage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detectedText" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guidelineStart"
