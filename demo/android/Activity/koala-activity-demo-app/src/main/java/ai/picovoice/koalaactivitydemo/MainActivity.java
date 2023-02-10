@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
 
     private ToggleButton recordButton;
     private ToggleButton playStopButton;
-    private SeekBar faderSlider;
+    private TextView recordedText;
     private ConstraintLayout playbackArea;
 
     private String referenceFilepath;
@@ -71,11 +71,13 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
 
         recordButton = findViewById(R.id.startButton);
         playStopButton = findViewById(R.id.playStopButton);
+        recordedText = findViewById(R.id.recordedText);
         playbackArea = findViewById(R.id.playbackArea);
 
-        faderSlider = findViewById(R.id.faderSlider);
+        SeekBar faderSlider = findViewById(R.id.faderSlider);
         faderSlider.setOnSeekBarChangeListener(this);
 
+        recordedText.setText("");
         playbackArea.setVisibility(View.INVISIBLE);
 
         try {
@@ -98,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
         enhancedFilepath = getApplicationContext().getFileStreamPath("enhanced.wav").getAbsolutePath();
         referenceMediaPlayer = new MediaPlayer();
         enhancedMediaPlayer = new MediaPlayer();
+        referenceMediaPlayer.setVolume(0, 0);
+        enhancedMediaPlayer.setVolume(1, 1);
     }
 
     @Override
@@ -154,6 +158,13 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
                 playbackArea.setVisibility(View.INVISIBLE);
                 playStopButton.setChecked(false);
 
+                if (referenceMediaPlayer.isPlaying()) {
+                    referenceMediaPlayer.stop();
+                }
+                if (enhancedMediaPlayer.isPlaying()) {
+                    enhancedMediaPlayer.stop();
+                }
+
                 if (hasRecordPermission()) {
                     microphoneReader.start();
                 } else {
@@ -180,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
                         .setUsage(AudioAttributes.USAGE_MEDIA)
                         .build()
         );
+        mediaPlayer.setLooping(true);
         mediaPlayer.setDataSource(audioFile);
         mediaPlayer.prepare();
     }
@@ -268,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
             stopped.set(false);
         }
 
-        @SuppressLint("MissingPermission")
+        @SuppressLint({"MissingPermission", "SetTextI18n"})
         private void read() throws KoalaException {
             final int minBufferSize = AudioRecord.getMinBufferSize(
                     koala.getSampleRate(),
@@ -303,6 +315,13 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
                             writeFrame(enhancedFile, frameBufferEnhanced);
                             enhancedSamplesWritten += frameBufferEnhanced.length;
                         }
+                    }
+
+                    if ((totalSamplesWritten / koala.getFrameLength()) % 10 == 0) {
+                        runOnUiThread(() -> {
+                            int secondsRecorded = (totalSamplesWritten / koala.getSampleRate());
+                            recordedText.setText("Recorded: " + secondsRecorded + "s");
+                        });
                     }
                 }
 

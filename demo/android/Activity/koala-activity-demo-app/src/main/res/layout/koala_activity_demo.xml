@@ -66,6 +66,16 @@
             app:layout_constraintTop_toBottomOf="@+id/faderSlider" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/recordedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Recorded"
+        app:layout_constraintBottom_toTopOf="@+id/startButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <ToggleButton
         android:id="@+id/startButton"
         android:layout_width="100dp"
@@ -76,7 +86,7 @@
         android:background="@drawable/button_background"
         android:onClick="onClickRecord"
         android:textColor="@android:color/white"
-        android:textOff="Start"
+        android:textOff="Record"
         android:textOn="Stop"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@id/errorMessage"
