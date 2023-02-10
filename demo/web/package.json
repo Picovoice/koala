@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "postinstall": "npx pvbase64 -i ../../lib/common/koala_params.pv -o ./koala_params.js",
-    "start": "yarn run http-server -a localhost -p 5000 -S"
+    "start": "yarn run http-server -a localhost -p 5000"
   },
   "keywords": [
     "Picovoice",
