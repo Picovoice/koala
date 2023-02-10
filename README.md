@@ -151,7 +151,7 @@ func getNextAudioFrame() -> [Int16] {
 
 while true {
   do {
-    let enhancedAudio = try koala!.process(getNextAudioFrame())
+    let enhancedAudio = try koala.process(getNextAudioFrame())
     // .. use enhanced audio
   } catch {}
 }
