@@ -21,7 +21,7 @@ enum UIState {
 
 class ViewModel: ObservableObject {
 
-    private let ACCESS_KEY = "Tw4jothrMMLyRYQ793yD/XF3DeithcbeNVsYlNN0Dc1vY26suWNOkg==" // Obtained from Picovoice Console (https://console.picovoice.ai)
+    private let ACCESS_KEY = "${YOUR_ACCESS_KEY_HERE}" // Obtained from Picovoice Console (https://console.picovoice.ai)
 
     private let AUDIO_FORMAT = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: Double(Koala.sampleRate), channels: 1, interleaved: true)!
 
