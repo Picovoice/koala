@@ -171,7 +171,7 @@ public class Koala {
         }
 
         throw KoalaIOError("""
-                           Could not find file at path '\(filePath)'. 
+                           Could not find file at path '\(filePath)'.
                            If this is a packaged asset, ensure you have added it to your xcode project.
                            """)
     }

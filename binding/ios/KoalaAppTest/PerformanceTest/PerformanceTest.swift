@@ -32,22 +32,23 @@ class PerformanceTest: XCTestCase {
         let koala = try Koala(accessKey: accessKey)
 
         let bundle = Bundle(for: type(of: self))
-        let fileURL:URL = bundle.url(forResource: "test", withExtension: "wav")!
+        let fileURL: URL = bundle.url(forResource: "test", withExtension: "wav")!
 
         let data = try Data(contentsOf: fileURL)
         var pcm = [Int16](repeating: 0, count: data.count / 2)
         _ = pcm.withUnsafeMutableBytes {
             data.copyBytes(to: $0, from: 44..<data.count)
         }
-        
-        let numFrames = pcm.count / Koala.frameLength
+
+        let frameLength = Int(Koala.frameLength)
+        let numFrames = pcm.count / frameLength
 
         var results: [Double] = []
         for i in 0...numTestIterations {
             var totalNSec = 0.0
 
             for j in 0..<numFrames {
-                let frame: [Int16] = Array(pcm[j * Koala.frameLength..<(j + 1) * Koala.frameLength])
+                let frame: [Int16] = Array(pcm[j * frameLength..<(j + 1) * frameLength])
                 let before = CFAbsoluteTimeGetCurrent()
                 let _ = try koala.process(frame)
                 let after = CFAbsoluteTimeGetCurrent()

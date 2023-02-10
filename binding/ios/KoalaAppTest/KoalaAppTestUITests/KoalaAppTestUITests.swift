@@ -36,7 +36,7 @@ class KoalaDemoUITests: XCTestCase {
     }
 
     func pcmRootMeanSquare(pcm: [Int16]) -> Float {
-        var sumOfSquares:Float = 0
+        var sumOfSquares: Float = 0
         for x in pcm {
             sumOfSquares += pow(Float(x) / Float(Int16.max), 2)
         }
@@ -57,8 +57,9 @@ class KoalaDemoUITests: XCTestCase {
 
         try koala!.reset()
 
-        for frameStart in stride(from: 0, to: inputPcm.count - Int(Koala.frameLength) + 1, by: Int(Koala.frameLength)) {
-            let inputFrame = Array(inputPcm[frameStart..<frameStart + Koala.frameLength])
+        let frameLength = Int(Koala.frameLength)
+        for frameStart in stride(from: 0, to: inputPcm.count - frameLength + 1, by: frameLength) {
+            let inputFrame = Array(inputPcm[frameStart..<frameStart + frameLength])
             let enhancedFrame = try koala!.process(inputFrame)
 
             let frameEnergy: Float = pcmRootMeanSquare(pcm: enhancedFrame)
@@ -67,7 +68,7 @@ class KoalaDemoUITests: XCTestCase {
                 energyDeviation = frameEnergy
             } else {
                 let refStart = frameStart - Int(koala!.delaySample)
-                let referenceFrame = refPcm![refStart..<refStart + Koala.frameLength]
+                let referenceFrame = refPcm![refStart..<refStart + frameLength]
                 energyDeviation = abs(frameEnergy - pcmRootMeanSquare(pcm: Array(referenceFrame)))
             }
 
@@ -77,14 +78,14 @@ class KoalaDemoUITests: XCTestCase {
 
     func testPureSpeech() throws {
         let testPcm = try getPcm(fileUrl: testAudioUrl)
-        
+
         koala = try Koala(accessKey: accessKey)
         try runTest(inputPcm: testPcm, refPcm: testPcm)
     }
 
     func testPureNoise() throws {
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
-        
+
         koala = try Koala(accessKey: accessKey)
         try runTest(inputPcm: noisePcm)
     }
@@ -93,7 +94,7 @@ class KoalaDemoUITests: XCTestCase {
         let testPcm = try getPcm(fileUrl: testAudioUrl)
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
         let mixPcm: [Int16] = zip(testPcm, noisePcm).map(+)
-        
+
         koala = try Koala(accessKey: accessKey)
         try runTest(inputPcm: mixPcm, refPcm: testPcm)
     }
@@ -103,16 +104,18 @@ class KoalaDemoUITests: XCTestCase {
 
         koala = try Koala(accessKey: accessKey)
         try koala!.reset()
+
+        let frameLength = Int(Koala.frameLength)
         var firstFrames: [Int16] = []
-        for frameStart in stride(from: 0, to: testPcm.count - Koala.frameLength + 1, by: Koala.frameLength) {
-            let inputFrame = Array(testPcm[frameStart..<frameStart + Koala.frameLength])
+        for frameStart in stride(from: 0, to: testPcm.count - frameLength + 1, by: frameLength) {
+            let inputFrame = Array(testPcm[frameStart..<frameStart + frameLength])
             firstFrames.append(contentsOf: try koala!.process(inputFrame))
         }
 
         try koala!.reset()
         var secondFrames: [Int16] = []
-        for frameStart in stride(from: 0, to: testPcm.count - Koala.frameLength + 1, by: Koala.frameLength) {
-            let inputFrame = Array(testPcm[frameStart..<frameStart + Koala.frameLength])
+        for frameStart in stride(from: 0, to: testPcm.count - frameLength + 1, by: frameLength) {
+            let inputFrame = Array(testPcm[frameStart..<frameStart + frameLength])
             secondFrames.append(contentsOf: try koala!.process(inputFrame))
         }
 
