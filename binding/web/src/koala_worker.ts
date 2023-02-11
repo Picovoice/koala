@@ -154,7 +154,13 @@ export class KoalaWorker {
                   processErrorCallback(`Unrecognized command: ${event.data.command}`);
               }
             };
-            resolve(new KoalaWorker(worker, event.data.version, event.data.frameLength, event.data.sampleRate, event.data.delaySample));
+            resolve(
+              new KoalaWorker(
+                worker,
+                event.data.version,
+                event.data.frameLength,
+                event.data.sampleRate,
+                event.data.delaySample));
             break;
           case 'failed':
           case 'error':
