@@ -1,6 +1,6 @@
 # Koala Binding for Web
 
-## Koala Speech-to-Text Engine
+## Koala Noise Suppression Engine
 
 Made in Vancouver, Canada by [Picovoice](https://picovoice.ai)
 
@@ -98,22 +98,17 @@ const koalaModel = {
 }
 ```
 
-#### Init options
+#### Initialize Koala
 
 Set `processErrorCallback` to handle errors if an error occurs while enhancing audio.
+Create a `processCallback` function to get the streaming results from the engine:
 
 ```typescript
 // Optional
 const options = {
   processErrorCallback: (error) => {}
 }
-```
 
-#### Initialize Koala
-
-Create a `processCallback` function to get the streaming results from the engine:
-
-```typescript
 function processCallback(enhancedPcm: Int16Array) {
   // do something with enhancedPcm
 }
@@ -148,14 +143,14 @@ The enhanced audio is received from `processCallback` as mentioned above.
 In case the next audio frame does not follow the previous one, call `reset` before calling `process`.
 
 ```typescript
-function getAudioData(): Int16Array {
-  ... // function to get audio data
+function getAudioFrame(): Int16Array {
+  ... // function to get a frame of audio
   return new Int16Array();
 }
 
 await handle.reset();
 for (;;) {
-  await handle.process(getAudioData());
+  await handle.process(getAudioFrame());
   // break on some condition
 }
 ```

@@ -181,7 +181,7 @@ export class KoalaWorker {
 
   /**
    * Processes a frame of audio in a worker.
-   * The transcript result will be supplied with the callback provided when initializing the worker either
+   * The result will be supplied with the callback provided when initializing the worker either
    * by 'fromBase64' or 'fromPublicDirectory'.
    * Can also send a message directly using 'this.worker.postMessage({command: "process", pcm: [...]})'.
    *

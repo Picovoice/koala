@@ -25,6 +25,7 @@ Koala is an on-device noise suppression engine. Koala is:
         - [Web](#web-demo)
     - [SDKs](#sdks)
         - [Python](#python)
+        - [C](#c)
         - [Web](#web)
     - [Releases](#releases)
 
