@@ -30,7 +30,9 @@ jobs:
     strategy:
       matrix:
         node-version: [lts/*]
-        procPerformanceThresholdSec: 1.2
+        include:
+        - node-version: lts/*
+          procPerformanceThresholdSec: 1.2
 
     steps:
       - uses: actions/checkout@v2
