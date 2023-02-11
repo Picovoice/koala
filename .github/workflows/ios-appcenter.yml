@@ -3,7 +3,7 @@ name: iOS AppCenter Tests
 on:
   workflow_dispatch:
   push:
-    branches: [ mains ]
+    branches: [ main ]
     paths:
       - '.github/workflows/ios-appcenter.yml'
       - 'binding/ios/KoalaAppTest/KoalaAppTestUITests/KoalaAppTestUITests.swift'

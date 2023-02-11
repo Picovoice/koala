@@ -90,7 +90,7 @@ class KoalaDemoUITests: XCTestCase {
         try runTest(inputPcm: noisePcm)
     }
 
-    func testPureMixed() throws {
+    func testMixed() throws {
         let testPcm = try getPcm(fileUrl: testAudioUrl)
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
         let mixPcm: [Int16] = zip(testPcm, noisePcm).map(+)
