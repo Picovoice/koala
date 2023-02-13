@@ -23,10 +23,12 @@ Koala is an on-device noise suppression engine. Koala is:
         - [Python](#python-demos)
         - [iOS](#ios-demo)
         - [C](#c-demos)
+        - [Web](#web-demo)
     - [SDKs](#sdks)
         - [Python](#python)
         - [iOS](#ios)
         - [C](#c)
+        - [Web](#web)
     - [Releases](#releases)
 
 ## AccessKey
@@ -102,6 +104,24 @@ obtained from [Picovoice Console](https://console.picovoice.ai/), and `${WAV_OUT
 where the enhanced audio will be stored. Terminate the demo with `Ctrl+C`.
 
 For more information about C demos go to [demo/c](./demo/c).
+
+### Web Demo
+
+From [demo/web](./demo/web) run the following in the terminal:
+
+```console
+yarn
+yarn start
+```
+
+(or)
+
+```console
+npm install
+npm run start
+```
+
+Open `http://localhost:5000` in your browser to try the demo.
 
 ## SDKs
 
@@ -201,6 +221,50 @@ Finally, when done be sure to release the acquired resources:
 ```c
 pv_koala_delete(handle);
 ```
+
+### Web
+
+Install the web SDK using yarn:
+
+```console
+yarn add @picovoice/koala-web
+```
+
+or using npm:
+
+```console
+npm install --save @picovoice/koala-web
+```
+
+Create an instance of the engine using `KoalaWorker` and enhance audio in real-time:
+
+```typescript
+import { Koala } from "@picovoice/koala-web";
+import koalaParams from "${PATH_TO_BASE64_KOALA_PARAMS}";
+
+function processCallback(enhancedPcm) {
+  // do something with enhancedPcm
+}
+
+function getAudioData(): Int16Array {
+... // function to get audio data
+  return new Int16Array();
+}
+
+const koala = await KoalaWorker.create(
+  "${ACCESS_KEY}",
+  processCallback,
+  { base64: koalaParams },
+);
+
+await koala.reset();
+for (;;) {
+    await koala.process(getAudioData());
+}
+```
+
+Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://console.picovoice.ai/). Finally, when done release the resources using `koala.release()`.
+
 
 ## Releases
 

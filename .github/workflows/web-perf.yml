@@ -1,0 +1,61 @@
+name: Web Performance
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'lib/wasm/**'
+      - 'lib/common/**'
+      - 'binding/web/test/koala_perf.test.ts'
+      - '.github/workflows/web-perf.yml'
+      - 'resources/audio_samples/**'
+  pull_request:
+    branches: [ main, 'v[0-9]+.[0-9]+' ]
+    paths:
+      - 'lib/wasm/**'
+      - 'lib/common/**'
+      - 'binding/web/test/koala_perf.test.ts'
+      - '.github/workflows/web-perf.yml'
+      - 'resources/audio_samples/**'
+
+defaults:
+  run:
+    working-directory: binding/web
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [lts/*]
+        include:
+        - node-version: lts/*
+          procPerformanceThresholdSec: 1.2
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Pre-build dependencies
+        run: npm install yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Copy libs
+        run: yarn copywasm
+
+      - name: Build
+        run: yarn build
+
+      - name: Prepare Test
+        run: yarn setup-test
+
+      - name: Test
+        run: yarn test-perf --env ACCESS_KEY=${{secrets.PV_VALID_ACCESS_KEY}},NUM_TEST_ITERATIONS=20,PROC_PERFORMANCE_THRESHOLD_SEC=0.8

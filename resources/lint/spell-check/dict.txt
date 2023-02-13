@@ -5,11 +5,16 @@ aarch
 armv
 astype
 calcsize
+camelcase
+copywasm
 denoising
+downsample
+downsampled
 drwav
 dtype
 frombuffer
 hanning
+iife
 irfft
 jetson
 koalafied
@@ -20,8 +25,10 @@ ndarray
 numpy
 outf
 picovoice
+pluginutils
 podfile
 pthread
+pvbase
 pvkoala
 pvkoalademo
 pvrecorder
