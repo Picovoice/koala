@@ -1,0 +1,62 @@
+name: Web
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'binding/web/**'
+      - '!binding/web/README.md'
+      - 'lib/common/**'
+      - 'lib/wasm/**'
+      - 'resources/**'
+      - '!resources/lint/**'
+      - '.github/workflows/web.yml'
+  pull_request:
+    branches: [ main, 'v[0-9]+.[0-9]+' ]
+    paths:
+      - 'binding/web/**'
+      - '!binding/web/README.md'
+      - 'lib/common/**'
+      - 'lib/wasm/**'
+      - 'resources/**'
+      - '!resources/lint/**'
+      - '.github/workflows/web.yml'
+
+defaults:
+  run:
+    working-directory: binding/web
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [lts/*]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Pre-build dependencies
+        run: npm install yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Copy libs
+        run: yarn copywasm
+
+      - name: Build
+        run: yarn build
+
+      - name: Prepare Test
+        run: yarn setup-test
+
+      - name: Test
+        run: yarn test --env ACCESS_KEY=${{secrets.PV_VALID_ACCESS_KEY}}
