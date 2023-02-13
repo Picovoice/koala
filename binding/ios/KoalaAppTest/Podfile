@@ -1,0 +1,14 @@
+source 'https://cdn.cocoapods.org/'
+platform :ios, '11.0'
+
+target 'KoalaAppTest' do
+  pod 'Koala-iOS', '~> 1.0.0'
+end
+
+target 'KoalaAppTestUITests' do
+  pod 'Koala-iOS', '~> 1.0.0'
+end
+
+target 'PerformanceTest' do
+  pod 'Koala-iOS', '~> 1.0.0'
+end

@@ -21,10 +21,12 @@ Koala is an on-device noise suppression engine. Koala is:
     - [AccessKey](#accesskey)
     - [Demos](#demos)
         - [Python](#python-demos)
+        - [iOS](#ios-demo)
         - [C](#c-demos)
         - [Web](#web-demo)
     - [SDKs](#sdks)
         - [Python](#python)
+        - [iOS](#ios)
         - [C](#c)
         - [Web](#web)
     - [Releases](#releases)
@@ -62,6 +64,19 @@ koala_demo_file \
 ```
 
 Replace `${ACCESS_KEY}` with yours obtained from Picovoice Console.
+
+### iOS Demo
+
+Copy your `AccessKey` into the `ACCESS_KEY` variable inside [`ViewModel.swift`](./demo/ios/KoalaDemo/KoalaDemo/ViewModel.swift).
+
+Before building the demo app, run the following from [`KoalaDemo`](./demo/ios/KoalaDemo) directory to install the `Koala-iOS` CocoaPod:
+
+```ruby
+pod install
+```
+
+Open [KoalaDemo.xcworkspace](./demo/ios/KoalaDemo/KoalaDemo.xcworkspace) and run the demo.
+
 
 ### C Demos
 
@@ -137,6 +152,36 @@ while True:
 ```
 
 Finally, when done be sure to explicitly release the resources using `koala.delete()`.
+
+### iOS
+
+Create an instance of the engine and enhance audio:
+
+```swift
+import Koala
+
+do {
+  let koala = try Koala(accessKey: "${ACCESS_KEY}")
+} catch {}
+
+func getNextAudioFrame() -> [Int16] {
+  // .. get a frame of audio
+  return audioFrame;
+}
+
+while true {
+  do {
+    let enhancedAudio = try koala.process(getNextAudioFrame())
+    // .. use enhanced audio
+  } catch {}
+}
+```
+
+Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://console.picovoice.ai/).
+
+In case the next audio frame does not directly follow the previous one, call `koala.reset()`.
+
+When done be sure to explicitly release the resources using `koala.delete()`.
 
 ### C
 

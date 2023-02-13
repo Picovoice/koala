@@ -26,6 +26,7 @@ numpy
 outf
 picovoice
 pluginutils
+podfile
 pthread
 pvbase
 pvkoala
@@ -35,5 +36,7 @@ randn
 rfft
 rfftfreq
 signup
+sqrtf
 wargv
 wchars
+xcworkspace
