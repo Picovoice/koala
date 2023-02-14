@@ -34,8 +34,8 @@
     "**/*.storyboard",
     "**/*.pbxproj",
     "**/*.xcscheme",
-    "**/*.m"
-    "../../../lib/ios/**/*"
+    "**/*.m",
+    "../../../lib/ios/**/*",
 
     // java
     "**/build.gradle",
