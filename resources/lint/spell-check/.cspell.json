@@ -34,6 +34,20 @@
     "**/*.storyboard",
     "**/*.pbxproj",
     "**/*.xcscheme",
-    "**/*.m"
+    "**/*.m",
+    "../../../lib/ios/**/*",
+
+    // java
+    "**/build.gradle",
+    "**/gradle-wrapper.properties",
+    "**/gradle.properties",
+    "**/gradlew",
+    "**/gradlew.bat",
+    "**/proguard-rules.pro",
+
+    // android
+    "**/AndroidManifest.xml",
+    "**/activity_main.xml",
+    "**/koala_activity_demo.xml"
   ]
 }
