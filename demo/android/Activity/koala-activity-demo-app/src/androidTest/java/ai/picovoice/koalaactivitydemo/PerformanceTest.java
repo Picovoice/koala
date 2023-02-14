@@ -67,8 +67,6 @@ public class PerformanceTest {
         accessKey = appContext.getString(R.string.pvTestingAccessKey);
     }
 
-
-
     @Test
     public void testPerformance() throws Exception {
         String iterationString = appContext.getString(R.string.numTestIterations);

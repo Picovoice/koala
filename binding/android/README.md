@@ -38,8 +38,6 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 
 ## Usage
 
-Add the Koala model file to your Android application by:
-
 Create an instance of the engine with the Koala Builder class by passing in the `accessKey` and Android app context:
 
 ```java
@@ -64,6 +62,11 @@ short[] getNextAudioFrame() {
 while true {
     short[] enhancedFrame = koala.process(getNextAudioFrame());
 }
+```
+
+In case the next audio frame does not directly follow the previous one, call `reset()`:
+```java
+koala.reset();
 ```
 
 When done, resources have to be released explicitly:

@@ -37,8 +37,8 @@ public class Koala {
     /**
      * Constructor.
      *
-     * @param accessKey                  AccessKey obtained from Picovoice Console
-     * @param modelPath                  Absolute path to the file containing Koala model parameters.
+     * @param accessKey AccessKey obtained from Picovoice Console
+     * @param modelPath Absolute path to the file containing Koala model parameters.
      *
      * @throws KoalaException if there is an error while initializing Koala.
      */
@@ -85,7 +85,7 @@ public class Koala {
     /**
      * Processes given audio data and returns delayed enhanced audio.
      *
-     * @param pcm A frame of audio samples. The number of samples per frame can be attained by
+     * @param pcm A frame of audio samples. The number of samples per frame can be obtained by
      *            calling {@link #getFrameLength()}. The incoming audio needs to have a sample rate
      *            equal to {@link #getSampleRate()} and be 16-bit linearly-encoded. Koala operates
      *            on single-channel audio. Consecutive calls to {@link #process()} must provide consecutive
@@ -94,7 +94,7 @@ public class Koala {
      * @return A frame of enhanced audio samples, stored as a sequence of 16-bit linearly-encoded integers.
      *          The output is not directly the enhanced version of the input PCM, but corresponds to samples
      *          that were given in previous calls to {@link #process()}. The delay in samples between the start
-     *          time of the input frame and the start time of the output frame can be attained from {@link #delaySample()}.
+     *          time of the input frame and the start time of the output frame can be obtained from {@link #getDelaySample()}.
      *
      * @throws KoalaException if there is an error while processing the audio frame.
      */
@@ -160,7 +160,7 @@ public class Koala {
     /**
      * Getter for Koala delaySample.
      *
-     * @return Koala delaySample.
+     * @return Koala process delay in number of samples.
      */
     public int getDelaySample() throws KoalaException {
         return KoalaNative.delaySample(handle);

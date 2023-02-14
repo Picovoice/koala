@@ -280,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
             stopped.set(false);
         }
 
-        @SuppressLint({"MissingPermission", "SetTextI18n"})
+        @SuppressLint({"MissingPermission", "SetTextI18n", "DefaultLocale"})
         private void read() throws KoalaException {
             final int minBufferSize = AudioRecord.getMinBufferSize(
                     koala.getSampleRate(),
@@ -319,13 +319,18 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
 
                     if ((totalSamplesWritten / koala.getFrameLength()) % 10 == 0) {
                         runOnUiThread(() -> {
-                            int secondsRecorded = (totalSamplesWritten / koala.getSampleRate());
-                            recordedText.setText("Recorded: " + secondsRecorded + "s");
+                            double secondsRecorded = ((double) (totalSamplesWritten) / (double) (koala.getSampleRate()));
+                            recordedText.setText(String.format("Recording: %.1fs", secondsRecorded));
                         });
                     }
                 }
 
                 audioRecord.stop();
+
+                runOnUiThread(() -> {
+                    double secondsRecorded = ((double) (totalSamplesWritten) / (double) (koala.getSampleRate()));
+                    recordedText.setText(String.format("Recorded: %.1fs", secondsRecorded));
+                });
 
                 short[] emptyFrame = new short[koala.getFrameLength()];
                 Arrays.fill(emptyFrame, (short) 0);

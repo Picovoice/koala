@@ -19,9 +19,4 @@ private static final String ACCESS_KEY = "YOUR_ACCESS_KEY_HERE";
 pvTestingAccessKey=YOUR_ACCESS_KEY_HERE
 ```
 
-## Usage
-
-Launch the demo on your phone using Android Studio.
-
-1. Press the start button
-2. Start talking. The app background will change to indicate that voice activity was detected above the threshold.
+3. Open the project in Android Studio and run the demo on your device or simulator.
