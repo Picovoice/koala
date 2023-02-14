@@ -40,20 +40,15 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 
 Add the Koala model file to your Android application by:
 
-1. Either create a model in [Picovoice Console](https://console.picovoice.ai/) or use the [default model](../../lib/common).
-2. Add the model as a bundled resource by placing it under the assets directory of your Android project (`src/main/assets`).
-
-Create an instance of the engine with the Koala Builder class by passing in the `accessKey`, `modelPath` and Android app context:
+Create an instance of the engine with the Koala Builder class by passing in the `accessKey` and Android app context:
 
 ```java
 import ai.picovoice.koala.*;
 
 final String accessKey = "${ACCESS_KEY}"; // AccessKey provided by Picovoice Console (https://console.picovoice.ai/)
-final String modelPath = "${MODEL_PATH}"; // relative path to assets directory or absolute path to file on device
 try {
     Koala koala = new Koala.Builder()
         .setAccessKey(accessKey)
-        .setModelPath(modelPath)
         .build(appContext);
 } catch (KoalaException ex) { }
 ```

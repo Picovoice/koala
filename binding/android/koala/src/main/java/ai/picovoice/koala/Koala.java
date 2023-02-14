@@ -172,7 +172,7 @@ public class Koala {
         private String modelPath = null;
 
         /**
-         * Setter the AccessKey
+         * Setter for the AccessKey
          *
          * @param accessKey AccessKey obtained from Picovoice Console
          */

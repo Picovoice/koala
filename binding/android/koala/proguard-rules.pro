@@ -1,2 +1,1 @@
 -keep class ai.picovoice.koala.*Exception { <init>(...); }
--keep class ai.picovoice.koala.KoalaTranscript
