@@ -2,24 +2,24 @@
 # yarn lockfile v1
 
 
-"@picovoice/koala-web@~1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@picovoice/koala-web/-/koala-web-1.0.0.tgz#679175f6ccbf18fb02819331e4002dda840f9a68"
-  integrity sha512-w96twTlkxRx5jAMJbz06DLfV5Q31MVR4zlvGbjcdlFpzcjASylHMUrRLe6R/5mO0qHKn1YPz7jSNgTQcImzU3g==
+"@picovoice/koala-web@~1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@picovoice/koala-web/-/koala-web-1.0.1.tgz#85849d1c2bb03dac3bee3d622a3fec1e1af49cc0"
+  integrity sha512-hYAX+6ArcaTx0iMriVZ8mMWs9v9fnGlR4KIPl9KODtrJoPV2gBZ5eUn4UKUaYHHZjnxVm4vOgXi80++P/U7/6Q==
   dependencies:
-    "@picovoice/web-utils" "=1.2.11"
+    "@picovoice/web-utils" "=1.2.12"
 
-"@picovoice/web-utils@=1.2.11":
-  version "1.2.11"
-  resolved "https://registry.yarnpkg.com/@picovoice/web-utils/-/web-utils-1.2.11.tgz#4a9564eacbacf1b74ba9d0df27c78646fe200e7d"
-  integrity sha512-DtgRXr618LjNLHvcIMKehy7THiJm6Lm1DFaHjHEDLFmIh9NrfYrbw9yosytHq1+n/mV2VfePQPhWsrPMI1JlVw==
+"@picovoice/web-utils@=1.2.12":
+  version "1.2.12"
+  resolved "https://registry.yarnpkg.com/@picovoice/web-utils/-/web-utils-1.2.12.tgz#65437c3fdb69c5a2f875fd803a89f7cdbb93d607"
+  integrity sha512-u5G9PPIlhG2TvSe9lj8oyjYfQae0cWCp6W6DCl3Wk6X8hyG6m2c3Y4nkJ6Jgy7/T38SekKu01CjPrKnXCuRohQ==
   dependencies:
     commander "^9.2.0"
 
-"@picovoice/web-voice-processor@~4.0.4":
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/@picovoice/web-voice-processor/-/web-voice-processor-4.0.4.tgz#12140c9a0120e0db9dda80bcf00d7f827f1a8c99"
-  integrity sha512-WZ4PPXU0i/yPzIjd+jbx9VSMF6Shbyf2BXt2U7a6MASJ2KWeG9+zDx6nteDF10cyG3T78G+4EB24tLsdyLVmWw==
+"@picovoice/web-voice-processor@~4.0.5":
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/@picovoice/web-voice-processor/-/web-voice-processor-4.0.5.tgz#f62ab49d03e13f870a49e505e4eb3a6f6206d19f"
+  integrity sha512-k93u3EQRU+9ahF7Gr5s/QgtqtAgwMAHCA+It5mDKWxGe1bzNBr/RWxKLcfey8A16WAA9GiDcsES1bd9ZQOXwWQ==
 
 ansi-styles@^4.1.0:
   version "4.3.0"
