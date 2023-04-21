@@ -7,13 +7,13 @@
 //  specific language governing permissions and limitations under the License.
 //
 
-public class KoalaError : LocalizedError {
-    private let message: String;
-    
+public class KoalaError: LocalizedError {
+    private let message: String
+
     public init (_ message: String) {
         self.message = message
     }
-    
+
     public var errorDescription: String? {
         return message
     }
@@ -25,24 +25,24 @@ public class KoalaError : LocalizedError {
     }
 }
 
-public class KoalaMemoryError : KoalaError {}
+public class KoalaMemoryError: KoalaError {}
 
-public class KoalaIOError : KoalaError {}
+public class KoalaIOError: KoalaError {}
 
-public class KoalaInvalidArgumentError : KoalaError {}
+public class KoalaInvalidArgumentError: KoalaError {}
 
-public class KoalaStopIterationError : KoalaError {}
+public class KoalaStopIterationError: KoalaError {}
 
-public class KoalaKeyError : KoalaError {}
+public class KoalaKeyError: KoalaError {}
 
-public class KoalaInvalidStateError : KoalaError {}
+public class KoalaInvalidStateError: KoalaError {}
 
-public class KoalaRuntimeError : KoalaError {}
+public class KoalaRuntimeError: KoalaError {}
 
-public class KoalaActivationError : KoalaError {}
+public class KoalaActivationError: KoalaError {}
 
-public class KoalaActivationLimitError : KoalaError {}
+public class KoalaActivationLimitError: KoalaError {}
 
-public class KoalaActivationThrottledError : KoalaError {}
+public class KoalaActivationThrottledError: KoalaError {}
 
-public class KoalaActivationRefusedError : KoalaError {}
+public class KoalaActivationRefusedError: KoalaError {}

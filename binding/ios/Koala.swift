@@ -59,7 +59,7 @@ public class Koala {
         }
 
         var modelPathArg = modelPath
-        if (modelPathArg == nil) {
+        if modelPathArg == nil {
             modelPathArg = Koala.resourceBundle.path(forResource: "koala_params", ofType: "pv")
             if modelPathArg == nil {
                 throw KoalaIOError("Could not find default model file in app bundle.")
@@ -118,19 +118,24 @@ public class Koala {
     ///   - pcm: A frame of audio samples. The number of samples per frame can be attained by calling
     ///     `Koala.frameLength`. The incoming audio needs to have a sample rate equal to `Koala.sampleRate`
     ///      and be 16-bit linearly-encoded. Koala operates on single-channel audio. Consecutive calls to `.process()`
-    ///      must provide consecutive frames of audio from the same source, unless `.reset()` has been called in between.
+    ///      must provide consecutive frames of audio from the same source, unless `.reset()` has
+    ///      been called in between.
     /// - Throws: KoalaError
-    /// - Returns: A frame of enhanced audio samples, stored as a sequence of 16-bit linearly-encoded integers.
-    ///        The output is not directly the enhanced version of the input PCM, but corresponds to samples that were given in
-    ///        previous calls to `.process()`. The delay in samples between the start time of the input frame and the start
-    ///        time of the output frame can be attained from `.delaySample` instance property.
+    /// - Returns: A frame of enhanced audio samples, stored as a sequence of 16-bit
+    ///        linearly-encoded integers. The output is not directly the enhanced version
+    ///        of the input PCM, but corresponds to samples that were given in previous
+    ///        calls to `.process()`. The delay in samples between the start time of the
+    ///        input frame and the start time of the output frame can be attained from
+    ///        `.delaySample` instance property.
     public func process(_ pcm: [Int16]) throws -> [Int16] {
         if handle == nil {
             throw KoalaInvalidStateError("Koala must be initialized before processing")
         }
 
         if pcm.count != Koala.frameLength {
-            throw KoalaInvalidArgumentError("Frame of audio data must contain \(Koala.frameLength) samples - given frame contained \(pcm.count)")
+            throw KoalaInvalidArgumentError(
+                "Frame of audio data must contain \(Koala.frameLength) samples - given frame contained \(pcm.count)"
+            )
         }
 
         var enhancedPcm = [Int16](repeating: 0, count: Int(Koala.frameLength))
@@ -165,7 +170,7 @@ public class Koala {
     /// - Returns: The full path of the resource.
     private func getResourcePath(_ filePath: String) throws -> String {
         if let resourcePath = Bundle(for: type(of: self)).resourceURL?.appendingPathComponent(filePath).path {
-            if (FileManager.default.fileExists(atPath: resourcePath)) {
+            if FileManager.default.fileExists(atPath: resourcePath) {
                 return resourcePath
             }
         }

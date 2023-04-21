@@ -53,7 +53,7 @@ class KoalaDemoUITests: XCTestCase {
         return pcm
     }
 
-    func runTest(inputPcm: [Int16], refPcm: [Int16]? = nil, tolerance: Float = 0.02) throws -> Void {
+    func runTest(inputPcm: [Int16], refPcm: [Int16]? = nil, tolerance: Float = 0.02) throws {
 
         try koala!.reset()
 
