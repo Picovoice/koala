@@ -50,7 +50,7 @@ class PerformanceTest: XCTestCase {
             for j in 0..<numFrames {
                 let frame: [Int16] = Array(pcm[j * frameLength..<(j + 1) * frameLength])
                 let before = CFAbsoluteTimeGetCurrent()
-                let _ = try koala.process(frame)
+                _ = try koala.process(frame)
                 let after = CFAbsoluteTimeGetCurrent()
                 totalNSec += (after - before)
             }

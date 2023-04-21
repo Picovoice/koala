@@ -41,7 +41,6 @@ struct ContentView: View {
                     .opacity(viewModel.state == .TEST ? 1 : 0)
                     .disabled(interactionDisabled || viewModel.state != .TEST)
 
-
             Button(action: viewModel.togglePlayback) {
                 Text(viewModel.isPlaying ? "STOP" : "PLAY")
                         .font(.title)
@@ -61,11 +60,13 @@ struct ContentView: View {
             Spacer()
 
             if viewModel.state == .RECORD {
-                Text(viewModel.isRecording ? String(format: "Recording : %.1fs", viewModel.recordingTimeSec) : "Start by recording some audio in a noisy environment")
+                Text(viewModel.isRecording ?
+                    String(format: "Recording : %.1fs", viewModel.recordingTimeSec) :
+                    "Start by recording some audio in a noisy environment")
                         .padding()
                         .font(.body)
                         .foregroundColor(Color.black)
-            } else if (viewModel.state == .TEST) {
+            } else if viewModel.state == .TEST {
                 Text(String(format: "Recorded : %.1fs", viewModel.recordingTimeSec))
                         .padding()
                         .font(.body)
@@ -95,12 +96,18 @@ struct ContentView: View {
                     .padding(12)
                     .disabled(interactionDisabled)
         }
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification), perform: { output in
-                    viewModel.initialize()
-                })
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification), perform: { output in
-                    viewModel.destroy()
-                })
+                .onReceive(NotificationCenter.default.publisher(
+                    for: UIApplication.willEnterForegroundNotification),
+                    perform: { _ in
+                        viewModel.initialize()
+                    }
+                )
+                .onReceive(NotificationCenter.default.publisher(
+                    for: UIApplication.didEnterBackgroundNotification),
+                    perform: { _ in
+                        viewModel.destroy()
+                    }
+                )
                 .padding()
                 .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 .background(Color.white)

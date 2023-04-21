@@ -23,7 +23,11 @@ class ViewModel: ObservableObject {
 
     private let ACCESS_KEY = "${YOUR_ACCESS_KEY_HERE}" // Obtained from Picovoice Console (https://console.picovoice.ai)
 
-    private let AUDIO_FORMAT = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: Double(Koala.sampleRate), channels: 1, interleaved: true)!
+    private let AUDIO_FORMAT = AVAudioFormat(
+        commonFormat: .pcmFormatInt16,
+        sampleRate: Double(Koala.sampleRate),
+        channels: 1,
+        interleaved: true)!
 
     private var koala: Koala!
 
@@ -55,7 +59,11 @@ class ViewModel: ObservableObject {
         do {
             try koala = Koala(accessKey: ACCESS_KEY)
 
-            let outputDir = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            let outputDir = try FileManager.default.url(
+                for: .documentDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: false)
             refFileUrl = outputDir.appendingPathComponent("ref.wav")
             enhancedFileUrl = outputDir.appendingPathComponent("enhanced.wav")
 
@@ -133,7 +141,7 @@ class ViewModel: ObservableObject {
     }
 
     public func recordingOn() {
-        if (isPlaying) {
+        if isPlaying {
             refPlayer?.stop()
             enhancedPlayer?.stop()
             isPlaying = false
@@ -146,13 +154,13 @@ class ViewModel: ObservableObject {
         enhancedFile = openOutputWav(fileUrl: enhancedFileUrl!)
 
         recordingTimeSec = 0
-        recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+        recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
             self.recordingTimeSec += 0.1
         }
 
         do {
             try koala.reset()
-            
+
             guard try VoiceProcessor.shared.hasPermissions() else {
                 errorMessage = "Microphone permissions denied"
                 return
@@ -249,7 +257,11 @@ class ViewModel: ObservableObject {
             if FileManager.default.fileExists(atPath: fileUrl.path) {
                 try FileManager.default.removeItem(at: fileUrl)
             }
-            return try AVAudioFile(forWriting: fileUrl, settings: AUDIO_FORMAT.settings, commonFormat: .pcmFormatInt16, interleaved: true)
+            return try AVAudioFile(
+                forWriting: fileUrl,
+                settings: AUDIO_FORMAT.settings,
+                commonFormat: .pcmFormatInt16,
+                interleaved: true)
         } catch {
             errorMessage = "\(error)"
             return nil
