@@ -22,7 +22,7 @@
 #include <windows.h>
 
 #define UTF8_COMPOSITION_FLAG (0)
-#define NULL_TERMINATED (-1)
+#define NULL_TERMINATED       (-1)
 
 #else
 
@@ -46,7 +46,6 @@ static void *open_dl(const char *dl_path) {
     return dlopen(dl_path, RTLD_NOW);
 
 #endif
-
 }
 
 static void *load_symbol(void *handle, const char *symbol) {
@@ -60,7 +59,6 @@ static void *load_symbol(void *handle, const char *symbol) {
     return dlsym(handle, symbol);
 
 #endif
-
 }
 
 static void close_dl(void *handle) {
@@ -74,7 +72,6 @@ static void close_dl(void *handle) {
     dlclose(handle);
 
 #endif
-
 }
 
 static void print_dl_error(const char *message) {
@@ -88,7 +85,6 @@ static void print_dl_error(const char *message) {
     fprintf(stderr, "%s with '%s'.\n", message, dlerror());
 
 #endif
-
 }
 
 static volatile bool is_interrupted = false;
@@ -137,7 +133,7 @@ static void print_vu_meter(const int16_t *pcm_buffer, int32_t num_samples) {
     for (uint32_t i = 0; i < num_samples; i++) {
         sum += (float) pcm_buffer[i] * (float) pcm_buffer[i];
     }
-    float volume_db = 10 * log10f((sum + FLT_EPSILON) / (float) num_samples / (float)(SHRT_MAX * SHRT_MAX));
+    float volume_db = 10 * log10f((sum + FLT_EPSILON) / (float) num_samples / (float) (SHRT_MAX * SHRT_MAX));
 
     float volume = (volume_db + 45) / 45;
     volume = volume < 0 ? 0 : volume;
@@ -145,9 +141,12 @@ static void print_vu_meter(const int16_t *pcm_buffer, int32_t num_samples) {
     int32_t bar_length = ((int32_t) roundf(volume * 20));
     int32_t empty_length = 20 - (bar_length);
     fprintf(stdout,
-            "\r[%3d%%]%.*s%.*s|", percentage,
-            bar_length, "####################",
-            empty_length, "                    ");
+            "\r[%3d%%]%.*s%.*s|",
+            percentage,
+            bar_length,
+            "####################",
+            empty_length,
+            "                    ");
     fflush(stdout);
 }
 
@@ -257,14 +256,16 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    int32_t(*pv_sample_rate_func)() = load_symbol(koala_library, "pv_sample_rate");
+    int32_t (*pv_sample_rate_func)() = load_symbol(koala_library, "pv_sample_rate");
     if (!pv_sample_rate_func) {
         print_dl_error("failed to load 'pv_sample_rate'");
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t(*pv_koala_init_func)(
-    const char *, const char *, pv_koala_t * *) = load_symbol(koala_library, "pv_koala_init");
+    pv_status_t (*pv_koala_init_func)(
+            const char *,
+            const char *,
+            pv_koala_t **) = load_symbol(koala_library, "pv_koala_init");
     if (!pv_koala_init_func) {
         print_dl_error("failed to load 'pv_koala_init'");
         exit(EXIT_FAILURE);
@@ -276,15 +277,16 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t(*pv_koala_process_func)(pv_koala_t * ,
-    const int16_t *, int16_t *) =
-    load_symbol(koala_library, "pv_koala_process");
+    pv_status_t (*pv_koala_process_func)(pv_koala_t *,
+                                         const int16_t *,
+                                         int16_t *) =
+            load_symbol(koala_library, "pv_koala_process");
     if (!pv_koala_process_func) {
         print_dl_error("failed to load 'pv_koala_process'");
         exit(EXIT_FAILURE);
     }
 
-    int32_t(*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
+    int32_t (*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
     if (!pv_koala_frame_length_func) {
         print_dl_error("failed to load 'pv_koala_frame_length'");
         exit(EXIT_FAILURE);
