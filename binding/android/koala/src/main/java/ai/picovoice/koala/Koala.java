@@ -200,10 +200,10 @@ public class Koala {
         }
 
         /**
-         * Creates an instance of Koala noise supression engine.
+         * Creates an instance of Koala noise suppression engine.
          *
          * @param context Android app context
-         * @return An instance of Koala noise supression engine
+         * @return An instance of Koala noise suppression engine
          * @throws KoalaException if there is an error while initializing Koala.
          */
         public Koala build(Context context) throws KoalaException {
