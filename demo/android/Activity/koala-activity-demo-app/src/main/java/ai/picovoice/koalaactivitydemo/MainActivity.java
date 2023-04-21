@@ -130,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
     }
 
     private boolean hasRecordPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestRecordPermission() {
@@ -138,7 +139,11 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length == 0 || grantResults[0] == PackageManager.PERMISSION_DENIED) {
             ToggleButton toggleButton = findViewById(R.id.startButton);
@@ -218,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if(seekBar.getId() == R.id.faderSlider){
+        if (seekBar.getId() == R.id.faderSlider) {
             float progressFloat = (float) progress;
             float referenceVol = (100f - progressFloat) / 100f;
             float enhancedVol = progressFloat / 100f;
@@ -319,7 +324,8 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
 
                     if ((totalSamplesWritten / koala.getFrameLength()) % 10 == 0) {
                         runOnUiThread(() -> {
-                            double secondsRecorded = ((double) (totalSamplesWritten) / (double) (koala.getSampleRate()));
+                            double secondsRecorded = ((double) (totalSamplesWritten) /
+                                    (double) (koala.getSampleRate()));
                             recordedText.setText(String.format("Recording: %.1fs", secondsRecorded));
                         });
                     }
@@ -359,7 +365,13 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
             outputFile.write(byteBuf.array());
         }
 
-        private void writeWavHeader(RandomAccessFile outputFile, short channelCount, short bitDepth, int sampleRate, int totalSampleCount) throws IOException {
+        private void writeWavHeader(
+                RandomAccessFile outputFile,
+                short channelCount,
+                short bitDepth,
+                int sampleRate,
+                int totalSampleCount
+        ) throws IOException {
             ByteBuffer byteBuf = ByteBuffer.allocate(wavHeaderLength);
             byteBuf.order(ByteOrder.LITTLE_ENDIAN);
 
