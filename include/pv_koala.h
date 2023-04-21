@@ -105,7 +105,6 @@ PV_API int32_t pv_koala_frame_length(void);
 PV_API const char *pv_koala_version(void);
 
 #ifdef __cplusplus
-
 }
 
 #endif

@@ -1,7 +1,9 @@
 /*
     Copyright 2023 Picovoice Inc.
+
     You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
     file accompanying this source.
+    
     Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
     specific language governing permissions and limitations under the License.
@@ -49,7 +51,7 @@ static void *load_symbol(void *handle, const char *symbol) {
 
 #if defined(_WIN32) || defined(_WIN64)
 
-    return GetProcAddress((HMODULE)handle, symbol);
+    return GetProcAddress((HMODULE) handle, symbol);
 
 #else
 
@@ -62,7 +64,7 @@ static void close_dl(void *handle) {
 
 #if defined(_WIN32) || defined(_WIN64)
 
-    FreeLibrary((HMODULE)handle);
+    FreeLibrary((HMODULE) handle);
 
 #else
 
@@ -93,8 +95,7 @@ static struct option long_options[] = {
 };
 
 void print_usage(const char *program_name) {
-    fprintf(stdout, "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n",
-            program_name);
+    fprintf(stdout, "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n", program_name);
 }
 
 static void print_progress_bar(size_t num_total_samples, size_t num_processed_samples) {
@@ -103,9 +104,12 @@ static void print_progress_bar(size_t num_total_samples, size_t num_processed_sa
     int32_t bar_length = ((int32_t) roundf(ratio * 20));
     int32_t empty_length = 20 - (bar_length);
     fprintf(stdout,
-            "\r[%3d%%]%.*s%.*s|", percentage,
-            bar_length, "####################",
-            empty_length, "                    ");
+            "\r[%3d%%]%.*s%.*s|",
+            percentage,
+            bar_length,
+            "####################",
+            empty_length,
+            "                    ");
     fflush(stdout);
 }
 
@@ -158,13 +162,13 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    int32_t(*pv_sample_rate_func)() = load_symbol(koala_library, "pv_sample_rate");
+    int32_t (*pv_sample_rate_func)() = load_symbol(koala_library, "pv_sample_rate");
     if (!pv_sample_rate_func) {
         print_dl_error("failed to load 'pv_sample_rate'");
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t(*pv_koala_init_func)(const char *, const char *, pv_koala_t * *) =
+    pv_status_t (*pv_koala_init_func)(const char *, const char *, pv_koala_t **) =
             load_symbol(koala_library, "pv_koala_init");
     if (!pv_koala_init_func) {
         print_dl_error("failed to load 'pv_koala_init'");
@@ -177,21 +181,21 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t(*pv_koala_process_func)(pv_koala_t * , const int16_t *, int16_t *) =
+    pv_status_t (*pv_koala_process_func)(pv_koala_t *, const int16_t *, int16_t *) =
             load_symbol(koala_library, "pv_koala_process");
     if (!pv_koala_process_func) {
         print_dl_error("failed to load 'pv_koala_process'");
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t(*pv_koala_delay_sample_func)(pv_koala_t * , int32_t *) =
+    pv_status_t (*pv_koala_delay_sample_func)(pv_koala_t *, int32_t *) =
             load_symbol(koala_library, "pv_koala_delay_sample");
     if (!pv_koala_delay_sample_func) {
         print_dl_error("failed to load 'pv_koala_delay_sample'");
         exit(EXIT_FAILURE);
     }
 
-    int32_t(*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
+    int32_t (*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
     if (!pv_koala_frame_length_func) {
         print_dl_error("failed to load 'pv_koala_frame_length'");
         exit(EXIT_FAILURE);
@@ -376,7 +380,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < argc; ++i) {
         // WideCharToMultiByte: https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-widechartomultibyte
         int arg_chars_num = WideCharToMultiByte(CP_UTF8, UTF8_COMPOSITION_FLAG, wargv[i], NULL_TERMINATED, NULL, 0, NULL, NULL);
-        utf8_argv[i] = (char *)malloc(arg_chars_num * sizeof(char));
+        utf8_argv[i] = (char *) malloc(arg_chars_num * sizeof(char));
         if (!utf8_argv[i]) {
             fprintf(stderr, "failed to to allocate memory for converting args");
         }
