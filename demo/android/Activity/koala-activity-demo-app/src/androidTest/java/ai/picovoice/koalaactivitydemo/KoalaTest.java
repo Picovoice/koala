@@ -88,7 +88,7 @@ public class KoalaTest {
         while (inputStream.available() > 0) {
             int numRead = inputStream.read(pcmBuff.array());
             ShortBuffer pcmShortBuffer = pcmBuff.asShortBuffer();
-            for (int i = 0; i < (numRead / 2); i ++) {
+            for (int i = 0; i < (numRead / 2); i++) {
                 output.add(pcmShortBuffer.get(i));
             }
         }
@@ -105,7 +105,7 @@ public class KoalaTest {
 
     private short[] frameFromList(List<Short> inputList, int start, int count) {
         short[] output = new short[count];
-        for(int i = 0; i < count; i++) {
+        for (int i = 0; i < count; i++) {
             output[i] = inputList.get(start + i);
         }
         return output;
@@ -123,7 +123,9 @@ public class KoalaTest {
             if (referencePcm == null || i < koala.getDelaySample()) {
                 energyDeviation = enhancedFrameEnergy;
             } else {
-                short[] referenceFrame = frameFromList(referencePcm, i - koala.getDelaySample(), koala.getFrameLength());
+                short[] referenceFrame = frameFromList(
+                        referencePcm, i - koala.getDelaySample(),
+                        koala.getFrameLength());
                 double referenceFrameEnergy = pcmRootMeanSquare(referenceFrame);
                 energyDeviation = Math.abs(enhancedFrameEnergy - referenceFrameEnergy);
             }

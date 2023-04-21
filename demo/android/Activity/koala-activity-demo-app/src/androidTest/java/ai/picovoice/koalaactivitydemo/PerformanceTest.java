@@ -7,6 +7,7 @@
     express or implied. See the License for the specific language governing permissions and
     limitations under the License.
 */
+
 package ai.picovoice.koalaactivitydemo;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
@@ -77,7 +78,7 @@ public class PerformanceTest {
         int numTestIterations = 100;
         try {
             numTestIterations = Integer.parseInt(iterationString);
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) { }
         double performanceThresholdSec = Double.parseDouble(thresholdString);
 
         Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());

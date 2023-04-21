@@ -58,7 +58,11 @@ public class Koala {
         }
     }
 
-    private static String extractResource(Context context, InputStream srcFileStream, String dstFilename) throws IOException {
+    private static String extractResource(
+            Context context,
+            InputStream srcFileStream,
+            String dstFilename
+    ) throws IOException {
         InputStream is = new BufferedInputStream(srcFileStream, 256);
         OutputStream os = new BufferedOutputStream(context.openFileOutput(dstFilename, Context.MODE_PRIVATE), 256);
         int r;
@@ -94,7 +98,8 @@ public class Koala {
      * @return A frame of enhanced audio samples, stored as a sequence of 16-bit linearly-encoded integers.
      *          The output is not directly the enhanced version of the input PCM, but corresponds to samples
      *          that were given in previous calls to {@link #process()}. The delay in samples between the start
-     *          time of the input frame and the start time of the output frame can be obtained from {@link #getDelaySample()}.
+     *          time of the input frame and the start time of the output frame can be obtained from
+     *          {@link #getDelaySample()}.
      *
      * @throws KoalaException if there is an error while processing the audio frame.
      */
@@ -166,13 +171,16 @@ public class Koala {
         return KoalaNative.delaySample(handle);
     }
 
+    /**
+     * Builder for creating an instance of Koala with a mixture of default arguments.
+     */
     public static class Builder {
 
         private String accessKey = null;
         private String modelPath = null;
 
         /**
-         * Setter for the AccessKey
+         * Setter for the AccessKey.
          *
          * @param accessKey AccessKey obtained from Picovoice Console
          */
@@ -191,6 +199,13 @@ public class Koala {
             return this;
         }
 
+        /**
+         * Creates an instance of Koala noise suppression engine.
+         *
+         * @param context Android app context
+         * @return An instance of Koala noise suppression engine
+         * @throws KoalaException if there is an error while initializing Koala.
+         */
         public Koala build(Context context) throws KoalaException {
             if (accessKey == null || this.accessKey.equals("")) {
                 throw new KoalaInvalidArgumentException("No AccessKey was provided to Koala");
