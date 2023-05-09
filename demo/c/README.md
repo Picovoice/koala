@@ -36,7 +36,7 @@ cmake -S demo/c/ -B demo/c/build && cmake --build demo/c/build --target koala_de
 Running the executable without any command-line arguments prints the usage info to the console:
 
 ```console
-Usage: %s [-s] [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH]
+Usage: koala_demo_mic [-s] [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH]
 ```
 
 To list the available audio input devices:
@@ -48,7 +48,7 @@ To list the available audio input devices:
 To run the Koala microphone demo:
 
 ```console
-./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODLE_PATH} -a ${ACCESS_KEY} -d ${AUDIO_DEVICE_INDEX} -o ${WAV_OUTPUT_PATH}
+./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODEL_PATH} -a ${ACCESS_KEY} -d ${AUDIO_DEVICE_INDEX} -o ${WAV_OUTPUT_PATH}
 ```
 
 Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](../../lib), `${MODEL_PATH}` with path
@@ -78,7 +78,7 @@ cmake -S demo/c/ -B demo/c/build && cmake --build demo/c/build --target koala_de
 Run the demo:
 
 ```console
-./demo/c/build/Koala_demo_file -l ${LIBRARY_PATH} -m ${MODLE_PATH} -a ${ACCESS_KEY} -i ${INPUT_WAV_FILE} -o ${OUTPUT_WAV_FILE}
+./demo/c/build/Koala_demo_file -l ${LIBRARY_PATH} -m ${MODEL_PATH} -a ${ACCESS_KEY} -i ${INPUT_WAV_FILE} -o ${OUTPUT_WAV_FILE}
 ```
 
 Replace `${LIBRARY_PATH}` with the path to the appropriate Koala library available

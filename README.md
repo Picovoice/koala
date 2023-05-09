@@ -17,21 +17,22 @@ Koala is an on-device noise suppression engine. Koala is:
 ## Table of Contents
 
 - [Koala](#koala)
-    - [Table of Contents](#table-of-contents)
-    - [AccessKey](#accesskey)
-    - [Demos](#demos)
-        - [Python](#python-demos)
-        - [Android](#android-demo)
-        - [iOS](#ios-demo)
-        - [C](#c-demos)
-        - [Web](#web-demo)
-    - [SDKs](#sdks)
-        - [Python](#python)
-        - [Android](#android)
-        - [iOS](#ios)
-        - [C](#c)
-        - [Web](#web)
-    - [Releases](#releases)
+  - [Table of Contents](#table-of-contents)
+  - [AccessKey](#accesskey)
+  - [Demos](#demos)
+    - [Python Demos](#python-demos)
+    - [Android Demo](#android-demo)
+    - [iOS Demo](#ios-demo)
+    - [C Demos](#c-demos)
+    - [Web Demo](#web-demo)
+  - [SDKs](#sdks)
+    - [Python](#python)
+    - [Android](#android)
+    - [iOS](#ios)
+    - [C](#c)
+    - [Web](#web)
+  - [Releases](#releases)
+    - [v1.0.0 February 7th, 2023](#v100-february-7th-2023)
 
 ## AccessKey
 
@@ -104,7 +105,7 @@ To list the available audio input devices:
 To run the demo:
 
 ```console
-./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODLE_PATH} -a ${ACCESS_KEY} -o ${WAV_OUTPUT_PATH}
+./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODEL_PATH} -a ${ACCESS_KEY} -o ${WAV_OUTPUT_PATH}
 ```
 
 Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](./lib), `${MODEL_PATH}` with path
