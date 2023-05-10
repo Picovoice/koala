@@ -104,7 +104,7 @@ To list the available audio input devices:
 To run the demo:
 
 ```console
-./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODLE_PATH} -a ${ACCESS_KEY} -o ${WAV_OUTPUT_PATH}
+./demo/c/build/koala_demo_mic -l ${LIBRARY_PATH} -m ${MODEL_PATH} -a ${ACCESS_KEY} -o ${WAV_OUTPUT_PATH}
 ```
 
 Replace `${LIBRARY_PATH}` with path to appropriate library available under [lib](./lib), `${MODEL_PATH}` with path

@@ -23,7 +23,6 @@ linalg
 LPWSTR
 Makefiles
 malloc
-MODLE
 ndarray
 numpy
 outf
