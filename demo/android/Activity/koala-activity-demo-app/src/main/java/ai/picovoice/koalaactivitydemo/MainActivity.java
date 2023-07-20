@@ -17,12 +17,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Process;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -41,18 +37,27 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import ai.picovoice.koala.*;
+import ai.picovoice.android.voiceprocessor.VoiceProcessor;
+import ai.picovoice.koala.Koala;
+import ai.picovoice.koala.KoalaActivationException;
+import ai.picovoice.koala.KoalaActivationLimitException;
+import ai.picovoice.koala.KoalaActivationRefusedException;
+import ai.picovoice.koala.KoalaActivationThrottledException;
+import ai.picovoice.koala.KoalaException;
+import ai.picovoice.koala.KoalaInvalidArgumentException;
 
 public class MainActivity extends AppCompatActivity implements OnSeekBarChangeListener {
-    private final MicrophoneReader microphoneReader = new MicrophoneReader();
-    public Koala koala;
 
     private static final String ACCESS_KEY = "${YOUR_ACCESS_KEY_HERE}";
+
+    private final VoiceProcessor voiceProcessor = VoiceProcessor.getInstance();
+    private Koala koala;
+
+    private final ArrayList<Short> referenceData = new ArrayList<>();
+    private final ArrayList<Short> enhancedData = new ArrayList<>();
 
     private ToggleButton recordButton;
     private ToggleButton playStopButton;
@@ -64,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
     private MediaPlayer referenceMediaPlayer;
     private MediaPlayer enhancedMediaPlayer;
 
+    @SuppressLint("DefaultLocale")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +108,34 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
         enhancedMediaPlayer = new MediaPlayer();
         referenceMediaPlayer.setVolume(0, 0);
         enhancedMediaPlayer.setVolume(1, 1);
+
+        voiceProcessor.addFrameListener(frame -> {
+            synchronized (voiceProcessor) {
+                try {
+                    for (short sample : frame) {
+                        referenceData.add(sample);
+                    }
+
+                    final short[] enhancedFrame = koala.process(frame);
+                    if (referenceData.size() >= koala.getDelaySample()) {
+                        for (short sample : enhancedFrame) {
+                            enhancedData.add(sample);
+                        }
+                    }
+
+                    if ((referenceData.size() / koala.getFrameLength()) % 10 == 0) {
+                        runOnUiThread(() -> {
+                            double secondsRecorded = ((double) (referenceData.size()) /
+                                    (double) (koala.getSampleRate()));
+                            recordedText.setText(String.format("Recording: %.1fs", secondsRecorded));
+                        });
+                    }
+                } catch (KoalaException e) {
+                    runOnUiThread(() -> displayError(e.toString()));
+                }
+            }
+        });
+        voiceProcessor.addErrorListener(error -> runOnUiThread(() -> displayError(error.toString())));
     }
 
     @Override
@@ -129,9 +163,56 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private boolean hasRecordPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) ==
-                PackageManager.PERMISSION_GRANTED;
+    private void startRecording() {
+        enhancedData.clear();
+        referenceData.clear();
+
+        try {
+            voiceProcessor.start(koala.getFrameLength(), koala.getSampleRate());
+        } catch (Exception e) {
+            displayError("Start recording failed\n" + e.getMessage());
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private void stopRecording() {
+        try {
+            voiceProcessor.stop();
+
+            double secondsRecorded = ((double) (referenceData.size()) / (double) (koala.getSampleRate()));
+            recordedText.setText(String.format("Recorded: %.1fs", secondsRecorded));
+
+            synchronized (voiceProcessor) {
+                short[] emptyFrame = new short[koala.getFrameLength()];
+                Arrays.fill(emptyFrame, (short) 0);
+                while (enhancedData.size() < referenceData.size()) {
+                    final short[] enhancedFrame = koala.process(emptyFrame);
+                    for (short sample : enhancedFrame) {
+                        enhancedData.add(sample);
+                    }
+                }
+
+                RandomAccessFile referenceFile = new RandomAccessFile(referenceFilepath, "rws");
+                RandomAccessFile enhancedFile = new RandomAccessFile(enhancedFilepath, "rws");
+
+                writeWavFile(
+                        referenceFile,
+                        (short) 1,
+                        (short) 16,
+                        koala.getSampleRate(),
+                        referenceData);
+                writeWavFile(
+                        enhancedFile,
+                        (short) 1,
+                        (short) 16,
+                        koala.getSampleRate(),
+                        enhancedData);
+                referenceFile.close();
+                enhancedFile.close();
+            }
+        } catch (Exception e) {
+            displayError("Stop recording failed\n" + e.getMessage());
+        }
     }
 
     private void requestRecordPermission() {
@@ -149,11 +230,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
             ToggleButton toggleButton = findViewById(R.id.startButton);
             toggleButton.toggle();
         } else {
-            try {
-                microphoneReader.start();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            startRecording();
         }
     }
 
@@ -170,21 +247,20 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
                     enhancedMediaPlayer.stop();
                 }
 
-                if (hasRecordPermission()) {
-                    microphoneReader.start();
+                if (voiceProcessor.hasRecordAudioPermission(this)) {
+                    startRecording();
                 } else {
                     requestRecordPermission();
                 }
             } else {
-                microphoneReader.stop();
-
+                stopRecording();
                 resetMediaPlayer(referenceMediaPlayer, referenceFilepath);
                 resetMediaPlayer(enhancedMediaPlayer, enhancedFilepath);
 
                 playbackArea.setVisibility(View.VISIBLE);
             }
-        } catch (InterruptedException | IOException e) {
-            displayError("Audio stop command interrupted\n" + e.getMessage());
+        } catch (IOException e) {
+            displayError("Recording toggle failed\n" + e.getMessage());
         }
     }
 
@@ -233,164 +309,40 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
         }
     }
 
-    private class MicrophoneReader {
-        private final AtomicBoolean started = new AtomicBoolean(false);
-        private final AtomicBoolean stop = new AtomicBoolean(false);
-        private final AtomicBoolean stopped = new AtomicBoolean(false);
-
+    private void writeWavFile(
+            RandomAccessFile outputFile,
+            short channelCount,
+            short bitDepth,
+            int sampleRate,
+            ArrayList<Short> pcm
+    ) throws IOException {
         final int wavHeaderLength = 44;
-        private RandomAccessFile referenceFile;
-        private RandomAccessFile enhancedFile;
-        private int totalSamplesWritten;
+        ByteBuffer byteBuf = ByteBuffer.allocate(wavHeaderLength);
+        byteBuf.order(ByteOrder.LITTLE_ENDIAN);
 
+        byteBuf.put("RIFF".getBytes(StandardCharsets.US_ASCII));
+        byteBuf.putInt((bitDepth / 8 * pcm.size()) + 36);
+        byteBuf.put("WAVE".getBytes(StandardCharsets.US_ASCII));
+        byteBuf.put("fmt ".getBytes(StandardCharsets.US_ASCII));
+        byteBuf.putInt(16);
+        byteBuf.putShort((short) 1);
+        byteBuf.putShort(channelCount);
+        byteBuf.putInt(sampleRate);
+        byteBuf.putInt(sampleRate * channelCount * bitDepth / 8);
+        byteBuf.putShort((short) (channelCount * bitDepth / 8));
+        byteBuf.putShort(bitDepth);
+        byteBuf.put("data".getBytes(StandardCharsets.US_ASCII));
+        byteBuf.putInt(bitDepth / 8 * pcm.size());
 
-        void start() throws IOException {
+        outputFile.seek(0);
+        outputFile.write(byteBuf.array());
 
-            if (started.get()) {
-                return;
-            }
+        byteBuf = ByteBuffer.allocate(2 * pcm.size());
+        byteBuf.order(ByteOrder.LITTLE_ENDIAN);
 
-            referenceFile = new RandomAccessFile(referenceFilepath, "rws");
-            enhancedFile = new RandomAccessFile(enhancedFilepath, "rws");
-            writeWavHeader(referenceFile, (short) 1, (short) 16, 16000, 0);
-            writeWavHeader(enhancedFile, (short) 1, (short) 16, 16000, 0);
-
-            started.set(true);
-
-            Executors.newSingleThreadExecutor().submit((Callable<Void>) () -> {
-                Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
-                read();
-                return null;
-            });
+        for (short s : pcm) {
+            byteBuf.putShort(s);
         }
-
-        void stop() throws InterruptedException, IOException {
-            if (!started.get()) {
-                return;
-            }
-
-            stop.set(true);
-
-            while (!stopped.get()) {
-                Thread.sleep(10);
-            }
-
-            writeWavHeader(referenceFile, (short) 1, (short) 16, 16000, totalSamplesWritten);
-            writeWavHeader(enhancedFile, (short) 1, (short) 16, 16000, totalSamplesWritten);
-            referenceFile.close();
-            enhancedFile.close();
-
-            started.set(false);
-            stop.set(false);
-            stopped.set(false);
-        }
-
-        @SuppressLint({"MissingPermission", "SetTextI18n", "DefaultLocale"})
-        private void read() throws KoalaException {
-            final int minBufferSize = AudioRecord.getMinBufferSize(
-                    koala.getSampleRate(),
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT);
-            final int bufferSize = Math.max(koala.getSampleRate() / 2, minBufferSize);
-
-            AudioRecord audioRecord = null;
-
-            short[] frameBuffer = new short[koala.getFrameLength()];
-
-            try {
-                audioRecord = new AudioRecord(
-                        MediaRecorder.AudioSource.MIC,
-                        koala.getSampleRate(),
-                        AudioFormat.CHANNEL_IN_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT,
-                        bufferSize);
-                audioRecord.startRecording();
-
-                final int koalaDelay = koala.getDelaySample();
-
-                totalSamplesWritten = 0;
-                int enhancedSamplesWritten = 0;
-                while (!stop.get()) {
-                    if (audioRecord.read(frameBuffer, 0, frameBuffer.length) == frameBuffer.length) {
-                        final short[] frameBufferEnhanced = koala.process(frameBuffer);
-
-                        writeFrame(referenceFile, frameBuffer);
-                        totalSamplesWritten += frameBuffer.length;
-                        if (totalSamplesWritten >= koalaDelay) {
-                            writeFrame(enhancedFile, frameBufferEnhanced);
-                            enhancedSamplesWritten += frameBufferEnhanced.length;
-                        }
-                    }
-
-                    if ((totalSamplesWritten / koala.getFrameLength()) % 10 == 0) {
-                        runOnUiThread(() -> {
-                            double secondsRecorded = ((double) (totalSamplesWritten) /
-                                    (double) (koala.getSampleRate()));
-                            recordedText.setText(String.format("Recording: %.1fs", secondsRecorded));
-                        });
-                    }
-                }
-
-                audioRecord.stop();
-
-                runOnUiThread(() -> {
-                    double secondsRecorded = ((double) (totalSamplesWritten) / (double) (koala.getSampleRate()));
-                    recordedText.setText(String.format("Recorded: %.1fs", secondsRecorded));
-                });
-
-                short[] emptyFrame = new short[koala.getFrameLength()];
-                Arrays.fill(emptyFrame, (short) 0);
-                while (enhancedSamplesWritten < totalSamplesWritten) {
-                    final short[] frameBufferEnhanced = koala.process(emptyFrame);
-                    writeFrame(enhancedFile, frameBufferEnhanced);
-                    enhancedSamplesWritten += frameBufferEnhanced.length;
-                }
-            } catch (IllegalArgumentException | IllegalStateException | IOException e) {
-                throw new KoalaException(e);
-            } finally {
-                if (audioRecord != null) {
-                    audioRecord.release();
-                }
-                stopped.set(true);
-            }
-        }
-
-        private void writeFrame(RandomAccessFile outputFile, short[] frame) throws IOException {
-            ByteBuffer byteBuf = ByteBuffer.allocate(2 * frame.length);
-            byteBuf.order(ByteOrder.LITTLE_ENDIAN);
-
-            for (short s : frame) {
-                byteBuf.putShort(s);
-            }
-            outputFile.write(byteBuf.array());
-        }
-
-        private void writeWavHeader(
-                RandomAccessFile outputFile,
-                short channelCount,
-                short bitDepth,
-                int sampleRate,
-                int totalSampleCount
-        ) throws IOException {
-            ByteBuffer byteBuf = ByteBuffer.allocate(wavHeaderLength);
-            byteBuf.order(ByteOrder.LITTLE_ENDIAN);
-
-            byteBuf.put("RIFF".getBytes(StandardCharsets.US_ASCII));
-            byteBuf.putInt((bitDepth / 8 * totalSampleCount) + 36);
-            byteBuf.put("WAVE".getBytes(StandardCharsets.US_ASCII));
-            byteBuf.put("fmt ".getBytes(StandardCharsets.US_ASCII));
-            byteBuf.putInt(16);
-            byteBuf.putShort((short) 1);
-            byteBuf.putShort(channelCount);
-            byteBuf.putInt(sampleRate);
-            byteBuf.putInt(sampleRate * channelCount * bitDepth / 8);
-            byteBuf.putShort((short) (channelCount * bitDepth / 8));
-            byteBuf.putShort(bitDepth);
-            byteBuf.put("data".getBytes(StandardCharsets.US_ASCII));
-            byteBuf.putInt(bitDepth / 8 * totalSampleCount);
-
-            outputFile.seek(0);
-            outputFile.write(byteBuf.array());
-        }
+        outputFile.write(byteBuf.array());
     }
 }
