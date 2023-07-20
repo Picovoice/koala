@@ -17,12 +17,8 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.media.AudioAttributes;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Process;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -42,17 +38,23 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import ai.picovoice.koala.*;
+import ai.picovoice.android.voiceprocessor.VoiceProcessor;
+import ai.picovoice.android.voiceprocessor.VoiceProcessorException;
+import ai.picovoice.koala.Koala;
+import ai.picovoice.koala.KoalaActivationException;
+import ai.picovoice.koala.KoalaActivationLimitException;
+import ai.picovoice.koala.KoalaActivationRefusedException;
+import ai.picovoice.koala.KoalaActivationThrottledException;
+import ai.picovoice.koala.KoalaException;
+import ai.picovoice.koala.KoalaInvalidArgumentException;
 
 public class MainActivity extends AppCompatActivity implements OnSeekBarChangeListener {
-    private final MicrophoneReader microphoneReader = new MicrophoneReader();
-    public Koala koala;
 
     private static final String ACCESS_KEY = "${YOUR_ACCESS_KEY_HERE}";
+
+    private final MicrophoneReader microphoneReader = new MicrophoneReader();
+    private Koala koala;
 
     private ToggleButton recordButton;
     private ToggleButton playStopButton;
@@ -151,8 +153,8 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
         } else {
             try {
                 microphoneReader.start();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                displayError(e.toString());
             }
         }
     }
@@ -171,20 +173,27 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
                 }
 
                 if (hasRecordPermission()) {
-                    microphoneReader.start();
+                    try {
+                        microphoneReader.start();
+                    } catch (Exception e) {
+                        displayError(e.toString());
+                    }
                 } else {
                     requestRecordPermission();
                 }
             } else {
-                microphoneReader.stop();
-
+                try {
+                    microphoneReader.stop();
+                } catch (Exception e) {
+                    displayError(e.toString());
+                }
                 resetMediaPlayer(referenceMediaPlayer, referenceFilepath);
                 resetMediaPlayer(enhancedMediaPlayer, enhancedFilepath);
 
                 playbackArea.setVisibility(View.VISIBLE);
             }
-        } catch (InterruptedException | IOException e) {
-            displayError("Audio stop command interrupted\n" + e.getMessage());
+        } catch (IOException e) {
+            displayError("Recording toggle failed\n" + e.getMessage());
         }
     }
 
@@ -234,124 +243,81 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
     }
 
     private class MicrophoneReader {
-        private final AtomicBoolean started = new AtomicBoolean(false);
-        private final AtomicBoolean stop = new AtomicBoolean(false);
-        private final AtomicBoolean stopped = new AtomicBoolean(false);
+        private final VoiceProcessor voiceProcessor = VoiceProcessor.getInstance();
 
-        final int wavHeaderLength = 44;
         private RandomAccessFile referenceFile;
         private RandomAccessFile enhancedFile;
-        private int totalSamplesWritten;
+        private int referenceSamplesWritten;
+        private int enhancedSamplesWritten;
 
-
-        void start() throws IOException {
-
-            if (started.get()) {
-                return;
-            }
-
-            referenceFile = new RandomAccessFile(referenceFilepath, "rws");
-            enhancedFile = new RandomAccessFile(enhancedFilepath, "rws");
-            writeWavHeader(referenceFile, (short) 1, (short) 16, 16000, 0);
-            writeWavHeader(enhancedFile, (short) 1, (short) 16, 16000, 0);
-
-            started.set(true);
-
-            Executors.newSingleThreadExecutor().submit((Callable<Void>) () -> {
-                Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
-                read();
-                return null;
-            });
-        }
-
-        void stop() throws InterruptedException, IOException {
-            if (!started.get()) {
-                return;
-            }
-
-            stop.set(true);
-
-            while (!stopped.get()) {
-                Thread.sleep(10);
-            }
-
-            writeWavHeader(referenceFile, (short) 1, (short) 16, 16000, totalSamplesWritten);
-            writeWavHeader(enhancedFile, (short) 1, (short) 16, 16000, totalSamplesWritten);
-            referenceFile.close();
-            enhancedFile.close();
-
-            started.set(false);
-            stop.set(false);
-            stopped.set(false);
-        }
-
-        @SuppressLint({"MissingPermission", "SetTextI18n", "DefaultLocale"})
-        private void read() throws KoalaException {
-            final int minBufferSize = AudioRecord.getMinBufferSize(
-                    koala.getSampleRate(),
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT);
-            final int bufferSize = Math.max(koala.getSampleRate() / 2, minBufferSize);
-
-            AudioRecord audioRecord = null;
-
-            short[] frameBuffer = new short[koala.getFrameLength()];
-
-            try {
-                audioRecord = new AudioRecord(
-                        MediaRecorder.AudioSource.MIC,
-                        koala.getSampleRate(),
-                        AudioFormat.CHANNEL_IN_MONO,
-                        AudioFormat.ENCODING_PCM_16BIT,
-                        bufferSize);
-                audioRecord.startRecording();
-
-                final int koalaDelay = koala.getDelaySample();
-
-                totalSamplesWritten = 0;
-                int enhancedSamplesWritten = 0;
-                while (!stop.get()) {
-                    if (audioRecord.read(frameBuffer, 0, frameBuffer.length) == frameBuffer.length) {
-                        final short[] frameBufferEnhanced = koala.process(frameBuffer);
-
-                        writeFrame(referenceFile, frameBuffer);
-                        totalSamplesWritten += frameBuffer.length;
-                        if (totalSamplesWritten >= koalaDelay) {
+        @SuppressLint("DefaultLocale")
+        public MicrophoneReader() {
+            voiceProcessor.addFrameListener(frame -> {
+                synchronized (voiceProcessor) {
+                    if (referenceFile == null || enhancedFile == null) {
+                        return;
+                    }
+                    try {
+                        final short[] frameBufferEnhanced = koala.process(frame);
+                        writeFrame(referenceFile, frame);
+                        referenceSamplesWritten += frame.length;
+                        if (referenceSamplesWritten >= koala.getDelaySample()) {
                             writeFrame(enhancedFile, frameBufferEnhanced);
                             enhancedSamplesWritten += frameBufferEnhanced.length;
                         }
-                    }
 
-                    if ((totalSamplesWritten / koala.getFrameLength()) % 10 == 0) {
-                        runOnUiThread(() -> {
-                            double secondsRecorded = ((double) (totalSamplesWritten) /
-                                    (double) (koala.getSampleRate()));
-                            recordedText.setText(String.format("Recording: %.1fs", secondsRecorded));
-                        });
+                        if ((referenceSamplesWritten / koala.getFrameLength()) % 10 == 0) {
+                            runOnUiThread(() -> {
+                                double secondsRecorded = ((double) (referenceSamplesWritten) /
+                                        (double) (koala.getSampleRate()));
+                                recordedText.setText(String.format("Recording: %.1fs", secondsRecorded));
+                            });
+                        }
+                    } catch (KoalaException | IOException e) {
+                        runOnUiThread(() -> displayError(e.toString()));
                     }
                 }
+            });
+            voiceProcessor.addErrorListener(error -> {
+                runOnUiThread(() -> displayError(error.toString()));
+            });
+        }
 
-                audioRecord.stop();
+        void start() throws IOException, VoiceProcessorException {
+            referenceSamplesWritten = 0;
+            enhancedSamplesWritten = 0;
 
-                runOnUiThread(() -> {
-                    double secondsRecorded = ((double) (totalSamplesWritten) / (double) (koala.getSampleRate()));
-                    recordedText.setText(String.format("Recorded: %.1fs", secondsRecorded));
-                });
+            referenceFile = new RandomAccessFile(referenceFilepath, "rws");
+            enhancedFile = new RandomAccessFile(enhancedFilepath, "rws");
+            writeWavHeader(referenceFile, (short) 1, (short) 16, koala.getSampleRate(), 0);
+            writeWavHeader(enhancedFile, (short) 1, (short) 16, koala.getSampleRate(), 0);
 
+            voiceProcessor.start(koala.getFrameLength(), koala.getSampleRate());
+        }
+
+        @SuppressLint("DefaultLocale")
+        void stop() throws IOException, KoalaException, VoiceProcessorException {
+            voiceProcessor.stop();
+
+            runOnUiThread(() -> {
+                double secondsRecorded = ((double) (referenceSamplesWritten) / (double) (koala.getSampleRate()));
+                recordedText.setText(String.format("Recorded: %.1fs", secondsRecorded));
+            });
+
+            synchronized (voiceProcessor) {
                 short[] emptyFrame = new short[koala.getFrameLength()];
                 Arrays.fill(emptyFrame, (short) 0);
-                while (enhancedSamplesWritten < totalSamplesWritten) {
+                while (enhancedSamplesWritten < referenceSamplesWritten) {
                     final short[] frameBufferEnhanced = koala.process(emptyFrame);
                     writeFrame(enhancedFile, frameBufferEnhanced);
                     enhancedSamplesWritten += frameBufferEnhanced.length;
                 }
-            } catch (IllegalArgumentException | IllegalStateException | IOException e) {
-                throw new KoalaException(e);
-            } finally {
-                if (audioRecord != null) {
-                    audioRecord.release();
-                }
-                stopped.set(true);
+                writeWavHeader(referenceFile, (short) 1, (short) 16, koala.getSampleRate(), referenceSamplesWritten);
+                writeWavHeader(enhancedFile, (short) 1, (short) 16, koala.getSampleRate(), enhancedSamplesWritten);
+                referenceFile.close();
+                enhancedFile.close();
+                referenceFile = null;
+                enhancedFile = null;
             }
         }
 
@@ -372,7 +338,8 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
                 int sampleRate,
                 int totalSampleCount
         ) throws IOException {
-            ByteBuffer byteBuf = ByteBuffer.allocate(wavHeaderLength);
+            int WAV_HEADER_LENGTH = 44;
+            ByteBuffer byteBuf = ByteBuffer.allocate(WAV_HEADER_LENGTH);
             byteBuf.order(ByteOrder.LITTLE_ENDIAN);
 
             byteBuf.put("RIFF".getBytes(StandardCharsets.US_ASCII));
