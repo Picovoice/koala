@@ -71,9 +71,6 @@ export class Koala {
 
   private _wasmMemory: WebAssembly.Memory | undefined;
   private readonly _pvFree: pv_free_type;
-  private readonly _memoryBuffer: Int16Array;
-  private readonly _memoryBufferUint8: Uint8Array;
-  private readonly _memoryBufferView: DataView;
   private readonly _processMutex: Mutex;
 
   private readonly _objectAddress: number;
@@ -114,10 +111,6 @@ export class Koala {
     this._objectAddress = handleWasm.objectAddress;
     this._inputBufferAddress = handleWasm.inputBufferAddress;
     this._outputBufferAddress = handleWasm.outputBufferAddress;
-
-    this._memoryBuffer = new Int16Array(handleWasm.memory.buffer);
-    this._memoryBufferUint8 = new Uint8Array(handleWasm.memory.buffer);
-    this._memoryBufferView = new DataView(handleWasm.memory.buffer);
 
     this._pvError = handleWasm.pvError;
     this._processMutex = new Mutex();
@@ -279,8 +272,9 @@ export class Koala {
         if (this._wasmMemory === undefined) {
           throw new Error('Attempted to call Koala process after release.');
         }
+        const memoryBuffer = new Int16Array(this._wasmMemory.buffer);
 
-        this._memoryBuffer.set(
+        memoryBuffer.set(
           pcm,
           this._inputBufferAddress / Int16Array.BYTES_PER_ELEMENT,
         );
@@ -290,10 +284,12 @@ export class Koala {
           this._inputBufferAddress,
           this._outputBufferAddress
         );
+
+        const memoryBufferUint8 = new Uint8Array(this._wasmMemory.buffer);
+
         if (status !== PV_STATUS_SUCCESS) {
-          const memoryBuffer = new Uint8Array(this._wasmMemory.buffer);
           const msg = `process failed with status ${arrayBufferToStringAtIndex(
-            memoryBuffer,
+            memoryBufferUint8,
             await this._pvStatusToString(status),
           )}`;
 
@@ -302,7 +298,7 @@ export class Koala {
           );
         }
 
-        const output = this._memoryBuffer.slice(
+        const output = memoryBuffer.slice(
           this._outputBufferAddress / Int16Array.BYTES_PER_ELEMENT,
           (this._outputBufferAddress / Int16Array.BYTES_PER_ELEMENT) + this.frameLength
         );
