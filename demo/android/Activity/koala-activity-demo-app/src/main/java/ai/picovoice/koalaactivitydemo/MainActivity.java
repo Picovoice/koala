@@ -316,8 +316,8 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
             int sampleRate,
             ArrayList<Short> pcm
     ) throws IOException {
-        int WAV_HEADER_LENGTH = 44;
-        ByteBuffer byteBuf = ByteBuffer.allocate(WAV_HEADER_LENGTH);
+        final int wavHeaderLength = 44;
+        ByteBuffer byteBuf = ByteBuffer.allocate(wavHeaderLength);
         byteBuf.order(ByteOrder.LITTLE_ENDIAN);
 
         byteBuf.put("RIFF".getBytes(StandardCharsets.US_ASCII));
