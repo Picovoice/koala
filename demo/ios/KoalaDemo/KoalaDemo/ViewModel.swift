@@ -31,6 +31,7 @@ class ViewModel: ObservableObject {
 
     private var koala: Koala!
 
+    private let lock = NSLock()
     private var recordingTimer = Timer()
     private var samplesWritten = 0
     private var currentSliderVal = 1.0
@@ -59,6 +60,9 @@ class ViewModel: ObservableObject {
         do {
             try koala = Koala(accessKey: ACCESS_KEY)
 
+            VoiceProcessor.instance.addFrameListener(VoiceProcessorFrameListener(audioCallback))
+            VoiceProcessor.instance.addErrorListener(VoiceProcessorErrorListener(errorCallback))
+            
             let outputDir = try FileManager.default.url(
                 for: .documentDirectory,
                 in: .userDomainMask,
@@ -113,8 +117,14 @@ class ViewModel: ObservableObject {
 
     public func recordingOff() {
         recordingTimer.invalidate()
-        VoiceProcessor.shared.stop()
-
+        
+        do {
+            try VoiceProcessor.instance.stop()
+        } catch {
+            errorMessage = "\(error)"
+            return
+        }
+        
         cleanupRecording()
         do {
             let audioSession = AVAudioSession.sharedInstance()
@@ -161,15 +171,25 @@ class ViewModel: ObservableObject {
         do {
             try koala.reset()
 
-            guard try VoiceProcessor.shared.hasPermissions() else {
-                errorMessage = "Microphone permissions denied"
+            guard VoiceProcessor.hasRecordAudioPermission else {
+                VoiceProcessor.requestRecordAudioPermission { isGranted in
+                    guard isGranted else {
+                        DispatchQueue.main.async {
+                            self.errorMessage = "Demo requires microphone permission"
+                        }
+                        return
+                    }
+
+                    DispatchQueue.main.async {
+                        self.recordingOn()
+                    }
+                }
                 return
             }
 
-            try VoiceProcessor.shared.start(
+            try VoiceProcessor.instance.start(
                     frameLength: Koala.frameLength,
-                    sampleRate: Koala.sampleRate,
-                    audioCallback: audioCallback
+                    sampleRate: Koala.sampleRate
             )
 
             state = UIState.RECORD
@@ -202,16 +222,20 @@ class ViewModel: ObservableObject {
         isPlaying = true
     }
 
-    private func audioCallback(pcm: [Int16]) {
-        guard koala != nil else {
+    private func audioCallback(frame: [Int16]) {
+        guard let koala = self.koala else {
             return
         }
 
         do {
-            writePcmToWav(pcm: pcm, audioFile: refFile)
-            samplesWritten += pcm.count
+            self.lock.lock()
+            defer {
+                self.lock.unlock()
+            }
+            writePcmToWav(pcm: frame, audioFile: refFile)
+            samplesWritten += frame.count
 
-            var enhancedPcm = try koala!.process(pcm)
+            var enhancedPcm = try koala.process(frame)
 
             // Koala's output is delayed by a certain number of samples
             // this ensures the original recording and the Koala-processed recording are aligned
@@ -224,7 +248,15 @@ class ViewModel: ObservableObject {
                 writePcmToWav(pcm: enhancedPcm, audioFile: enhancedFile)
             }
         } catch {
-            errorMessage = "\(error.localizedDescription)"
+            DispatchQueue.main.async {
+                self.errorMessage = "\(error)"
+            }
+        }
+    }
+    
+    private func errorCallback(error: VoiceProcessorError) {
+        DispatchQueue.main.async {
+            self.errorMessage = "\(error)"
         }
     }
 
@@ -276,7 +308,9 @@ class ViewModel: ObservableObject {
         do {
             try audioFile?.write(from: writeBuffer)
         } catch {
-            errorMessage = "\(error)"
+            DispatchQueue.main.async {
+                self.errorMessage = "\(error)"
+            }
         }
 
     }
