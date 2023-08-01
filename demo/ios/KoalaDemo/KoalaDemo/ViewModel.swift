@@ -31,7 +31,6 @@ class ViewModel: ObservableObject {
 
     private var koala: Koala!
 
-    private let lock = NSLock()
     private var recordingTimer = Timer()
     private var samplesWritten = 0
     private var currentSliderVal = 1.0
@@ -62,7 +61,7 @@ class ViewModel: ObservableObject {
 
             VoiceProcessor.instance.addFrameListener(VoiceProcessorFrameListener(audioCallback))
             VoiceProcessor.instance.addErrorListener(VoiceProcessorErrorListener(errorCallback))
-            
+
             let outputDir = try FileManager.default.url(
                 for: .documentDirectory,
                 in: .userDomainMask,
@@ -117,14 +116,14 @@ class ViewModel: ObservableObject {
 
     public func recordingOff() {
         recordingTimer.invalidate()
-        
+
         do {
             try VoiceProcessor.instance.stop()
         } catch {
             errorMessage = "\(error)"
             return
         }
-        
+
         cleanupRecording()
         do {
             let audioSession = AVAudioSession.sharedInstance()
@@ -228,10 +227,6 @@ class ViewModel: ObservableObject {
         }
 
         do {
-            self.lock.lock()
-            defer {
-                self.lock.unlock()
-            }
             writePcmToWav(pcm: frame, audioFile: refFile)
             samplesWritten += frame.count
 
@@ -253,7 +248,7 @@ class ViewModel: ObservableObject {
             }
         }
     }
-    
+
     private func errorCallback(error: VoiceProcessorError) {
         DispatchQueue.main.async {
             self.errorMessage = "\(error)"
@@ -312,6 +307,5 @@ class ViewModel: ObservableObject {
                 self.errorMessage = "\(error)"
             }
         }
-
     }
 }
