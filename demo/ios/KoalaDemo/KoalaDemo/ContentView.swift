@@ -71,7 +71,9 @@ struct ContentView: View {
                         .padding()
                         .font(.body)
                         .foregroundColor(Color.black)
-            } else {
+            }
+
+            if !viewModel.errorMessage.isEmpty {
                 Text(viewModel.errorMessage)
                         .padding()
                         .foregroundColor(Color.white)
