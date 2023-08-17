@@ -12,13 +12,26 @@ on:
     branches: [ main, 'v[0-9]+.[0-9]+']
     paths:
       - '.github/workflows/android-appcenter.yml'
-      - 'binding/android/KoalaTestAppy/**'
+      - 'binding/android/KoalaTestApp/**'
       - 'resources/audio_samples/**'
 
 defaults:
   run:
-    working-directory: binding/
-      - '!demo/android/Activity/README.md'
+    working-directory: binding/android/KoalaTestApp
+
+jobs:
+  build:
+    name: Run Android Tests on AppCenter
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js LTS
+      uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+
     - name: Install AppCenter CLI
       run: npm install -g appcenter-cli
 
