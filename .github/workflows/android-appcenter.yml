@@ -6,20 +6,18 @@ on:
     branches: [ main ]
     paths:
       - '.github/workflows/android-appcenter.yml'
-      - 'demo/android/Activity/**'
-      - '!demo/android/Activity/README.md'
+      - 'binding/android/KoalaTestApp/**'
       - 'resources/audio_samples/**'
   pull_request:
     branches: [ main, 'v[0-9]+.[0-9]+']
     paths:
       - '.github/workflows/android-appcenter.yml'
-      - 'demo/android/Activity/**'
-      - '!demo/android/Activity/README.md'
+      - 'binding/android/KoalaTestApp/**'
       - 'resources/audio_samples/**'
 
 defaults:
   run:
-    working-directory: demo/android/Activity
+    working-directory: binding/android/KoalaTestApp
 
 jobs:
   build:
@@ -43,15 +41,21 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
 
-    - name: Binding pre-build
-      run: ./gradlew assemble
-      working-directory: binding/android
-
     - name: Copy test_resources
       run: ./copy_test_resources.sh
 
     - name: Inject AccessKey
       run: echo pvTestingAccessKey="${{secrets.PV_VALID_ACCESS_KEY}}" >> local.properties
+
+    - name: Inject Android keystore variables
+      run: |
+        echo storePassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
+        echo keyPassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
+        echo keyAlias=picovoice >> local.properties
+        echo storeFile=../picovoice.jks >> local.properties
+
+    - name: Setup Android keystore file
+      run: echo "${{secrets.ANDROID_RELEASE_KEYSTORE_FILE_B64}}" | base64 -d > picovoice.jks
 
     - name: Build app
       run: ./gradlew assembleDebug
@@ -64,7 +68,63 @@ jobs:
         --token ${{secrets.APPCENTERAPITOKEN}}
         --app "Picovoice/Koala-Android"
         --devices "Picovoice/android-min-max"
-        --app-path koala-activity-demo-app/build/outputs/apk/debug/koala-activity-demo-app-debug.apk
+        --app-path koala-test-app/build/outputs/apk/debug/koala-test-app-debug.apk
         --test-series "koala-android"
         --locale "en_US"
-        --build-dir koala-activity-demo-app/build/outputs/apk/androidTest/debug
+        --build-dir koala-test-app/build/outputs/apk/androidTest/debug
+
+  build-integ:
+    name: Run Android Integration Tests on AppCenter
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node.js LTS
+      uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+
+    - name: Install AppCenter CLI
+      run: npm install -g appcenter-cli
+
+    - name: set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+
+    - name: Copy test_resources
+      run: ./copy_test_resources.sh
+
+    - name: Inject AccessKey
+      run: echo pvTestingAccessKey="${{secrets.PV_VALID_ACCESS_KEY}}" >> local.properties
+
+    - name: Inject Android keystore variables
+      run: |
+        echo storePassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
+        echo keyPassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
+        echo keyAlias=picovoice >> local.properties
+        echo storeFile=../picovoice.jks >> local.properties
+
+    - name: Setup Android keystore file
+      run: echo "${{secrets.ANDROID_RELEASE_KEYSTORE_FILE_B64}}" | base64 -d > picovoice.jks
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build app
+      run: ./gradlew assembleRelease
+
+    - name: Build androidTest
+      run: ./gradlew assembleReleaseAndroidTest -DtestBuildType=integ
+
+    - name: Run tests on AppCenter
+      run: appcenter test run espresso
+        --token ${{secrets.APPCENTERAPITOKEN}}
+        --app "Picovoice/Koala-Android"
+        --devices "Picovoice/android-min-max"
+        --app-path koala-test-app/build/outputs/apk/release/koala-test-app-release.apk
+        --test-series "koala-android"
+        --locale "en_US"
+        --build-dir koala-test-app/build/outputs/apk/androidTest/release

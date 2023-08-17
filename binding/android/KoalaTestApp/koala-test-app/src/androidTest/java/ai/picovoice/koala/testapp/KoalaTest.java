@@ -8,7 +8,7 @@
     limitations under the License.
 */
 
-package ai.picovoice.koalaactivitydemo;
+package ai.picovoice.koala.testapp;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 
@@ -41,11 +41,11 @@ import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import ai.picovoice.koala.Koala;
-import ai.picovoice.koala.KoalaException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import ai.picovoice.koala.Koala;
+import ai.picovoice.koala.KoalaException;
 
 
 @RunWith(AndroidJUnit4.class)
