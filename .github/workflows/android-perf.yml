@@ -19,7 +19,7 @@ on:
 
 defaults:
   run:
-    working-directory: demo/android/Activity
+    working-directory: binding/android/KoalaTestApp
 
 jobs:
   build:
@@ -58,6 +58,16 @@ jobs:
     - name: Inject AccessKey
       run: echo pvTestingAccessKey="${{secrets.PV_VALID_ACCESS_KEY}}" >> local.properties
 
+    - name: Inject Android keystore variables
+      run: |
+        echo storePassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
+        echo keyPassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
+        echo keyAlias=picovoice >> local.properties
+        echo storeFile=../picovoice.jks >> local.properties
+
+    - name: Setup Android keystore file
+      run: echo "${{secrets.ANDROID_RELEASE_KEYSTORE_FILE_B64}}" | base64 -d > picovoice.jks
+
     - name: Inject Number of Iterations
       run: echo numTestIterations="30" >> local.properties
 
@@ -71,15 +81,15 @@ jobs:
       run: ./gradlew assembleDebug
 
     - name: Build androidTest
-      run: ./gradlew assembleAndroidTest
+      run: ./gradlew assembleAndroidTest -DtestBuildType=perf
 
     - name: Run tests on AppCenter
       run: appcenter test run espresso
         --token ${{secrets.APPCENTERAPITOKEN}}
         --app "Picovoice/Koala-Android"
         --devices "Picovoice/${{ matrix.device }}"
-        --app-path koala-activity-demo-app/build/outputs/apk/debug/koala-activity-demo-app-debug.apk
+        --app-path koala-test-app/build/outputs/apk/debug/koala-activity-test-debug.apk
         --test-series "koala-android"
         --locale "en_US"
-        --build-dir koala-activity-demo-app/build/outputs/apk/androidTest/debug
+        --build-dir koala-test-app/build/outputs/apk/androidTest/debug
 

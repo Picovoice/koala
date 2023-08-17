@@ -8,7 +8,7 @@
     limitations under the License.
 */
 
-package ai.picovoice.koalaactivitydemo;
+package ai.picovoice.koala.testapp;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static org.junit.Assert.assertTrue;
