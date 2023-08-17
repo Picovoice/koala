@@ -88,7 +88,7 @@ jobs:
         --token ${{secrets.APPCENTERAPITOKEN}}
         --app "Picovoice/Koala-Android"
         --devices "Picovoice/${{ matrix.device }}"
-        --app-path koala-test-app/build/outputs/apk/debug/koala-activity-test-debug.apk
+        --app-path koala-test-app/build/outputs/apk/debug/koala-test-app-debug.apk
         --test-series "koala-android"
         --locale "en_US"
         --build-dir koala-test-app/build/outputs/apk/androidTest/debug
