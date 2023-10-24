@@ -7,6 +7,8 @@
 //  specific language governing permissions and limitations under the License.
 //
 
+import Foundation
+
 public class KoalaError: LocalizedError {
     private let message: String
 
