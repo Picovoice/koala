@@ -17,7 +17,7 @@ import unittest
 import wave
 from typing import Optional, Sequence
 
-from _koala import Koala
+from _koala import Koala, KoalaError
 from _util import default_library_path, default_model_path
 
 
@@ -110,6 +110,32 @@ class KoalaTestCase(unittest.TestCase):
         version = self.koala.version
         self.assertIsInstance(version, str)
         self.assertGreater(len(version), 0)
+
+    def test_message_stack(self):
+        relative_path = '../..'
+
+        error = None
+        try:
+            k = Koala(
+                access_key='invalid',
+                model_path=default_model_path(relative_path),
+                library_path=default_library_path(relative_path))
+            self.assertIsNone(k)
+        except KoalaError as e:
+            error = e.message_stack
+
+        self.assertIsNotNone(error)
+        self.assertGreater(len(error), 0)
+
+        try:
+            k = Koala(
+                access_key='invalid',
+                model_path=default_model_path(relative_path),
+                library_path=default_library_path(relative_path))
+            self.assertIsNone(k)
+        except KoalaError as e:
+            self.assertEqual(len(error), len(e.message_stack))
+            self.assertListEqual(list(error), list(e.message_stack))
 
 
 if __name__ == '__main__':
