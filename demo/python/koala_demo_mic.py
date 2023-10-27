@@ -13,7 +13,6 @@ import argparse
 import contextlib
 import math
 import struct
-import sys
 import wave
 
 from pvkoala import create, KoalaActivationLimitError
@@ -45,7 +44,7 @@ def main():
     args = parser.parse_args()
 
     if args.show_audio_devices:
-        for index, name in enumerate(PvRecorder.get_audio_devices()):
+        for index, name in enumerate(PvRecorder.get_available_devices()):
             print('Device #%d: %s' % (index, name))
         return
 
