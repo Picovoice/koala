@@ -61,7 +61,7 @@ class KoalaCTestCase(unittest.TestCase):
         stdout, stderr = process.communicate()
         self.assertEqual(process.poll(), 0)
         self.assertEqual(stderr.decode('utf-8'), '')
-        self.assertTrue("real time factor" in stdout.decode('utf-8'))
+        self.assertTrue("Real time factor" in stdout.decode('utf-8'))
 
     def test_koala(self):
         self.run_koala("test.wav")

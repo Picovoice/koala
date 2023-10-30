@@ -94,8 +94,17 @@ static struct option long_options[] = {
         {"output_path",  required_argument, NULL, 'o'},
 };
 
-void print_usage(const char *program_name) {
-    fprintf(stdout, "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n", program_name);
+static void print_usage(const char *program_name) {
+    fprintf(
+            stdout,
+            "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n",
+            program_name);
+}
+
+static void print_error_message(char **message_stack, int32_t message_stack_depth) {
+    for (int32_t i = 0; i < message_stack_depth; i++) {
+        fprintf(stderr, "  [%d] %s\n", i, message_stack[i]);
+    }
 }
 
 static void print_progress_bar(size_t num_total_samples, size_t num_processed_samples) {
@@ -151,66 +160,94 @@ int picovoice_main(int argc, char *argv[]) {
 
     void *koala_library = open_dl(library_path);
     if (!koala_library) {
-        fprintf(stderr, "failed to open library at '%s'.\n", library_path);
+        fprintf(stderr, "Failed to open library at '%s'.\n", library_path);
         exit(EXIT_FAILURE);
     }
 
     const char *(*pv_status_to_string_func)(pv_status_t) =
             load_symbol(koala_library, "pv_status_to_string");
     if (!pv_status_to_string_func) {
-        print_dl_error("failed to load 'pv_status_to_string'");
+        print_dl_error("Failed to load 'pv_status_to_string'");
         exit(EXIT_FAILURE);
     }
 
     int32_t (*pv_sample_rate_func)() = load_symbol(koala_library, "pv_sample_rate");
     if (!pv_sample_rate_func) {
-        print_dl_error("failed to load 'pv_sample_rate'");
+        print_dl_error("Failed to load 'pv_sample_rate'");
         exit(EXIT_FAILURE);
     }
 
     pv_status_t (*pv_koala_init_func)(const char *, const char *, pv_koala_t **) =
             load_symbol(koala_library, "pv_koala_init");
     if (!pv_koala_init_func) {
-        print_dl_error("failed to load 'pv_koala_init'");
+        print_dl_error("Failed to load 'pv_koala_init'");
         exit(EXIT_FAILURE);
     }
 
     void (*pv_koala_delete_func)(pv_koala_t *) = load_symbol(koala_library, "pv_koala_delete");
     if (!pv_koala_delete_func) {
-        print_dl_error("failed to load 'pv_koala_delete'");
+        print_dl_error("Failed to load 'pv_koala_delete'");
         exit(EXIT_FAILURE);
     }
 
     pv_status_t (*pv_koala_process_func)(pv_koala_t *, const int16_t *, int16_t *) =
             load_symbol(koala_library, "pv_koala_process");
     if (!pv_koala_process_func) {
-        print_dl_error("failed to load 'pv_koala_process'");
+        print_dl_error("Failed to load 'pv_koala_process'");
         exit(EXIT_FAILURE);
     }
 
     pv_status_t (*pv_koala_delay_sample_func)(pv_koala_t *, int32_t *) =
             load_symbol(koala_library, "pv_koala_delay_sample");
     if (!pv_koala_delay_sample_func) {
-        print_dl_error("failed to load 'pv_koala_delay_sample'");
+        print_dl_error("Failed to load 'pv_koala_delay_sample'");
         exit(EXIT_FAILURE);
     }
 
     int32_t (*pv_koala_frame_length_func)() = load_symbol(koala_library, "pv_koala_frame_length");
     if (!pv_koala_frame_length_func) {
-        print_dl_error("failed to load 'pv_koala_frame_length'");
+        print_dl_error("Failed to load 'pv_koala_frame_length'");
         exit(EXIT_FAILURE);
     }
 
     const char *(*pv_koala_version_func)() = load_symbol(koala_library, "pv_koala_version");
     if (!pv_koala_version_func) {
-        print_dl_error("failed to load 'pv_koala_version'");
+        print_dl_error("Failed to load 'pv_koala_version'");
+        exit(EXIT_FAILURE);
+    }
+
+    pv_status_t (*pv_get_error_stack_func)(char ***, int32_t *) = load_symbol(koala_library, "pv_get_error_stack");
+    if (!pv_get_error_stack_func) {
+        print_dl_error("Failed to load 'pv_get_error_stack'");
+        exit(EXIT_FAILURE);
+    }
+
+    void (*pv_free_error_stack_func)(char **) = load_symbol(koala_library, "pv_free_error_stack");
+    if (!pv_free_error_stack_func) {
+        print_dl_error("Failed to load 'pv_free_error_stack./b'");
         exit(EXIT_FAILURE);
     }
 
     pv_koala_t *koala = NULL;
     pv_status_t koala_status = pv_koala_init_func(access_key, model_path, &koala);
     if (koala_status != PV_STATUS_SUCCESS) {
-        fprintf(stderr, "failed to init with '%s'", pv_status_to_string_func(koala_status));
+        fprintf(stderr, "Failed to init with '%s'", pv_status_to_string_func(koala_status));
+        char **message_stack = NULL;
+        int32_t message_stack_depth = 0;
+        pv_status_t error_status = pv_get_error_stack_func(&message_stack, &message_stack_depth);
+        if (error_status != PV_STATUS_SUCCESS) {
+            fprintf(
+                    stderr,
+                    ".\nUnable to get Octopus error state with '%s'.\n",
+                    pv_status_to_string_func(error_status));
+            exit(EXIT_FAILURE);
+        }
+
+        if (message_stack_depth > 0) {
+            fprintf(stderr, ":\n");
+            print_error_message(message_stack, message_stack_depth);
+            pv_free_error_stack_func(message_stack);
+        }
         exit(EXIT_FAILURE);
     }
     fprintf(stdout, "V%s\n\n", pv_koala_version_func());
@@ -231,7 +268,7 @@ int picovoice_main(int argc, char *argv[]) {
 #endif
 
     if (!drwav_init_file_status) {
-        fprintf(stderr, "failed to open wav file at '%s'.", input_path);
+        fprintf(stderr, "Failed to open wav file at '%s'.", input_path);
         exit(EXIT_FAILURE);
     }
 
@@ -272,7 +309,7 @@ int picovoice_main(int argc, char *argv[]) {
 #endif
 
     if (!drwav_init_file_status) {
-        fprintf(stderr, "failed to open the output file at '%s'.", output_path);
+        fprintf(stderr, "Failed to open the output file at '%s'.", output_path);
         exit(EXIT_FAILURE);
     }
 
@@ -280,7 +317,23 @@ int picovoice_main(int argc, char *argv[]) {
     int32_t delay_samples = 0;
     koala_status = pv_koala_delay_sample_func(koala, &delay_samples);
     if (koala_status != PV_STATUS_SUCCESS) {
-        fprintf(stderr, "failed to get delay sample with '%s'", pv_status_to_string_func(koala_status));
+        fprintf(stderr, "Failed to get delay sample with '%s'", pv_status_to_string_func(koala_status));
+        char **message_stack = NULL;
+        int32_t message_stack_depth = 0;
+        pv_status_t error_status = pv_get_error_stack_func(&message_stack, &message_stack_depth);
+        if (error_status != PV_STATUS_SUCCESS) {
+            fprintf(
+                    stderr,
+                    ".\nUnable to get Octopus error state with '%s'.\n",
+                    pv_status_to_string_func(error_status));
+            exit(EXIT_FAILURE);
+        }
+
+        if (message_stack_depth > 0) {
+            fprintf(stderr, ":\n");
+            print_error_message(message_stack, message_stack_depth);
+            pv_free_error_stack_func(message_stack);
+        }
         exit(EXIT_FAILURE);
     }
 
@@ -318,6 +371,22 @@ int picovoice_main(int argc, char *argv[]) {
         koala_status = pv_koala_process_func(koala, pcm, enhanced_pcm);
         if (koala_status != PV_STATUS_SUCCESS) {
             fprintf(stderr, "'pv_koala_process' failed with '%s'\n", pv_status_to_string_func(koala_status));
+            char **message_stack = NULL;
+            int32_t message_stack_depth = 0;
+            pv_status_t error_status = pv_get_error_stack_func(&message_stack, &message_stack_depth);
+            if (error_status != PV_STATUS_SUCCESS) {
+                fprintf(
+                        stderr,
+                        ".\nUnable to get Octopus error state with '%s'.\n",
+                        pv_status_to_string_func(error_status));
+                exit(EXIT_FAILURE);
+            }
+
+            if (message_stack_depth > 0) {
+                fprintf(stderr, ":\n");
+                print_error_message(message_stack, message_stack_depth);
+                pv_free_error_stack_func(message_stack);
+            }
             exit(EXIT_FAILURE);
         }
 
@@ -351,7 +420,7 @@ int picovoice_main(int argc, char *argv[]) {
     }
 
     const double real_time_factor = total_cpu_time_usec / total_processed_time_usec;
-    fprintf(stdout, "\nreal time factor : %.3f\n", real_time_factor);
+    fprintf(stdout, "\nReal time factor : %.3f\n", real_time_factor);
 
     fprintf(stdout, "\n");
 
@@ -382,7 +451,7 @@ int main(int argc, char *argv[]) {
         int arg_chars_num = WideCharToMultiByte(CP_UTF8, UTF8_COMPOSITION_FLAG, wargv[i], NULL_TERMINATED, NULL, 0, NULL, NULL);
         utf8_argv[i] = (char *) malloc(arg_chars_num * sizeof(char));
         if (!utf8_argv[i]) {
-            fprintf(stderr, "failed to to allocate memory for converting args");
+            fprintf(stderr, "Failed to to allocate memory for converting args");
         }
         WideCharToMultiByte(CP_UTF8, UTF8_COMPOSITION_FLAG, wargv[i], NULL_TERMINATED, utf8_argv[i], arg_chars_num, NULL, NULL);
     }
