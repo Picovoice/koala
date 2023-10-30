@@ -11,6 +11,23 @@
 
 import { PvModel } from "@picovoice/web-utils";
 
+import {KoalaError} from "./koala_errors";
+
+export enum PvStatus {
+  SUCCESS = 10000,
+  OUT_OF_MEMORY,
+  IO_ERROR,
+  INVALID_ARGUMENT,
+  STOP_ITERATION,
+  KEY_ERROR,
+  INVALID_STATE,
+  RUNTIME_ERROR,
+  ACTIVATION_ERROR,
+  ACTIVATION_LIMIT_REACHED,
+  ACTIVATION_THROTTLED,
+  ACTIVATION_REFUSED,
+}
+
 /**
  * KoalaModel types
  */
@@ -18,7 +35,7 @@ export type KoalaModel = PvModel;
 
 export type KoalaOptions = {
   /** @defaultValue undefined */
-  processErrorCallback?: (error: string) => void
+  processErrorCallback?: (error: KoalaError) => void;
 };
 
 export type KoalaWorkerInitRequest = {
@@ -51,7 +68,9 @@ export type KoalaWorkerRequest =
 
 export type KoalaWorkerFailureResponse = {
   command: 'failed' | 'error';
-  message: string;
+  status: PvStatus;
+  shortMessage: string;
+  messageStack: string[];
 };
 
 export type KoalaWorkerInitResponse = KoalaWorkerFailureResponse | {

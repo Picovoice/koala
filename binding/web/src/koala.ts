@@ -15,30 +15,50 @@ import { Mutex } from 'async-mutex';
 
 import {
   aligned_alloc_type,
-  pv_free_type,
-  buildWasm,
   arrayBufferToStringAtIndex,
+  buildWasm,
   isAccessKeyValid,
   loadModel,
-  PvError
+  pv_free_type,
+  PvError,
 } from '@picovoice/web-utils';
 
 import { simd } from 'wasm-feature-detect';
 
-import { KoalaModel, KoalaOptions } from './types';
+import { KoalaModel, KoalaOptions, PvStatus } from './types';
+
+import * as KoalaErrors from './koala_errors';
+import { pvStatusToException } from './koala_errors';
 
 /**
  * WebAssembly function types
  */
-type pv_koala_init_type = (accessKey: number, modelPath: number, object: number) => Promise<number>;
-type pv_koala_delay_sample_type = (object: number, delaySample: number) => Promise<number>;
-type pv_koala_process_type = (object: number, pcm: number, enhancedPcm: number) => Promise<number>;
+type pv_koala_init_type = (
+  accessKey: number,
+  modelPath: number,
+  object: number
+) => Promise<number>;
+type pv_koala_delay_sample_type = (
+  object: number,
+  delaySample: number
+) => Promise<number>;
+type pv_koala_process_type = (
+  object: number,
+  pcm: number,
+  enhancedPcm: number
+) => Promise<number>;
 type pv_koala_reset_type = (object: number) => Promise<number>;
 type pv_koala_delete_type = (object: number) => Promise<void>;
-type pv_status_to_string_type = (status: number) => Promise<number>
+type pv_status_to_string_type = (status: number) => Promise<number>;
 type pv_koala_frame_length_type = () => Promise<number>;
 type pv_sample_rate_type = () => Promise<number>;
 type pv_koala_version_type = () => Promise<number>;
+type pv_set_sdk_type = (sdk: number) => Promise<void>;
+type pv_get_error_stack_type = (
+  messageStack: number,
+  messageStackDepth: number
+) => Promise<number>;
+type pv_free_error_stack_type = (messageStack: number) => Promise<void>;
 
 /**
  * JavaScript/WebAssembly Binding for Koala
@@ -48,12 +68,16 @@ type KoalaWasmOutput = {
   memory: WebAssembly.Memory;
   pvFree: pv_free_type;
   objectAddress: number;
+  messageStackAddressAddressAddress: number;
+  messageStackDepthAddress: number;
   pvKoalaDelete: pv_koala_delete_type;
   pvKoalaProcess: pv_koala_process_type;
   pvKoalaReset: pv_koala_reset_type;
   pvStatusToString: pv_status_to_string_type;
+  pvGetErrorStack: pv_get_error_stack_type;
+  pvFreeErrorStack: pv_free_error_stack_type;
   delaySample: number;
-  frameLength: number
+  frameLength: number;
   sampleRate: number;
   version: string;
   inputBufferAddress: number;
@@ -68,6 +92,8 @@ export class Koala {
   private readonly _pvKoalaProcess: pv_koala_process_type;
   private readonly _pvKoalaReset: pv_koala_reset_type;
   private readonly _pvStatusToString: pv_status_to_string_type;
+  private readonly _pvGetErrorStack: pv_get_error_stack_type;
+  private readonly _pvFreeErrorStack: pv_free_error_stack_type;
 
   private _wasmMemory: WebAssembly.Memory | undefined;
   private readonly _pvFree: pv_free_type;
@@ -76,6 +102,8 @@ export class Koala {
   private readonly _objectAddress: number;
   private readonly _inputBufferAddress: number;
   private readonly _outputBufferAddress: number;
+  private readonly _messageStackAddressAddressAddress: number;
+  private readonly _messageStackDepthAddress: number;
 
   private static _delaySample: number;
   private static _frameLength: number;
@@ -83,18 +111,21 @@ export class Koala {
   private static _version: string;
   private static _wasm: string;
   private static _wasmSimd: string;
+  private static _sdk: string = 'web';
 
   private static _koalaMutex = new Mutex();
 
   private readonly _processCallback: (enhancedPcm: Int16Array) => void;
-  private readonly _processErrorCallback?: (error: string) => void;
+  private readonly _processErrorCallback?: (
+    error: KoalaErrors.KoalaError
+  ) => void;
 
   private readonly _pvError: PvError;
 
   private constructor(
     handleWasm: KoalaWasmOutput,
     processCallback: (enhancedPcm: Int16Array) => void,
-    processErrorCallback?: (error: string) => void,
+    processErrorCallback?: (error: KoalaErrors.KoalaError) => void
   ) {
     Koala._delaySample = handleWasm.delaySample;
     Koala._frameLength = handleWasm.frameLength;
@@ -105,18 +136,27 @@ export class Koala {
     this._pvKoalaProcess = handleWasm.pvKoalaProcess;
     this._pvKoalaReset = handleWasm.pvKoalaReset;
     this._pvStatusToString = handleWasm.pvStatusToString;
+    this._pvGetErrorStack = handleWasm.pvGetErrorStack;
+    this._pvFreeErrorStack = handleWasm.pvFreeErrorStack;
 
     this._wasmMemory = handleWasm.memory;
     this._pvFree = handleWasm.pvFree;
     this._objectAddress = handleWasm.objectAddress;
     this._inputBufferAddress = handleWasm.inputBufferAddress;
     this._outputBufferAddress = handleWasm.outputBufferAddress;
+    this._messageStackAddressAddressAddress =
+      handleWasm.messageStackDepthAddress;
+    this._messageStackDepthAddress = handleWasm.messageStackDepthAddress;
 
     this._pvError = handleWasm.pvError;
     this._processMutex = new Mutex();
 
     this._processCallback = processCallback;
     this._processErrorCallback = processErrorCallback;
+  }
+
+  public static setSdk(sdk: string): void {
+    Koala._sdk = sdk;
   }
 
   /**
@@ -195,36 +235,37 @@ export class Koala {
     accessKey: string,
     processCallback: (enhancedPcm: Int16Array) => void,
     model: KoalaModel,
-    options: KoalaOptions = {},
+    options: KoalaOptions = {}
   ): Promise<Koala> {
-    const customWritePath = (model.customWritePath) ? model.customWritePath : 'koala_model';
+    const customWritePath = model.customWritePath
+      ? model.customWritePath
+      : 'koala_model';
     const modelPath = await loadModel({ ...model, customWritePath });
 
-    return Koala._init(
-      accessKey,
-      processCallback,
-      modelPath,
-      options
-    );
+    return Koala._init(accessKey, processCallback, modelPath, options);
   }
 
   public static async _init(
     accessKey: string,
     processCallback: (enhancedPcm: Int16Array) => void,
     modelPath: string,
-    options: KoalaOptions = {},
+    options: KoalaOptions = {}
   ): Promise<Koala> {
     const { processErrorCallback } = options;
 
     if (!isAccessKeyValid(accessKey)) {
-      throw new Error('Invalid AccessKey');
+      throw new KoalaErrors.KoalaInvalidArgumentError('Invalid AccessKey');
     }
 
     return new Promise<Koala>((resolve, reject) => {
       Koala._koalaMutex
         .runExclusive(async () => {
           const isSimd = await simd();
-          const wasmOutput = await Koala.initWasm(accessKey.trim(), (isSimd) ? this._wasmSimd : this._wasm, modelPath, options);
+          const wasmOutput = await Koala.initWasm(
+            accessKey.trim(),
+            isSimd ? this._wasmSimd : this._wasm,
+            modelPath
+          );
           return new Koala(wasmOutput, processCallback, processErrorCallback);
         })
         .then((result: Koala) => {
@@ -247,9 +288,11 @@ export class Koala {
    */
   public async process(pcm: Int16Array): Promise<void> {
     if (!(pcm instanceof Int16Array)) {
-      const error = new Error('The argument \'pcm\' must be provided as an Int16Array');
+      const error = new KoalaErrors.KoalaInvalidArgumentError(
+        "The argument 'pcm' must be provided as an Int16Array"
+      );
       if (this._processErrorCallback) {
-        this._processErrorCallback(error.toString());
+        this._processErrorCallback(error);
       } else {
         // eslint-disable-next-line no-console
         console.error(error);
@@ -257,10 +300,11 @@ export class Koala {
     }
 
     if (pcm.length !== this.frameLength) {
-      const error = new Error(`Koala process requires frames of length ${this.frameLength}. 
+      const error =
+        new KoalaErrors.KoalaInvalidArgumentError(`Koala process requires frames of length ${this.frameLength}. 
         Received frame of size ${pcm.length}.`);
       if (this._processErrorCallback) {
-        this._processErrorCallback(error.toString());
+        this._processErrorCallback(error);
       } else {
         // eslint-disable-next-line no-console
         console.error(error);
@@ -270,13 +314,15 @@ export class Koala {
     this._processMutex
       .runExclusive(async () => {
         if (this._wasmMemory === undefined) {
-          throw new Error('Attempted to call Koala process after release.');
+          throw new KoalaErrors.KoalaInvalidStateError(
+            'Attempted to call Koala process after release.'
+          );
         }
         const memoryBuffer = new Int16Array(this._wasmMemory.buffer);
 
         memoryBuffer.set(
           pcm,
-          this._inputBufferAddress / Int16Array.BYTES_PER_ELEMENT,
+          this._inputBufferAddress / Int16Array.BYTES_PER_ELEMENT
         );
 
         const status = await this._pvKoalaProcess(
@@ -285,29 +331,44 @@ export class Koala {
           this._outputBufferAddress
         );
 
-        const memoryBufferUint8 = new Uint8Array(this._wasmMemory.buffer);
-
-        if (status !== PV_STATUS_SUCCESS) {
-          const msg = `process failed with status ${arrayBufferToStringAtIndex(
-            memoryBufferUint8,
-            await this._pvStatusToString(status),
-          )}`;
-
-          throw new Error(
-            `${msg}\nDetails: ${this._pvError.getErrorString()}`
+        if (status !== PvStatus.SUCCESS) {
+          const memoryBufferUint8 = new Uint8Array(this._wasmMemory.buffer);
+          const memoryBufferView = new DataView(this._wasmMemory.buffer);
+          const messageStack = await Koala.getMessageStack(
+            this._pvGetErrorStack,
+            this._pvFreeErrorStack,
+            this._messageStackAddressAddressAddress,
+            this._messageStackDepthAddress,
+            memoryBufferView,
+            memoryBufferUint8
           );
+
+          const error = pvStatusToException(
+            status,
+            'Process failed',
+            messageStack
+          );
+          if (this._processErrorCallback) {
+            this._processErrorCallback(error);
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(error);
+          }
         }
 
         const output = memoryBuffer.slice(
           this._outputBufferAddress / Int16Array.BYTES_PER_ELEMENT,
-          (this._outputBufferAddress / Int16Array.BYTES_PER_ELEMENT) + this.frameLength
+          this._outputBufferAddress / Int16Array.BYTES_PER_ELEMENT +
+            this.frameLength
         );
 
         this._processCallback(output);
       })
       .catch((error: any) => {
         if (this._processErrorCallback) {
-          this._processErrorCallback(error.toString());
+          this._processErrorCallback(
+            pvStatusToException(PvStatus.RUNTIME_ERROR, error.toString())
+          );
         } else {
           // eslint-disable-next-line no-console
           console.error(error);
@@ -320,33 +381,51 @@ export class Koala {
    * Call this function in between calls to `process` that do not provide consecutive frames of audio.
    */
   public async reset(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this._processMutex
-        .runExclusive(async () => {
-          if (this._wasmMemory === undefined) {
-            throw new Error('Attempted to call Koala reset after release.');
+    this._processMutex
+      .runExclusive(async () => {
+        if (this._wasmMemory === undefined) {
+          throw new KoalaErrors.KoalaInvalidStateError(
+            'Attempted to call Koala reset after release.'
+          );
+        }
+
+        const status = await this._pvKoalaReset(this._objectAddress);
+
+        if (status !== PvStatus.SUCCESS) {
+          const memoryBufferUint8 = new Uint8Array(this._wasmMemory.buffer);
+          const memoryBufferView = new DataView(this._wasmMemory.buffer);
+          const messageStack = await Koala.getMessageStack(
+            this._pvGetErrorStack,
+            this._pvFreeErrorStack,
+            this._messageStackAddressAddressAddress,
+            this._messageStackDepthAddress,
+            memoryBufferView,
+            memoryBufferUint8
+          );
+
+          const error = pvStatusToException(
+            status,
+            'Reset failed',
+            messageStack
+          );
+          if (this._processErrorCallback) {
+            this._processErrorCallback(error);
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(error);
           }
-
-          const status = await this._pvKoalaReset(this._objectAddress);
-
-          if (status !== PV_STATUS_SUCCESS) {
-            const memoryBuffer = new Uint8Array(this._wasmMemory.buffer);
-            const msg = `process failed with status ${arrayBufferToStringAtIndex(
-              memoryBuffer,
-              await this._pvStatusToString(status),
-            )}`;
-
-            throw new Error(
-              `${msg}\nDetails: ${this._pvError.getErrorString()}`
-            );
-          }
-
-          resolve();
-        })
-        .catch((error: any) => {
-          reject(error);
-        });
-    });
+        }
+      })
+      .catch((error: any) => {
+        if (this._processErrorCallback) {
+          this._processErrorCallback(
+            pvStatusToException(PvStatus.RUNTIME_ERROR, error.toString())
+          );
+        } else {
+          // eslint-disable-next-line no-console
+          console.error(error);
+        }
+      });
   }
 
   /**
@@ -371,11 +450,16 @@ export class Koala {
     }
   }
 
-  private static async initWasm(accessKey: string, wasmBase64: string, modelPath: string, _: KoalaOptions): Promise<KoalaWasmOutput> {
+  private static async initWasm(
+    accessKey: string,
+    wasmBase64: string,
+    modelPath: string
+  ): Promise<KoalaWasmOutput> {
     // A WebAssembly page has a constant size of 64KiB. -> 1MiB ~= 16 pages
     const memory = new WebAssembly.Memory({ initial: 300 });
 
     const memoryBufferUint8 = new Uint8Array(memory.buffer);
+    const memoryBufferView = new DataView(memory.buffer);
 
     const pvError = new PvError();
 
@@ -384,30 +468,42 @@ export class Koala {
     const aligned_alloc = exports.aligned_alloc as aligned_alloc_type;
     const pv_free = exports.pv_free as pv_free_type;
     const pv_koala_version = exports.pv_koala_version as pv_koala_version_type;
-    const pv_koala_delay_sample = exports.pv_koala_delay_sample as pv_koala_delay_sample_type;
+    const pv_koala_delay_sample =
+      exports.pv_koala_delay_sample as pv_koala_delay_sample_type;
     const pv_koala_process = exports.pv_koala_process as pv_koala_process_type;
     const pv_koala_reset = exports.pv_koala_reset as pv_koala_reset_type;
     const pv_koala_delete = exports.pv_koala_delete as pv_koala_delete_type;
     const pv_koala_init = exports.pv_koala_init as pv_koala_init_type;
-    const pv_status_to_string = exports.pv_status_to_string as pv_status_to_string_type;
-    const pv_koala_frame_length = exports.pv_koala_frame_length as pv_koala_frame_length_type;
+    const pv_status_to_string =
+      exports.pv_status_to_string as pv_status_to_string_type;
+    const pv_koala_frame_length =
+      exports.pv_koala_frame_length as pv_koala_frame_length_type;
     const pv_sample_rate = exports.pv_sample_rate as pv_sample_rate_type;
+    const pv_set_sdk = exports.pv_set_sdk as pv_set_sdk_type;
+    const pv_get_error_stack =
+      exports.pv_get_error_stack as pv_get_error_stack_type;
+    const pv_free_error_stack =
+      exports.pv_free_error_stack as pv_free_error_stack_type;
 
     const objectAddressAddress = await aligned_alloc(
       Int32Array.BYTES_PER_ELEMENT,
-      Int32Array.BYTES_PER_ELEMENT,
+      Int32Array.BYTES_PER_ELEMENT
     );
     if (objectAddressAddress === 0) {
-      throw new Error('malloc failed: Cannot allocate memory');
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
     }
 
     const accessKeyAddress = await aligned_alloc(
       Uint8Array.BYTES_PER_ELEMENT,
-      (accessKey.length + 1) * Uint8Array.BYTES_PER_ELEMENT,
+      (accessKey.length + 1) * Uint8Array.BYTES_PER_ELEMENT
     );
 
     if (accessKeyAddress === 0) {
-      throw new Error('malloc failed: Cannot allocate memory');
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
     }
 
     for (let i = 0; i < accessKey.length; i++) {
@@ -418,82 +514,140 @@ export class Koala {
     const modelPathEncoded = new TextEncoder().encode(modelPath);
     const modelPathAddress = await aligned_alloc(
       Uint8Array.BYTES_PER_ELEMENT,
-      (modelPathEncoded.length + 1) * Uint8Array.BYTES_PER_ELEMENT,
+      (modelPathEncoded.length + 1) * Uint8Array.BYTES_PER_ELEMENT
     );
 
     if (modelPathAddress === 0) {
-      throw new Error('malloc failed: Cannot allocate memory');
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
     }
 
     memoryBufferUint8.set(modelPathEncoded, modelPathAddress);
     memoryBufferUint8[modelPathAddress + modelPathEncoded.length] = 0;
 
+    const sdkEncoded = new TextEncoder().encode(this._sdk);
+    const sdkAddress = await aligned_alloc(
+      Uint8Array.BYTES_PER_ELEMENT,
+      (sdkEncoded.length + 1) * Uint8Array.BYTES_PER_ELEMENT
+    );
+    if (!sdkAddress) {
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
+    }
+    memoryBufferUint8.set(sdkEncoded, sdkAddress);
+    memoryBufferUint8[sdkAddress + sdkEncoded.length] = 0;
+    await pv_set_sdk(sdkAddress);
+
+    const messageStackDepthAddress = await aligned_alloc(
+      Int32Array.BYTES_PER_ELEMENT,
+      Int32Array.BYTES_PER_ELEMENT
+    );
+    if (!messageStackDepthAddress) {
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
+    }
+
+    const messageStackAddressAddressAddress = await aligned_alloc(
+      Int32Array.BYTES_PER_ELEMENT,
+      Int32Array.BYTES_PER_ELEMENT
+    );
+    if (!messageStackAddressAddressAddress) {
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
+    }
+
     let status = await pv_koala_init(
       accessKeyAddress,
       modelPathAddress,
-      objectAddressAddress);
-    if (status !== PV_STATUS_SUCCESS) {
-      const msg = `'pv_koala_init' failed with status ${arrayBufferToStringAtIndex(
-        memoryBufferUint8,
-        await pv_status_to_string(status),
-      )}`;
+      objectAddressAddress
+    );
 
-      throw new Error(
-        `${msg}\nDetails: ${pvError.getErrorString()}`
+    await pv_free(accessKeyAddress);
+    await pv_free(modelPathAddress);
+
+    if (status !== PvStatus.SUCCESS) {
+      const messageStack = await Koala.getMessageStack(
+        pv_get_error_stack,
+        pv_free_error_stack,
+        messageStackAddressAddressAddress,
+        messageStackDepthAddress,
+        memoryBufferView,
+        memoryBufferUint8
+      );
+
+      throw pvStatusToException(
+        status,
+        'Initialization failed',
+        messageStack,
+        pvError
       );
     }
-    const memoryBufferView = new DataView(memory.buffer);
+
     const objectAddress = memoryBufferView.getInt32(objectAddressAddress, true);
 
     const delaySampleAddress = await aligned_alloc(
       Int32Array.BYTES_PER_ELEMENT,
-      Int32Array.BYTES_PER_ELEMENT,
+      Int32Array.BYTES_PER_ELEMENT
     );
 
     if (delaySampleAddress === 0) {
-      throw new Error('malloc failed: Cannot allocate memory');
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
     }
 
     status = await pv_koala_delay_sample(objectAddress, delaySampleAddress);
     if (status !== PV_STATUS_SUCCESS) {
-      const msg = `'pv_koala_delay_sample' failed with status ${arrayBufferToStringAtIndex(
-        memoryBufferUint8,
-        await pv_status_to_string(status),
-      )}`;
+      const messageStack = await Koala.getMessageStack(
+        pv_get_error_stack,
+        pv_free_error_stack,
+        messageStackAddressAddressAddress,
+        messageStackDepthAddress,
+        memoryBufferView,
+        memoryBufferUint8
+      );
 
-      throw new Error(
-        `${msg}\nDetails: ${pvError.getErrorString()}`
+      throw pvStatusToException(
+        status,
+        'Get Koala delay samples failed',
+        messageStack,
+        pvError
       );
     }
 
     const delaySample = memoryBufferView.getInt32(delaySampleAddress, true);
+    await pv_free(delaySample);
 
     const frameLength = await pv_koala_frame_length();
     const sampleRate = await pv_sample_rate();
     const versionAddress = await pv_koala_version();
     const version = arrayBufferToStringAtIndex(
       memoryBufferUint8,
-      versionAddress,
+      versionAddress
     );
-
-    await pv_free(accessKeyAddress);
-    await pv_free(modelPathAddress);
-    await pv_free(delaySample);
 
     const inputBufferAddress = await aligned_alloc(
       Int16Array.BYTES_PER_ELEMENT,
-      frameLength * Int16Array.BYTES_PER_ELEMENT,
+      frameLength * Int16Array.BYTES_PER_ELEMENT
     );
     if (inputBufferAddress === 0) {
-      throw new Error('malloc failed: Cannot allocate memory');
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
     }
 
     const outputBufferAddress = await aligned_alloc(
       Int16Array.BYTES_PER_ELEMENT,
-      frameLength * Int16Array.BYTES_PER_ELEMENT,
+      frameLength * Int16Array.BYTES_PER_ELEMENT
     );
     if (outputBufferAddress === 0) {
-      throw new Error('malloc failed: Cannot allocate memory');
+      throw new KoalaErrors.KoalaOutOfMemoryError(
+        'malloc failed: Cannot allocate memory'
+      );
     }
 
     return {
@@ -501,17 +655,64 @@ export class Koala {
       memory: memory,
       pvFree: pv_free,
       objectAddress: objectAddress,
+      messageStackAddressAddressAddress: messageStackAddressAddressAddress,
+      messageStackDepthAddress: messageStackDepthAddress,
       pvKoalaDelete: pv_koala_delete,
       pvKoalaProcess: pv_koala_process,
       pvKoalaReset: pv_koala_reset,
       pvStatusToString: pv_status_to_string,
+      pvGetErrorStack: pv_get_error_stack,
+      pvFreeErrorStack: pv_free_error_stack,
       delaySample: delaySample,
       frameLength: frameLength,
       sampleRate: sampleRate,
       version: version,
       inputBufferAddress: inputBufferAddress,
       outputBufferAddress: outputBufferAddress,
-      pvError: pvError
+      pvError: pvError,
     };
+  }
+
+  private static async getMessageStack(
+    pv_get_error_stack: pv_get_error_stack_type,
+    pv_free_error_stack: pv_free_error_stack_type,
+    messageStackAddressAddressAddress: number,
+    messageStackDepthAddress: number,
+    memoryBufferView: DataView,
+    memoryBufferUint8: Uint8Array
+  ): Promise<string[]> {
+    const status = await pv_get_error_stack(
+      messageStackAddressAddressAddress,
+      messageStackDepthAddress
+    );
+    if (status !== PvStatus.SUCCESS) {
+      throw pvStatusToException(status, 'Unable to get Koala error state');
+    }
+
+    const messageStackAddressAddress = memoryBufferView.getInt32(
+      messageStackAddressAddressAddress,
+      true
+    );
+
+    const messageStackDepth = memoryBufferView.getInt32(
+      messageStackDepthAddress,
+      true
+    );
+    const messageStack: string[] = [];
+    for (let i = 0; i < messageStackDepth; i++) {
+      const messageStackAddress = memoryBufferView.getInt32(
+        messageStackAddressAddress + i * Int32Array.BYTES_PER_ELEMENT,
+        true
+      );
+      const message = arrayBufferToStringAtIndex(
+        memoryBufferUint8,
+        messageStackAddress
+      );
+      messageStack.push(message);
+    }
+
+    await pv_free_error_stack(messageStackAddressAddress);
+
+    return messageStack;
   }
 }

@@ -11,7 +11,8 @@
 /// <reference lib="webworker" />
 
 import { Koala } from './koala';
-import { KoalaWorkerRequest } from './types';
+import { KoalaWorkerRequest, PvStatus } from './types';
+import { KoalaError } from './koala_errors';
 
 let koala: Koala | null = null;
 
@@ -22,10 +23,12 @@ const processCallback = (enhancedPcm: Int16Array): void => {
   });
 };
 
-const processErrorCallback = (error: string): void => {
+const processErrorCallback = (error: KoalaError): void => {
   self.postMessage({
     command: 'error',
-    message: error,
+    status: error.status,
+    shortMessage: error.shortMessage,
+    messageStack: error.messageStack,
   });
 };
 
@@ -40,7 +43,8 @@ self.onmessage = async function (
       if (koala !== null) {
         self.postMessage({
           command: 'error',
-          message: 'Koala already initialized',
+          status: PvStatus.INVALID_STATE,
+          shortMessage: 'Koala already initialized',
         });
         return;
       }
@@ -58,20 +62,31 @@ self.onmessage = async function (
           version: koala.version,
           frameLength: koala.frameLength,
           sampleRate: koala.sampleRate,
-          delaySample: koala.delaySample
+          delaySample: koala.delaySample,
         });
       } catch (e: any) {
-        self.postMessage({
-          command: 'error',
-          message: e.message,
-        });
+        if (e instanceof KoalaError) {
+          self.postMessage({
+            command: 'error',
+            status: e.status,
+            shortMessage: e.shortMessage,
+            messageStack: e.messageStack,
+          });
+        } else {
+          self.postMessage({
+            command: 'error',
+            status: PvStatus.RUNTIME_ERROR,
+            shortMessage: e.message,
+          });
+        }
       }
       break;
     case 'process':
       if (koala === null) {
         self.postMessage({
           command: 'error',
-          message: 'Koala not initialized',
+          status: PvStatus.INVALID_STATE,
+          shortMessage: 'Koala not initialized',
         });
         return;
       }
@@ -81,7 +96,8 @@ self.onmessage = async function (
       if (koala === null) {
         self.postMessage({
           command: 'error',
-          message: 'Koala not initialized',
+          status: PvStatus.INVALID_STATE,
+          shortMessage: 'Koala not initialized',
         });
         return;
       }
@@ -100,8 +116,9 @@ self.onmessage = async function (
     default:
       self.postMessage({
         command: 'failed',
+        status: PvStatus.RUNTIME_ERROR,
         // @ts-ignore
-        message: `Unrecognized command: ${event.data.command}`,
+        shortMessage: `Unrecognized command: ${event.data.command}`,
       });
   }
 };

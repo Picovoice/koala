@@ -17,8 +17,10 @@ import {
   KoalaWorkerInitResponse,
   KoalaWorkerProcessResponse,
   KoalaWorkerReleaseResponse,
+  PvStatus,
 } from './types';
 import { loadModel } from '@picovoice/web-utils';
+import { pvStatusToException } from './koala_errors';
 
 export class KoalaWorker {
   private readonly _worker: Worker;
@@ -26,11 +28,18 @@ export class KoalaWorker {
   private readonly _frameLength: number;
   private readonly _sampleRate: number;
   private readonly _delaySample: number;
+  private static _sdk: string = 'web';
 
   private static _wasm: string;
   private static _wasmSimd: string;
 
-  private constructor(worker: Worker, version: string, frameLength: number, sampleRate: number, delaySample: number) {
+  private constructor(
+    worker: Worker,
+    version: string,
+    frameLength: number,
+    sampleRate: number,
+    delaySample: number
+  ) {
     this._worker = worker;
     this._version = version;
     this._frameLength = frameLength;
@@ -94,6 +103,10 @@ export class KoalaWorker {
     }
   }
 
+  public static setSdk(sdk: string): void {
+    KoalaWorker._sdk = sdk;
+  }
+
   /**
    * Creates an instance of the Picovoice Koala Noise Suppression Engine.
    * Behind the scenes, it requires the WebAssembly code to load and initialize before
@@ -121,63 +134,96 @@ export class KoalaWorker {
     accessKey: string,
     processCallback: (enhancedPcm: Int16Array) => void,
     model: KoalaModel,
-    options: KoalaOptions = {},
+    options: KoalaOptions = {}
   ): Promise<KoalaWorker> {
-    const { processErrorCallback, ...rest } = options;
+    const { processErrorCallback, ...workerOptions } = options;
 
-    const customWritePath = (model.customWritePath) ? model.customWritePath : 'koala_model';
+    const customWritePath = model.customWritePath
+      ? model.customWritePath
+      : 'koala_model';
     const modelPath = await loadModel({ ...model, customWritePath });
 
     const worker = new PvWorker();
-    const returnPromise: Promise<KoalaWorker> = new Promise((resolve, reject) => {
-      // @ts-ignore - block from GC
-      this.worker = worker;
-      worker.onmessage = (event: MessageEvent<KoalaWorkerInitResponse>): void => {
-        switch (event.data.command) {
-          case 'ok':
-            worker.onmessage = (ev: MessageEvent<KoalaWorkerProcessResponse>): void => {
-              switch (ev.data.command) {
-                case 'ok':
-                  processCallback(ev.data.enhancedPcm);
-                  break;
-                case 'failed':
-                case 'error':
-                  if (processErrorCallback) {
-                    processErrorCallback(ev.data.message);
-                  } else {
-                    // eslint-disable-next-line no-console
-                    console.error(ev.data.message);
-                  }
-                  break;
-                default:
+    const returnPromise: Promise<KoalaWorker> = new Promise(
+      (resolve, reject) => {
+        // @ts-ignore - block from GC
+        this.worker = worker;
+        worker.onmessage = (
+          event: MessageEvent<KoalaWorkerInitResponse>
+        ): void => {
+          switch (event.data.command) {
+            case 'ok':
+              worker.onmessage = (
+                ev: MessageEvent<KoalaWorkerProcessResponse>
+              ): void => {
+                switch (ev.data.command) {
+                  case 'ok':
+                    processCallback(ev.data.enhancedPcm);
+                    break;
+                  case 'failed':
+                  case 'error':
+                    {
+                      const error = pvStatusToException(
+                        ev.data.status,
+                        ev.data.shortMessage,
+                        ev.data.messageStack
+                      );
+                      if (processErrorCallback) {
+                        processErrorCallback(error);
+                      } else {
+                        // eslint-disable-next-line no-console
+                        console.error(error);
+                      }
+                    }
+                    break;
+                  default:
+                    // @ts-ignore
+                    processErrorCallback(
+                      pvStatusToException(
+                        PvStatus.RUNTIME_ERROR,
+                        `Unrecognized command: ${event.data.command}`
+                      )
+                    );
+                }
+              };
+              resolve(
+                new KoalaWorker(
+                  worker,
+                  event.data.version,
+                  event.data.frameLength,
+                  event.data.sampleRate,
+                  event.data.delaySample
+                )
+              );
+              break;
+            case 'failed':
+            case 'error':
+              reject(
+                pvStatusToException(
+                  event.data.status,
+                  event.data.shortMessage,
+                  event.data.messageStack
+                )
+              );
+              break;
+            default:
+              reject(
+                pvStatusToException(
+                  PvStatus.RUNTIME_ERROR,
                   // @ts-ignore
-                  processErrorCallback(`Unrecognized command: ${event.data.command}`);
-              }
-            };
-            resolve(
-              new KoalaWorker(
-                worker,
-                event.data.version,
-                event.data.frameLength,
-                event.data.sampleRate,
-                event.data.delaySample));
-            break;
-          case 'failed':
-          case 'error':
-            reject(event.data.message);
-            break;
-          default:
-            // @ts-ignore
-            reject(`Unrecognized command: ${event.data.command}`);
-        }
-      };
-    });
+                  `Unrecognized command: ${event.data.command}`
+                )
+              );
+          }
+        };
+      }
+    );
 
     worker.postMessage({
       command: 'init',
       accessKey: accessKey,
       modelPath: modelPath,
-      options: rest,
+      options: workerOptions,
       wasm: this._wasm,
       wasmSimd: this._wasmSimd,
     });
@@ -206,7 +252,7 @@ export class KoalaWorker {
    */
   public async reset(): Promise<void> {
     this._worker.postMessage({
-      command: 'reset'
+      command: 'reset',
     });
   }
 
@@ -215,18 +261,31 @@ export class KoalaWorker {
    */
   public release(): Promise<void> {
     const returnPromise: Promise<void> = new Promise((resolve, reject) => {
-      this._worker.onmessage = (event: MessageEvent<KoalaWorkerReleaseResponse>): void => {
+      this._worker.onmessage = (
+        event: MessageEvent<KoalaWorkerReleaseResponse>
+      ): void => {
         switch (event.data.command) {
           case 'ok':
             resolve();
             break;
           case 'failed':
           case 'error':
-            reject(event.data.message);
+            reject(
+              pvStatusToException(
+                event.data.status,
+                event.data.shortMessage,
+                event.data.messageStack
+              )
+            );
             break;
           default:
-            // @ts-ignore
-            reject(`Unrecognized command: ${event.data.command}`);
+            reject(
+              pvStatusToException(
+                PvStatus.RUNTIME_ERROR,
+                // @ts-ignore
+                `Unrecognized command: ${event.data.command}`
+              )
+            );
         }
       };
     });

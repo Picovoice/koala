@@ -2,10 +2,8 @@
 # yarn lockfile v1
 
 
-"@picovoice/koala-web@~1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@picovoice/koala-web/-/koala-web-1.0.3.tgz#95dd441f34f1697d7d1a03d5b61326ad3a1488ac"
-  integrity sha512-S1LFNn1CaWsBZ0jNo3IsfFfhAyjl7aZjCwO4eyFdJdHsybFNORUeKAWEfaPoyELmiHUooR4jtRVn51f+woGvyA==
+"@picovoice/koala-web@file:../../binding/web":
+  version "2.0.0"
   dependencies:
     "@picovoice/web-utils" "=1.3.1"
 
