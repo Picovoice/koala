@@ -9,9 +9,9 @@
   specific language governing permissions and limitations under the License.
 */
 
-import { PvModel } from "@picovoice/web-utils";
+import { PvModel } from '@picovoice/web-utils';
 
-import {KoalaError} from "./koala_errors";
+import { KoalaError } from './koala_errors';
 
 export enum PvStatus {
   SUCCESS = 10000,
@@ -54,17 +54,17 @@ export type KoalaWorkerProcessRequest = {
 
 export type KoalaWorkerResetRequest = {
   command: 'reset';
-}
+};
 
 export type KoalaWorkerReleaseRequest = {
   command: 'release';
 };
 
 export type KoalaWorkerRequest =
-  KoalaWorkerInitRequest |
-  KoalaWorkerProcessRequest |
-  KoalaWorkerResetRequest |
-  KoalaWorkerReleaseRequest;
+  | KoalaWorkerInitRequest
+  | KoalaWorkerProcessRequest
+  | KoalaWorkerResetRequest
+  | KoalaWorkerReleaseRequest;
 
 export type KoalaWorkerFailureResponse = {
   command: 'failed' | 'error';
@@ -73,29 +73,37 @@ export type KoalaWorkerFailureResponse = {
   messageStack: string[];
 };
 
-export type KoalaWorkerInitResponse = KoalaWorkerFailureResponse | {
-  command: 'ok';
-  frameLength: number;
-  sampleRate: number;
-  version: string;
-  delaySample: number;
-};
+export type KoalaWorkerInitResponse =
+  | KoalaWorkerFailureResponse
+  | {
+      command: 'ok';
+      frameLength: number;
+      sampleRate: number;
+      version: string;
+      delaySample: number;
+    };
 
-export type KoalaWorkerProcessResponse = KoalaWorkerFailureResponse | {
-  command: 'ok';
-  enhancedPcm: Int16Array;
-};
+export type KoalaWorkerProcessResponse =
+  | KoalaWorkerFailureResponse
+  | {
+      command: 'ok';
+      enhancedPcm: Int16Array;
+    };
 
-export type KoalaWorkerResetResponse = KoalaWorkerFailureResponse | {
-  command: 'ok';
-};
+export type KoalaWorkerResetResponse =
+  | KoalaWorkerFailureResponse
+  | {
+      command: 'ok';
+    };
 
-export type KoalaWorkerReleaseResponse = KoalaWorkerFailureResponse | {
-  command: 'ok';
-};
+export type KoalaWorkerReleaseResponse =
+  | KoalaWorkerFailureResponse
+  | {
+      command: 'ok';
+    };
 
 export type KoalaWorkerResponse =
-  KoalaWorkerInitResponse |
-  KoalaWorkerProcessResponse |
-  KoalaWorkerResetResponse |
-  KoalaWorkerReleaseResponse;
+  | KoalaWorkerInitResponse
+  | KoalaWorkerProcessResponse
+  | KoalaWorkerResetResponse
+  | KoalaWorkerReleaseResponse;

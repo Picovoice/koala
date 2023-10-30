@@ -1,8 +1,10 @@
-import { Koala, KoalaWorker } from "../";
+import { Koala, KoalaWorker } from '../';
 
 const ACCESS_KEY = Cypress.env('ACCESS_KEY');
 const NUM_TEST_ITERATIONS = Number(Cypress.env('NUM_TEST_ITERATIONS'));
-const PROC_PERFORMANCE_THRESHOLD_SEC = Number(Cypress.env('PROC_PERFORMANCE_THRESHOLD_SEC'));
+const PROC_PERFORMANCE_THRESHOLD_SEC = Number(
+  Cypress.env('PROC_PERFORMANCE_THRESHOLD_SEC')
+);
 
 async function testPerformance(
   instance: typeof Koala | typeof KoalaWorker,
@@ -23,17 +25,22 @@ async function testPerformance(
 
     numFrames = Math.round(inputPcm.length / koala.frameLength) - 1;
 
-    const waitUntil = (): Promise<void> => new Promise(resolve => {
-      setInterval(() => {
-        if (numFrames === processedFrames) {
-          resolve();
-        }
-      }, 100);
-    });
+    const waitUntil = (): Promise<void> =>
+      new Promise(resolve => {
+        setInterval(() => {
+          if (numFrames === processedFrames) {
+            resolve();
+          }
+        }, 100);
+      });
 
     await koala.reset();
     const start = Date.now();
-    for (let i = 0; i < (inputPcm.length - koala.frameLength + 1); i += koala.frameLength) {
+    for (
+      let i = 0;
+      i < inputPcm.length - koala.frameLength + 1;
+      i += koala.frameLength
+    ) {
       await koala.process(inputPcm.slice(i, i + koala.frameLength));
     }
 
@@ -49,6 +56,7 @@ async function testPerformance(
   }
 
   const avgPerf = perfResults.reduce((a, b) => a + b) / NUM_TEST_ITERATIONS;
+  // eslint-disable-next-line no-console
   console.log(`Average proc performance: ${avgPerf} seconds`);
   expect(avgPerf).to.be.lessThan(PROC_PERFORMANCE_THRESHOLD_SEC);
 }
@@ -57,13 +65,13 @@ describe('Koala binding performance test', () => {
   Cypress.config('defaultCommandTimeout', 60000);
 
   it(`should be lower than performance threshold (${PROC_PERFORMANCE_THRESHOLD_SEC}s)`, () => {
-    cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
+    cy.getFramesFromFile('audio_samples/test.wav').then(async inputPcm => {
       await testPerformance(Koala, inputPcm);
     });
   });
 
   it(`should be lower than performance threshold (${PROC_PERFORMANCE_THRESHOLD_SEC}s) (worker)`, () => {
-    cy.getFramesFromFile('audio_samples/test.wav').then( async inputPcm => {
+    cy.getFramesFromFile('audio_samples/test.wav').then(async inputPcm => {
       await testPerformance(KoalaWorker, inputPcm);
     });
   });
