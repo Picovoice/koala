@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name = 'Koala-iOS'
   s.module_name = 'Koala'
-  s.version = '1.0.0'
+  s.version = '2.0.0'
   s.license = {:type => 'Apache 2.0'}
   s.summary = 'iOS SDK for Picovoice\'s Koala Noise Suppression Engine'
   s.description =
