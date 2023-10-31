@@ -75,13 +75,15 @@ public class Koala {
                 modelPathArg,
                 &self.handle)
         if status != PV_STATUS_SUCCESS {
-            throw pvStatusToKoalaError(status, "Koala init failed")
+            let messageStack = try getMessageStack()
+            throw pvStatusToKoalaError(status, "Koala init failed", messageStack)
         }
 
         var cDelaySample: Int32 = 0
         status = pv_koala_delay_sample(self.handle, &cDelaySample)
         if status != PV_STATUS_SUCCESS {
-            throw pvStatusToKoalaError(status, "Failed to get Koala delay sample")
+            let messageStack = try getMessageStack()
+            throw pvStatusToKoalaError(status, "Failed to get Koala delay sample", messageStack)
         }
         self.delaySample = UInt32(cDelaySample)
     }
@@ -141,7 +143,8 @@ public class Koala {
         var enhancedPcm = [Int16](repeating: 0, count: Int(Koala.frameLength))
         let status = pv_koala_process(self.handle, pcm, &enhancedPcm[0])
         if status != PV_STATUS_SUCCESS {
-            throw pvStatusToKoalaError(status, "Koala process failed")
+            let messageStack = try getMessageStack()
+            throw pvStatusToKoalaError(status, "Koala process failed", messageStack)
         }
 
         return enhancedPcm
@@ -158,7 +161,8 @@ public class Koala {
 
         let status = pv_koala_reset(self.handle)
         if status != PV_STATUS_SUCCESS {
-            throw pvStatusToKoalaError(status, "Koala process failed")
+            let messageStack = try getMessageStack()
+            throw pvStatusToKoalaError(status, "Koala process failed", messageStack)
         }
     }
 
@@ -181,33 +185,54 @@ public class Koala {
                            """)
     }
 
-    private func pvStatusToKoalaError(_ status: pv_status_t, _ message: String) -> KoalaError {
+    private func pvStatusToKoalaError(
+        _ status: pv_status_t,
+        _ message: String,
+        _ messageStack: [String] = []) -> KoalaError {
         switch status {
         case PV_STATUS_OUT_OF_MEMORY:
-            return KoalaMemoryError(message)
+            return KoalaMemoryError(message, messageStack)
         case PV_STATUS_IO_ERROR:
-            return KoalaIOError(message)
+            return KoalaIOError(message, messageStack)
         case PV_STATUS_INVALID_ARGUMENT:
-            return KoalaInvalidArgumentError(message)
+            return KoalaInvalidArgumentError(message, messageStack)
         case PV_STATUS_STOP_ITERATION:
-            return KoalaStopIterationError(message)
+            return KoalaStopIterationError(message, messageStack)
         case PV_STATUS_KEY_ERROR:
-            return KoalaKeyError(message)
+            return KoalaKeyError(message, messageStack)
         case PV_STATUS_INVALID_STATE:
-            return KoalaInvalidStateError(message)
+            return KoalaInvalidStateError(message, messageStack)
         case PV_STATUS_RUNTIME_ERROR:
-            return KoalaRuntimeError(message)
+            return KoalaRuntimeError(message, messageStack)
         case PV_STATUS_ACTIVATION_ERROR:
-            return KoalaActivationError(message)
+            return KoalaActivationError(message, messageStack)
         case PV_STATUS_ACTIVATION_LIMIT_REACHED:
-            return KoalaActivationLimitError(message)
+            return KoalaActivationLimitError(message, messageStack)
         case PV_STATUS_ACTIVATION_THROTTLED:
-            return KoalaActivationThrottledError(message)
+            return KoalaActivationThrottledError(message, messageStack)
         case PV_STATUS_ACTIVATION_REFUSED:
-            return KoalaActivationRefusedError(message)
+            return KoalaActivationRefusedError(message, messageStack)
         default:
             let pvStatusString = String(cString: pv_status_to_string(status))
-            return KoalaError("\(pvStatusString): \(message)")
+            return KoalaError("\(pvStatusString): \(message)", messageStack)
         }
+    }
+
+    private func getMessageStack() throws -> [String] {
+        var messageStackRef: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?
+        var messageStackDepth: Int32 = 0
+        let status = pv_get_error_stack(&messageStackRef, &messageStackDepth)
+        if status != PV_STATUS_SUCCESS {
+            throw pvStatusToOctopusError(status, "Unable to get Porcupine error state")
+        }
+
+        var messageStack: [String] = []
+        for i in 0..<messageStackDepth {
+            messageStack.append(String(cString: messageStackRef!.advanced(by: Int(i)).pointee!))
+        }
+
+        pv_free_error_stack(messageStackRef)
+
+        return messageStack
     }
 }
