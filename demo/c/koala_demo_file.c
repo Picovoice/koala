@@ -224,7 +224,7 @@ int picovoice_main(int argc, char *argv[]) {
 
     void (*pv_free_error_stack_func)(char **) = load_symbol(koala_library, "pv_free_error_stack");
     if (!pv_free_error_stack_func) {
-        print_dl_error("Failed to load 'pv_free_error_stack./b'");
+        print_dl_error("Failed to load 'pv_free_error_stack'");
         exit(EXIT_FAILURE);
     }
 
