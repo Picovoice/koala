@@ -10,7 +10,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   Koala-iOS:
-    :commit: c6fea1422fb2447602564b834833cc3542e04809
+    :commit: 82b588b19cb7225222853f7709f9e5de20415b47
     :git: https://github.com/Picovoice/koala.git
 
 SPEC CHECKSUMS:
