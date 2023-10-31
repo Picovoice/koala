@@ -381,51 +381,56 @@ export class Koala {
    * Call this function in between calls to `process` that do not provide consecutive frames of audio.
    */
   public async reset(): Promise<void> {
-    this._processMutex
-      .runExclusive(async () => {
-        if (this._wasmMemory === undefined) {
-          throw new KoalaErrors.KoalaInvalidStateError(
-            'Attempted to call Koala reset after release.'
-          );
-        }
+    return new Promise((resolve, reject) => {
+      this._processMutex
+        .runExclusive(async () => {
+          if (this._wasmMemory === undefined) {
+            throw new KoalaErrors.KoalaInvalidStateError(
+              'Attempted to call Koala reset after release.'
+            );
+          }
 
-        const status = await this._pvKoalaReset(this._objectAddress);
+          const status = await this._pvKoalaReset(this._objectAddress);
 
-        if (status !== PvStatus.SUCCESS) {
-          const memoryBufferUint8 = new Uint8Array(this._wasmMemory.buffer);
-          const memoryBufferView = new DataView(this._wasmMemory.buffer);
-          const messageStack = await Koala.getMessageStack(
-            this._pvGetErrorStack,
-            this._pvFreeErrorStack,
-            this._messageStackAddressAddressAddress,
-            this._messageStackDepthAddress,
-            memoryBufferView,
-            memoryBufferUint8
-          );
+          if (status !== PvStatus.SUCCESS) {
+            const memoryBufferUint8 = new Uint8Array(this._wasmMemory.buffer);
+            const memoryBufferView = new DataView(this._wasmMemory.buffer);
+            const messageStack = await Koala.getMessageStack(
+              this._pvGetErrorStack,
+              this._pvFreeErrorStack,
+              this._messageStackAddressAddressAddress,
+              this._messageStackDepthAddress,
+              memoryBufferView,
+              memoryBufferUint8
+            );
 
-          const error = pvStatusToException(
-            status,
-            'Reset failed',
-            messageStack
-          );
+            const error = pvStatusToException(
+              status,
+              'Reset failed',
+              messageStack
+            );
+            if (this._processErrorCallback) {
+              this._processErrorCallback(error);
+            } else {
+              // eslint-disable-next-line no-console
+              console.error(error);
+            }
+          }
+
+          resolve();
+        })
+        .catch((error: any) => {
           if (this._processErrorCallback) {
-            this._processErrorCallback(error);
+            this._processErrorCallback(
+              pvStatusToException(PvStatus.RUNTIME_ERROR, error.toString())
+            );
           } else {
             // eslint-disable-next-line no-console
             console.error(error);
           }
-        }
-      })
-      .catch((error: any) => {
-        if (this._processErrorCallback) {
-          this._processErrorCallback(
-            pvStatusToException(PvStatus.RUNTIME_ERROR, error.toString())
-          );
-        } else {
-          // eslint-disable-next-line no-console
-          console.error(error);
-        }
-      });
+          reject(error);
+        });
+    });
   }
 
   /**
