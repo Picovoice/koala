@@ -19,10 +19,6 @@ class KoalaDemoUITests: XCTestCase {
 
     var koala: Koala?
 
-    override func setUp() {
-        super.setUp()
-    }
-
     override func tearDown() {
         if koala != nil {
             koala!.delete()
