@@ -14,11 +14,13 @@ package ai.picovoice.koala;
 
 class KoalaNative {
 
-    static native int getSampleRate();
-
     static native String getVersion();
 
     static native int getFrameLength();
+
+    static native int getSampleRate();
+
+    static native void setSdk(String sdk);
 
     static native long init(String accessKey, String modelPath) throws KoalaException;
 

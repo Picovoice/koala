@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements OnSeekBarChangeLi
         try {
             koala = new Koala.Builder().setAccessKey(ACCESS_KEY).build(getApplicationContext());
         } catch (KoalaInvalidArgumentException e) {
-            onKoalaInitError(String.format("AccessKey '%s' is invalid", ACCESS_KEY));
+            onKoalaInitError(e.getMessage());
         } catch (KoalaActivationException e) {
             onKoalaInitError("AccessKey activation error");
         } catch (KoalaActivationLimitException e) {
