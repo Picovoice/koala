@@ -223,7 +223,7 @@ public class Koala {
         var messageStackDepth: Int32 = 0
         let status = pv_get_error_stack(&messageStackRef, &messageStackDepth)
         if status != PV_STATUS_SUCCESS {
-            throw pvStatusToOctopusError(status, "Unable to get Porcupine error state")
+            throw pvStatusToKoalaError(status, "Unable to get Porcupine error state")
         }
 
         var messageStack: [String] = []
