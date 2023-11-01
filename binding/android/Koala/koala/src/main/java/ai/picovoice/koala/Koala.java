@@ -35,6 +35,10 @@ public class Koala {
 
     private long handle;
 
+    public static void setSdk(String sdk) {
+        Koala._sdk = sdk;
+    }
+
     /**
      * Constructor.
      *
