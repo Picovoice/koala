@@ -46,6 +46,10 @@ public class Koala {
 
     private static var sdk = "ios"
 
+    public static func setSdk(sdk: String) {
+        self.sdk = sdk
+    }
+
     /// Constructor.
     ///
     /// - Parameters:
