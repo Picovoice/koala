@@ -44,6 +44,8 @@ public class Koala {
     ///  streams of audio data, this delay specifies the time shift between the input and output stream.
     public var delaySample: UInt32 = 0
 
+    private static var sdk = "ios"
+
     /// Constructor.
     ///
     /// - Parameters:
@@ -69,6 +71,8 @@ public class Koala {
         if !FileManager().fileExists(atPath: modelPathArg!) {
             modelPathArg = try getResourcePath(modelPathArg!)
         }
+
+        pv_set_sdk(Koala.sdk)
 
         var status = pv_koala_init(
                 accessKey,
@@ -223,7 +227,7 @@ public class Koala {
         var messageStackDepth: Int32 = 0
         let status = pv_get_error_stack(&messageStackRef, &messageStackDepth)
         if status != PV_STATUS_SUCCESS {
-            throw pvStatusToKoalaError(status, "Unable to get Porcupine error state")
+            throw pvStatusToKoalaError(status, "Unable to get Koala error state")
         }
 
         var messageStack: [String] = []
