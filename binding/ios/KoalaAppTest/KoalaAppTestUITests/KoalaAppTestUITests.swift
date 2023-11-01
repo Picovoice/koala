@@ -19,10 +19,6 @@ class KoalaDemoUITests: XCTestCase {
 
     var koala: Koala?
 
-    override func setUp() {
-        super.setUp()
-    }
-
     override func tearDown() {
         if koala != nil {
             koala!.delete()
@@ -140,5 +136,23 @@ class KoalaDemoUITests: XCTestCase {
 
     func testVersion() throws {
         XCTAssertGreaterThan(Koala.version, "")
+    }
+
+    func testMessageStack() throws {
+        var first_error: String = ""
+        do {
+            let koala = try Koala(accessKey: "invalid")
+            XCTAssertNil(koala)
+        } catch {
+            first_error = "\(error.localizedDescription)"
+            XCTAssert(first_error.count < 1024)
+        }
+
+        do {
+            let koala = try Koala(accessKey: "invalid")
+            XCTAssertNil(koala)
+        } catch {
+            XCTAssert("\(error.localizedDescription)".count == first_error.count)
+        }
     }
 }

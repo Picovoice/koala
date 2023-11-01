@@ -1,16 +1,21 @@
 PODS:
-  - Koala-iOS (1.0.0)
+  - Koala-iOS (2.0.0)
 
 DEPENDENCIES:
-  - Koala-iOS (~> 1.0.0)
+  - Koala-iOS (from `https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios/binding/ios/Koala-iOS.podspec`)
 
-SPEC REPOS:
-  trunk:
-    - Koala-iOS
+EXTERNAL SOURCES:
+  Koala-iOS:
+    :podspec: https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios/binding/ios/Koala-iOS.podspec
+
+CHECKOUT OPTIONS:
+  Koala-iOS:
+    :commit: 82b588b19cb7225222853f7709f9e5de20415b47
+    :git: https://github.com/Picovoice/koala.git
 
 SPEC CHECKSUMS:
-  Koala-iOS: 98ccd64b2531c57a0380dae47ea4105c4c5ae641
+  Koala-iOS: 865994d8e18b03854f2b933ec9645915ba95f189
 
-PODFILE CHECKSUM: 1973a21901d505bae8a4a3f3777bd9df4b434bda
+PODFILE CHECKSUM: aa02120478c1d3dd9e8085db3379479143edbc02
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.11.3
