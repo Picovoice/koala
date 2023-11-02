@@ -1,7 +1,7 @@
 source 'https://cdn.cocoapods.org/'
-platform :ios, '11.0'
+platform :ios, '13.0'
 
 target 'KoalaDemo' do
-  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0/binding/ios/Koala-iOS.podspec'
+  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios-update/binding/ios/Koala-iOS.podspec'
   pod 'ios-voice-processor', '~> 1.1.0'
 end
