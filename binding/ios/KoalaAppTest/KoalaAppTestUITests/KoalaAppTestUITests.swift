@@ -155,4 +155,19 @@ class KoalaDemoUITests: XCTestCase {
             XCTAssert("\(error.localizedDescription)".count == first_error.count)
         }
     }
+
+    func testProcessMessageStack() throws {
+        let k = try Koala.init(accessKey: accessKey)
+        k.delete()
+
+        var testPcm: [Int16] = []
+        testPcm.reserveCapacity(Int(Koala.frameLength))
+
+        do {
+            let res = try k.process(pcm: testPcm)
+            XCTAssert(res.count == 0)
+        } catch {
+            XCTAssert("\(error.localizedDescription)".count > 0)
+        }
+    }
 }
