@@ -164,7 +164,7 @@ class KoalaDemoUITests: XCTestCase {
         testPcm.reserveCapacity(Int(Koala.frameLength))
 
         do {
-            let res = try k.process(pcm: testPcm)
+            let res = try k.process(testPcm)
             XCTAssert(res.count == 0)
         } catch {
             XCTAssert("\(error.localizedDescription)".count > 0)
