@@ -15,7 +15,7 @@ Koala is an on-device noise suppression engine. Koala is:
 
 ## Compatibility
 
-- iOS 11.0+
+- iOS 13.0+
 
 ## Installation
 
