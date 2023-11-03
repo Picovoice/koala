@@ -86,14 +86,14 @@ export type KoalaWorkerInitResponse =
 export type KoalaWorkerProcessResponse =
   | KoalaWorkerFailureResponse
   | {
-      command: 'ok';
+      command: 'ok-process';
       enhancedPcm: Int16Array;
     };
 
 export type KoalaWorkerResetResponse =
   | KoalaWorkerFailureResponse
   | {
-      command: 'ok';
+      command: 'ok-reset';
     };
 
 export type KoalaWorkerReleaseResponse =

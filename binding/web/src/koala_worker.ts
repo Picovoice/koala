@@ -17,6 +17,7 @@ import {
   KoalaWorkerInitResponse,
   KoalaWorkerProcessResponse,
   KoalaWorkerReleaseResponse,
+  KoalaWorkerResetResponse,
   PvStatus,
 } from './types';
 import { loadModel } from '@picovoice/web-utils';
@@ -154,11 +155,15 @@ export class KoalaWorker {
           switch (event.data.command) {
             case 'ok':
               worker.onmessage = (
-                ev: MessageEvent<KoalaWorkerProcessResponse>
+                ev: MessageEvent<
+                  KoalaWorkerProcessResponse | KoalaWorkerResetResponse
+                >
               ): void => {
                 switch (ev.data.command) {
-                  case 'ok':
+                  case 'ok-process':
                     processCallback(ev.data.enhancedPcm);
+                    break;
+                  case 'ok-reset':
                     break;
                   case 'failed':
                   case 'error':

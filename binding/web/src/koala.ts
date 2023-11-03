@@ -391,7 +391,6 @@ export class Koala {
           }
 
           const status = await this._pvKoalaReset(this._objectAddress);
-
           if (status !== PvStatus.SUCCESS) {
             const memoryBufferUint8 = new Uint8Array(this._wasmMemory.buffer);
             const memoryBufferView = new DataView(this._wasmMemory.buffer);
@@ -404,30 +403,13 @@ export class Koala {
               memoryBufferUint8
             );
 
-            const error = pvStatusToException(
-              status,
-              'Reset failed',
-              messageStack
-            );
-            if (this._processErrorCallback) {
-              this._processErrorCallback(error);
-            } else {
-              // eslint-disable-next-line no-console
-              console.error(error);
-            }
+            throw pvStatusToException(status, 'Reset failed', messageStack);
           }
-
+        })
+        .then(() => {
           resolve();
         })
         .catch((error: any) => {
-          if (this._processErrorCallback) {
-            this._processErrorCallback(
-              pvStatusToException(PvStatus.RUNTIME_ERROR, error.toString())
-            );
-          } else {
-            // eslint-disable-next-line no-console
-            console.error(error);
-          }
           reject(error);
         });
     });
@@ -440,6 +422,8 @@ export class Koala {
     await this._pvKoalaDelete(this._objectAddress);
     await this._pvFree(this._inputBufferAddress);
     await this._pvFree(this._outputBufferAddress);
+    await this._pvFree(this._messageStackAddressAddressAddress);
+    await this._pvFree(this._messageStackDepthAddress);
     delete this._wasmMemory;
     this._wasmMemory = undefined;
   }
