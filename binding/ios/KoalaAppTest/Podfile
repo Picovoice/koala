@@ -2,13 +2,13 @@ source 'https://cdn.cocoapods.org/'
 platform :ios, '11.0'
 
 target 'KoalaAppTest' do
-  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios/binding/ios/Koala-iOS.podspec'
+  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0/binding/ios/Koala-iOS.podspec'
 end
 
 target 'KoalaAppTestUITests' do
-  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios/binding/ios/Koala-iOS.podspec'
+  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0/binding/ios/Koala-iOS.podspec'
 end
 
 target 'PerformanceTest' do
-  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios/binding/ios/Koala-iOS.podspec'
+  pod 'Koala-iOS', :podspec => 'https://raw.githubusercontent.com/Picovoice/koala/v2.0/binding/ios/Koala-iOS.podspec'
 end
