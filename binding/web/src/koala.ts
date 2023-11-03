@@ -145,7 +145,7 @@ export class Koala {
     this._inputBufferAddress = handleWasm.inputBufferAddress;
     this._outputBufferAddress = handleWasm.outputBufferAddress;
     this._messageStackAddressAddressAddress =
-      handleWasm.messageStackDepthAddress;
+      handleWasm.messageStackAddressAddressAddress;
     this._messageStackDepthAddress = handleWasm.messageStackDepthAddress;
 
     this._pvError = handleWasm.pvError;

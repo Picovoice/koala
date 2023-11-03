@@ -2,6 +2,7 @@ import { Koala, KoalaWorker } from '../';
 
 // @ts-ignore
 import koalaParams from './koala_params';
+import { KoalaError } from "../dist/types/koala_errors";
 
 const ACCESS_KEY = Cypress.env('ACCESS_KEY');
 
@@ -11,6 +12,10 @@ function rootMeanSquare(pcm: Int16Array): number {
     sumSquares += Math.pow(pcm[i] / 32768, 2);
   }
   return Math.sqrt(sumSquares / pcm.length);
+}
+
+function delay(time: number) {
+  return new Promise(resolve => setTimeout(resolve, time));
 }
 
 async function runTest(
@@ -70,7 +75,7 @@ async function runTest(
         },
         { publicPath: '/test/koala_params.pv', forceWrite: true },
         {
-          processErrorCallback: (error: string) => {
+          processErrorCallback: (error: KoalaError) => {
             reject(error);
           },
         }
@@ -155,6 +160,47 @@ async function testReset(
 }
 
 describe('Koala Binding', function () {
+  it(`should return process error message stack`, async () => {
+    let error: KoalaError | null = null;
+
+    const runProcess = () => new Promise<void>(async resolve => {
+      const koala = await Koala.create(
+        ACCESS_KEY,
+        () => { },
+        {
+          publicPath: '/test/koala_params.pv',
+          forceWrite: true,
+        },
+        {
+          processErrorCallback: (e: KoalaError) => {
+            error = e;
+            resolve();
+          }
+        }
+      );
+      const testPcm = new Int16Array(koala.frameLength);
+      // @ts-ignore
+      const objectAddress = koala._objectAddress;
+
+      // @ts-ignore
+      koala._objectAddress = 0;
+      await koala.process(testPcm);
+
+      await delay(1000);
+
+      // @ts-ignore
+      koala._objectAddress = objectAddress;
+      await koala.release();
+    });
+
+    await runProcess();
+    expect(error).to.not.be.null;
+    if (error) {
+      expect((error as KoalaError).messageStack.length).to.be.gt(0);
+      expect((error as KoalaError).messageStack.length).to.be.lte(8);
+    }
+  });
+
   for (const instance of [Koala, KoalaWorker]) {
     const instanceString = instance === KoalaWorker ? 'worker' : 'main';
     it(`should be able to init with public path (${instanceString})`, async () => {
