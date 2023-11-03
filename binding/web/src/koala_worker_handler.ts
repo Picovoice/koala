@@ -43,6 +43,7 @@ const initRequest = async (request: KoalaWorkerInitRequest): Promise<any> => {
   try {
     Koala.setWasm(request.wasm);
     Koala.setWasmSimd(request.wasmSimd);
+    Koala.setSdk(request.sdk);
     koala = await Koala._init(
       request.accessKey,
       processCallback,

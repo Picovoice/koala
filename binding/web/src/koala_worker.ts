@@ -231,6 +231,7 @@ export class KoalaWorker {
       options: workerOptions,
       wasm: this._wasm,
       wasmSimd: this._wasmSimd,
+      sdk: this._sdk,
     });
 
     return returnPromise;

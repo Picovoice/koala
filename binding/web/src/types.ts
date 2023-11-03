@@ -45,6 +45,7 @@ export type KoalaWorkerInitRequest = {
   options: KoalaOptions;
   wasm: string;
   wasmSimd: string;
+  sdk: string;
 };
 
 export type KoalaWorkerProcessRequest = {
