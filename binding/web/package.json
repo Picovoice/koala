@@ -3,7 +3,7 @@
   "description": "Koala Noise Suppression engine for web browsers (via WebAssembly)",
   "author": "Picovoice Inc",
   "license": "Apache-2.0",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "keywords": [
     "koala",
     "web",
@@ -67,6 +67,6 @@
     "wasm-feature-detect": "^1.5.0"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   }
 }
