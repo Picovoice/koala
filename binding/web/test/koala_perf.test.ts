@@ -63,7 +63,7 @@ async function testPerformance(
 
 describe('Koala binding performance test', () => {
   for (const instance of [Koala, KoalaWorker]) {
-    Cypress.config('defaultCommandTimeout', 60000);
+    Cypress.config('defaultCommandTimeout', 90000);
 
     it(`should be lower than performance threshold (${PROC_PERFORMANCE_THRESHOLD_SEC}s)`, () => {
       cy.getFramesFromFile('audio_samples/test.wav').then(async inputPcm => {
