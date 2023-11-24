@@ -4,25 +4,17 @@ PODS:
 
 DEPENDENCIES:
   - ios-voice-processor (~> 1.1.0)
-  - Koala-iOS (from `https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios-update/binding/ios/Koala-iOS.podspec`)
+  - Koala-iOS (~> 2.0.0)
 
 SPEC REPOS:
   trunk:
     - ios-voice-processor
-
-EXTERNAL SOURCES:
-  Koala-iOS:
-    :podspec: https://raw.githubusercontent.com/Picovoice/koala/v2.0-ios-update/binding/ios/Koala-iOS.podspec
-
-CHECKOUT OPTIONS:
-  Koala-iOS:
-    :commit: 9ea3024bbf5a91ad3ec558d23c64c936bcebf623
-    :git: https://github.com/Picovoice/koala.git
+    - Koala-iOS
 
 SPEC CHECKSUMS:
   ios-voice-processor: 8e32d7f980a06d392d128ef1cd19cf6ddcaca3c1
   Koala-iOS: b0e48400203d615520e6539f9994826183e5bb5a
 
-PODFILE CHECKSUM: f99f2e7415cfd22cf0f2a831dcc43a163a55e560
+PODFILE CHECKSUM: 83bf75f0e80df078aab1b58cc8d0c1f923297232
 
 COCOAPODS: 1.11.3
