@@ -27,12 +27,17 @@ import java.io.OutputStream;
 public class Koala {
 
     private static String defaultModelPath;
+    private static String _sdk = "android";
 
     static {
         System.loadLibrary("pv_koala");
     }
 
     private long handle;
+
+    public static void setSdk(String sdk) {
+        Koala._sdk = sdk;
+    }
 
     /**
      * Constructor.
@@ -43,6 +48,7 @@ public class Koala {
      * @throws KoalaException if there is an error while initializing Koala.
      */
     private Koala(String accessKey, String modelPath) throws KoalaException {
+        KoalaNative.setSdk(Koala._sdk);
         handle = KoalaNative.init(accessKey, modelPath);
     }
 

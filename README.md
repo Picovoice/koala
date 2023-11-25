@@ -314,6 +314,14 @@ Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://con
 
 ## Releases
 
-### v1.0.0 February 7th, 2023
+### v2.0.0 - November 24th, 2023
 
-- Initial release.
+- Improvements to error reporting
+- Upgrades to authorization and authentication system
+- Various bug fixes and improvements
+- Web min support bumped to Node 16
+- iOS support bumped to iOS 13
+
+### v1.0.0 - February 7th, 2023
+
+- Initial release

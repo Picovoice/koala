@@ -1,5 +1,6 @@
 import { Koala } from './koala';
 import { KoalaWorker } from './koala_worker';
+import * as KoalaErrors from './koala_errors';
 
 import {
   KoalaModel,
@@ -25,6 +26,7 @@ KoalaWorker.setWasmSimd(koalaWasmSimd);
 
 export {
   Koala,
+  KoalaErrors,
   KoalaModel,
   KoalaOptions,
   KoalaWorker,

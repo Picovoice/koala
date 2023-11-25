@@ -206,6 +206,31 @@ public class KoalaTest {
         }
     }
 
+    @Test
+    public void testErrorStack() {
+        String[] error = {};
+        try {
+            new Koala.Builder()
+                    .setAccessKey("invalid")
+                    .build(getApplicationContext());
+        } catch (KoalaException e) {
+            error = e.getMessageStack();
+        }
+
+        assertTrue(0 < error.length);
+        assertTrue(error.length <= 8);
+
+        try {
+            new Koala.Builder()
+                    .setAccessKey("invalid")
+                    .build(getApplicationContext());
+        } catch (KoalaException e) {
+            for (int i = 0; i < error.length; i++) {
+                assertEquals(e.getMessageStack()[i], error[i]);
+            }
+        }
+    }
+
     private void extractTestFile(String filepath) throws IOException {
 
         InputStream is = new BufferedInputStream(assetManager.open(filepath), 256);

@@ -11,22 +11,108 @@
 /// <reference lib="webworker" />
 
 import { Koala } from './koala';
-import { KoalaWorkerRequest } from './types';
+import { KoalaWorkerRequest, KoalaWorkerInitRequest, PvStatus } from './types';
+import { KoalaError } from './koala_errors';
 
 let koala: Koala | null = null;
 
 const processCallback = (enhancedPcm: Int16Array): void => {
   self.postMessage({
-    command: 'ok',
+    command: 'ok-process',
     enhancedPcm: enhancedPcm,
   });
 };
 
-const processErrorCallback = (error: string): void => {
+const processErrorCallback = (error: KoalaError): void => {
   self.postMessage({
     command: 'error',
-    message: error,
+    status: error.status,
+    shortMessage: error.shortMessage,
+    messageStack: error.messageStack,
   });
+};
+
+const initRequest = async (request: KoalaWorkerInitRequest): Promise<any> => {
+  if (koala !== null) {
+    return {
+      command: 'error',
+      status: PvStatus.INVALID_STATE,
+      shortMessage: 'Koala already initialized',
+    };
+  }
+  try {
+    Koala.setWasm(request.wasm);
+    Koala.setWasmSimd(request.wasmSimd);
+    Koala.setSdk(request.sdk);
+    koala = await Koala._init(
+      request.accessKey,
+      processCallback,
+      request.modelPath,
+      { ...request.options, processErrorCallback }
+    );
+    return {
+      command: 'ok',
+      version: koala.version,
+      frameLength: koala.frameLength,
+      sampleRate: koala.sampleRate,
+      delaySample: koala.delaySample,
+    };
+  } catch (e: any) {
+    if (e instanceof KoalaError) {
+      return {
+        command: 'error',
+        status: e.status,
+        shortMessage: e.shortMessage,
+        messageStack: e.messageStack,
+      };
+    }
+    return {
+      command: 'error',
+      status: PvStatus.RUNTIME_ERROR,
+      shortMessage: e.message,
+    };
+  }
+};
+
+const resetRequest = async (): Promise<any> => {
+  if (koala === null) {
+    return {
+      command: 'error',
+      status: PvStatus.INVALID_STATE,
+      shortMessage: 'Koala not initialized',
+    };
+  }
+  try {
+    await koala.reset();
+    return {
+      command: 'ok-reset',
+    };
+  } catch (e: any) {
+    if (e instanceof KoalaError) {
+      return {
+        command: 'error',
+        status: e.status,
+        shortMessage: e.shortMessage,
+        messageStack: e.messageStack,
+      };
+    }
+    return {
+      command: 'error',
+      status: PvStatus.RUNTIME_ERROR,
+      shortMessage: e.message,
+    };
+  }
+};
+
+const releaseRequest = async (): Promise<any> => {
+  if (koala !== null) {
+    await koala.release();
+    koala = null;
+    close();
+  }
+  return {
+    command: 'ok',
+  };
 };
 
 /**
@@ -37,71 +123,31 @@ self.onmessage = async function (
 ): Promise<void> {
   switch (event.data.command) {
     case 'init':
-      if (koala !== null) {
-        self.postMessage({
-          command: 'error',
-          message: 'Koala already initialized',
-        });
-        return;
-      }
-      try {
-        Koala.setWasm(event.data.wasm);
-        Koala.setWasmSimd(event.data.wasmSimd);
-        koala = await Koala._init(
-          event.data.accessKey,
-          processCallback,
-          event.data.modelPath,
-          { ...event.data.options, processErrorCallback }
-        );
-        self.postMessage({
-          command: 'ok',
-          version: koala.version,
-          frameLength: koala.frameLength,
-          sampleRate: koala.sampleRate,
-          delaySample: koala.delaySample
-        });
-      } catch (e: any) {
-        self.postMessage({
-          command: 'error',
-          message: e.message,
-        });
-      }
+      self.postMessage(await initRequest(event.data));
       break;
     case 'process':
       if (koala === null) {
         self.postMessage({
           command: 'error',
-          message: 'Koala not initialized',
+          status: PvStatus.INVALID_STATE,
+          shortMessage: 'Koala not initialized',
         });
         return;
       }
       await koala.process(event.data.inputFrame);
       break;
     case 'reset':
-      if (koala === null) {
-        self.postMessage({
-          command: 'error',
-          message: 'Koala not initialized',
-        });
-        return;
-      }
-      await koala.reset();
+      self.postMessage(await resetRequest());
       break;
     case 'release':
-      if (koala !== null) {
-        await koala.release();
-        koala = null;
-        close();
-      }
-      self.postMessage({
-        command: 'ok',
-      });
+      self.postMessage(await releaseRequest());
       break;
     default:
       self.postMessage({
         command: 'failed',
+        status: PvStatus.RUNTIME_ERROR,
         // @ts-ignore
-        message: `Unrecognized command: ${event.data.command}`,
+        shortMessage: `Unrecognized command: ${event.data.command}`,
       });
   }
 };
