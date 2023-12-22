@@ -18,9 +18,9 @@ Koala is an on-device noise suppression engine. Koala is:
 - iOS 13.0+
 
 ## Installation
-
+<!-- markdown-link-check-disable -->
 The Koala iOS binding is available via [CocoaPods](https://cocoapods.org/pods/Koala-iOS). To import it into your iOS project, add the following line to your Podfile:
-
+<!-- markdown-link-check-enable -->
 ```ruby
 pod 'Koala-iOS'
 ```
