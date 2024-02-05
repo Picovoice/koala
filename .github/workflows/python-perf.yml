@@ -90,7 +90,7 @@ jobs:
           proc_performance_threshold_sec: 2.5
         - machine: rpi4-64
           proc_performance_threshold_sec: 2.5
-        - machine: rpi4-64
+        - machine: rpi5-64
           proc_performance_threshold_sec: 0.1
         - machine: jetson
           proc_performance_threshold_sec: 2.5
