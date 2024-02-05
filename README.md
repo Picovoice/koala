@@ -34,8 +34,6 @@ Koala is an on-device noise suppression engine. Koala is:
     - [C](#c)
     - [Web](#web)
   - [Releases](#releases)
-    - [v2.0.0 - November 24th, 2023](#v200---november-24th-2023)
-    - [v1.0.0 - February 7th, 2023](#v100---february-7th-2023)
 
 ## AccessKey
 
