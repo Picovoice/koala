@@ -48,6 +48,6 @@ setuptools.setup(
             'koala_demo_mic=pvkoalademo.koala_demo_mic:main',
         ],
     ),
-    python_requires='>=3.5',
+    python_requires='>=3.7',
     keywords="Noise Cancellation, Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
 )
