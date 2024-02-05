@@ -14,26 +14,28 @@ Koala is an on-device noise suppression engine. Koala is:
   - Linux (x86_64), macOS (x86_64, arm64), Windows (x86_64)
   - Android and iOS
   - Chrome, Safari, Firefox, and Edge
-  - Raspberry Pi (4, 3) and NVIDIA Jetson Nano
+  - Raspberry Pi (5, 4, 3) and NVIDIA Jetson Nano
 
 ## Table of Contents
 
 - [Koala](#koala)
-    - [Table of Contents](#table-of-contents)
-    - [AccessKey](#accesskey)
-    - [Demos](#demos)
-        - [Python](#python-demos)
-        - [Android](#android-demo)
-        - [iOS](#ios-demo)
-        - [C](#c-demos)
-        - [Web](#web-demo)
-    - [SDKs](#sdks)
-        - [Python](#python)
-        - [Android](#android)
-        - [iOS](#ios)
-        - [C](#c)
-        - [Web](#web)
-    - [Releases](#releases)
+  - [Table of Contents](#table-of-contents)
+  - [AccessKey](#accesskey)
+  - [Demos](#demos)
+    - [Python Demos](#python-demos)
+    - [Android Demo](#android-demo)
+    - [iOS Demo](#ios-demo)
+    - [C Demos](#c-demos)
+    - [Web Demo](#web-demo)
+  - [SDKs](#sdks)
+    - [Python](#python)
+    - [Android](#android)
+    - [iOS](#ios)
+    - [C](#c)
+    - [Web](#web)
+  - [Releases](#releases)
+    - [v2.0.0 - November 24th, 2023](#v200---november-24th-2023)
+    - [v1.0.0 - February 7th, 2023](#v100---february-7th-2023)
 
 ## AccessKey
 
