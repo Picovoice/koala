@@ -11,7 +11,7 @@ Koala is an on-device noise suppression engine. Koala is:
   - Linux (x86_64), macOS (x86_64, arm64), Windows (x86_64)
   - Android and iOS
   - Chrome, Safari, Firefox, and Edge
-  - Raspberry Pi (4, 3) and NVIDIA Jetson Nano
+  - Raspberry Pi (3, 4, 5) and NVIDIA Jetson Nano
 
 ## Compatibility
 
