@@ -1,10 +1,16 @@
 # Koala
 
+[![GitHub release](https://img.shields.io/github/release/Picovoice/Koala.svg)](https://github.com/Picovoice/Koala/releases)
+[![GitHub](https://img.shields.io/github/license/Picovoice/koala)](https://github.com/Picovoice/koala/)
+
+[![Maven Central](https://img.shields.io/maven-central/v/ai.picovoice/koala-android?label=maven-central%20%5Bandroid%5D)](https://repo1.maven.org/maven2/ai/picovoice/koala-android/)
+[![npm](https://img.shields.io/npm/v/@picovoice/koala-web?label=npm%20%5Bweb%5D)](https://www.npmjs.com/package/@picovoice/koala-web)
+[![CocoaPods](https://img.shields.io/cocoapods/v/Koala-iOS)](https://cocoapods.org/pods/Koala-iOS)<!-- markdown-link-check-disable-line -->
+[![PyPI](https://img.shields.io/pypi/v/pvkoala)](https://pypi.org/project/pvkoala/)
+
 Made in Vancouver, Canada by [Picovoice](https://picovoice.ai)
 
-<!-- markdown-link-check-disable -->
-[![Twitter URL](https://img.shields.io/twitter/url?label=%40AiPicovoice&style=social&url=https%3A%2F%2Ftwitter.com%2FAiPicovoice)](https://twitter.com/AiPicovoice)
-<!-- markdown-link-check-enable -->
+[![Twitter URL](https://img.shields.io/twitter/url?label=%40AiPicovoice&style=social&url=https%3A%2F%2Ftwitter.com%2FAiPicovoice)](https://twitter.com/AiPicovoice)<!-- markdown-link-check-disable-line -->
 [![YouTube Channel Views](https://img.shields.io/youtube/channel/views/UCAdi9sTCXLosG1XeqDwLx7w?label=YouTube&style=social)](https://www.youtube.com/channel/UCAdi9sTCXLosG1XeqDwLx7w)
 
 Koala is an on-device noise suppression engine. Koala is:
