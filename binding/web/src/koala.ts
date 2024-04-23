@@ -609,7 +609,7 @@ export class Koala {
     }
 
     const delaySample = memoryBufferView.getInt32(delaySampleAddress, true);
-    await pv_free(delaySample);
+    await pv_free(delaySampleAddress);
 
     const frameLength = await pv_koala_frame_length();
     const sampleRate = await pv_sample_rate();
