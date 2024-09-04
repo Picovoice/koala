@@ -1,5 +1,5 @@
 #
-# Copyright 2023 Picovoice Inc.
+# Copyright 2023-2024 Picovoice Inc.
 #
 # You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 # file accompanying this source.
@@ -15,7 +15,7 @@ import shutil
 import setuptools
 
 INCLUDE_FILES = ('../../LICENSE', '__init__.py', '_factory.py', '_koala.py', '_util.py')
-INCLUDE_LIBS = ('common', 'jetson', 'linux', 'mac', 'raspberry-pi', 'windows')
+INCLUDE_LIBS = ('common', 'linux', 'mac', 'raspberry-pi', 'windows')
 
 os.system('git clean -dfx')
 
@@ -42,7 +42,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
 
 setuptools.setup(
     name="pvkoala",
-    version="2.0.1",
+    version="2.0.2",
     author="Picovoice",
     author_email="hello@picovoice.ai",
     description="Koala Noise Suppression Engine.",

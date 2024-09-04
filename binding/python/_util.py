@@ -54,7 +54,6 @@ _RASPBERRY_PI_MACHINES = {
     "cortex-a53-aarch64",
     "cortex-a72-aarch64",
     "cortex-a76-aarch64"}
-_JETSON_MACHINES = {'cortex-a57-aarch64'}
 
 
 def default_library_path(relative: str = '') -> str:
@@ -67,8 +66,6 @@ def default_library_path(relative: str = '') -> str:
         linux_machine = _linux_machine()
         if linux_machine == 'x86_64':
             return os.path.join(os.path.dirname(__file__), relative, 'lib/linux/x86_64/libpv_koala.so')
-        elif linux_machine in _JETSON_MACHINES:
-            return os.path.join(os.path.dirname(__file__), relative, 'lib/jetson/%s/libpv_koala.so' % linux_machine)
         elif linux_machine in _RASPBERRY_PI_MACHINES:
             return os.path.join(
                 os.path.dirname(__file__),
