@@ -28,7 +28,7 @@ if (rootProject.file("local.properties").exists()) {
 }
 
 android {
-    compileSdkVersion defaultTargetSdkVersion
+    compileSdk defaultTargetSdkVersion
 
     defaultConfig {
         applicationId "ai.picovoice.koala.testapp"
@@ -104,6 +104,7 @@ android {
     lint {
         abortOnError false
     }
+    namespace 'ai.picovoice.koala.testapp'
 }
 
 dependencies {
