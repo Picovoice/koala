@@ -28,7 +28,7 @@ if (rootProject.file("local.properties").exists()) {
 }
 
 android {
-    compileSdkVersion defaultTargetSdkVersion
+    compileSdk defaultTargetSdkVersion
 
     defaultConfig {
         applicationId "ai.picovoice.koala.testapp"
@@ -104,6 +104,7 @@ android {
     lint {
         abortOnError false
     }
+    namespace 'ai.picovoice.koala.testapp'
 }
 
 dependencies {
@@ -119,13 +120,16 @@ dependencies {
     androidTestImplementation('androidx.test.espresso:espresso-core:3.2.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    androidTestImplementation('com.microsoft.appcenter:espresso-test-extension:1.4')
     androidTestImplementation('androidx.test.espresso:espresso-intents:3.5.1')
 }
 
 afterEvaluate {
         tasks."mergeDebugAssets".dependsOn "copyParams"
         tasks."mergeReleaseAssets".dependsOn "copyParams"
+        tasks."generateReleaseLintVitalReportModel".dependsOn "copyParams"
+        tasks."lintVitalAnalyzeRelease".dependsOn "copyParams"
         tasks."mergeDebugAssets".dependsOn "copyAudio"
         tasks."mergeReleaseAssets".dependsOn "copyAudio"
+        tasks."generateReleaseLintVitalReportModel".dependsOn "copyAudio"
+        tasks."lintVitalAnalyzeRelease".dependsOn "copyAudio"
 }

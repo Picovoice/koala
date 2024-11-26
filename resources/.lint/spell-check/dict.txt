@@ -44,4 +44,5 @@ styleable
 testapp
 wargv
 wchars
+xcuitest
 xcworkspace
