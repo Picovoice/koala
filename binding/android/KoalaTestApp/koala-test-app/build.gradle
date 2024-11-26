@@ -126,6 +126,10 @@ dependencies {
 afterEvaluate {
         tasks."mergeDebugAssets".dependsOn "copyParams"
         tasks."mergeReleaseAssets".dependsOn "copyParams"
+        tasks."generateReleaseLintVitalReportModel".dependsOn "copyParams"
+        tasks."lintVitalAnalyzeRelease".dependsOn "copyParams"
         tasks."mergeDebugAssets".dependsOn "copyAudio"
         tasks."mergeReleaseAssets".dependsOn "copyAudio"
+        tasks."generateReleaseLintVitalReportModel".dependsOn "copyAudio"
+        tasks."lintVitalAnalyzeRelease".dependsOn "copyAudio"
 }
