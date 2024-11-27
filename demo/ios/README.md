@@ -16,4 +16,4 @@ Before building the demo app, run the following from `KoalaDemo` directory to in
 pod install
 ```
 
-Open [KoalaDemo.xcworkspace](./KoalaDemo/KoalaDemo.xcworkspace) and run the demo.
+Open [KoalaDemo.xcodeproj](./KoalaDemo/KoalaDemo.xcodeproj) and run the demo.
