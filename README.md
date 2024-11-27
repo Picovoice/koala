@@ -92,7 +92,7 @@ Before building the demo app, run the following from [`KoalaDemo`](./demo/ios/Ko
 pod install
 ```
 
-Open [KoalaDemo.xcworkspace](./demo/ios/KoalaDemo/KoalaDemo.xcworkspace) and run the demo.
+Open [KoalaDemo.xcodeproj](./demo/ios/KoalaDemo/KoalaDemo.xcodeproj) and run the demo.
 
 
 ### C Demos
