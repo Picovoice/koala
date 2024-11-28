@@ -61,7 +61,7 @@ jobs:
       - name: XCode Build
         run: xcrun xcodebuild build-for-testing
           -configuration Debug
-          -project  KoalaAppTest.xcodeproj
+          -project KoalaAppTest.xcodeproj
           -sdk iphoneos
           -scheme PerformanceTest
           -derivedDataPath ddp

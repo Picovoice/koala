@@ -14,6 +14,12 @@ import PvKoala
 /// iOS binding for Koala Noise Suppression Engine. Provides a Swift interface to the Koala library.
 public class Koala {
 
+#if SWIFT_PACKAGE
+
+    static let resourceBundle = Bundle.module
+
+#else
+
     static let resourceBundle: Bundle = {
         let myBundle = Bundle(for: Koala.self)
 
@@ -30,6 +36,8 @@ public class Koala {
 
         return resourceBundle
     }()
+
+#endif
 
     private var handle: OpaquePointer?
 
