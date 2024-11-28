@@ -19,8 +19,15 @@ Koala is an on-device noise suppression engine. Koala is:
 
 ## Installation
 <!-- markdown-link-check-disable -->
-The Koala iOS binding is available via [CocoaPods](https://cocoapods.org/pods/Koala-iOS). To import it into your iOS project, add the following line to your Podfile:
+The Koala iOS binding is available via [Swift Package Manager](https://www.swift.org/documentation/package-manager/) or [CocoaPods](https://cocoapods.org/pods/Koala-iOS).
 <!-- markdown-link-check-enable -->
+
+To import the package using SPM, open up your project's Package Dependencies in XCode and add:
+```
+https://github.com/Picovoice/koala.git
+```
+To import it into your iOS project using CocoaPods, add the following line to your Podfile:
+
 ```ruby
 pod 'Koala-iOS'
 ```
@@ -79,9 +86,7 @@ When done be sure to explicitly release the resources using `koala.delete()`.
 
 ## Running Unit Tests
 
-- Run `pod install` in the [`KoalaAppTest`](./KoalaAppTest) directory
-- Copy your `AccessKey` into the `accessKey` variable in [`KoalaAppTestUITests.swift`](./KoalaAppTest/KoalaAppTestUITests/KoalaAppTestUITests.swift)
-- Open [`KoalaAppTest.xcworkspace`](KoalaAppTest/KoalaAppTest.xcworkspace) with XCode and run the tests with `Product > Test`.
+Copy your `AccessKey` into the `accessKey` variable in [`KoalaAppTestUITests.swift`](KoalaAppTest/KoalaAppTestUITests/KoalaAppTestUITests.swift). Open [`KoalaAppTest.xcodeproj`](KoalaAppTest/KoalaAppTest.xcodeproj) with XCode and run the tests with `Product > Test`.
 
 ## Demo App
 

@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name = 'Koala-iOS'
   s.module_name = 'Koala'
-  s.version = '2.0.0'
+  s.version = '2.0.1'
   s.license = {:type => 'Apache 2.0'}
   s.summary = 'iOS SDK for Picovoice\'s Koala Noise Suppression Engine'
   s.description =
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   DESC
   s.homepage = 'https://github.com/Picovoice/koala/tree/main/binding/ios'
   s.author = { 'Picovoice' => 'hello@picovoice.ai' }
-  s.source = { :git => "https://github.com/Picovoice/koala.git", :tag => "Koala-iOS-v2.0.0" }
+  s.source = { :git => "https://github.com/Picovoice/koala.git", :tag => s.version.to_s }
   s.ios.deployment_target = '13.0'
   s.swift_version = '5.0'
   s.vendored_frameworks = 'lib/ios/PvKoala.xcframework'
