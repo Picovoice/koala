@@ -44,5 +44,7 @@ styleable
 testapp
 wargv
 wchars
+xcframework
+xcodeproj
 xcuitest
 xcworkspace
