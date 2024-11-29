@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -236,7 +236,7 @@
 			);
 			mainGroup = 1E00654B27CFF7EB006FF6E9;
 			packageReferences = (
-				E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */,
+				E1CF9E222CFA572A004BA9A9 /* XCRemoteSwiftPackageReference "koala" */,
 			);
 			productRefGroup = 1E00655527CFF7EB006FF6E9 /* Products */;
 			projectDirPath = "";
@@ -655,6 +655,17 @@
 			relativePath = ../../../../koala;
 		};
 /* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E1CF9E222CFA572A004BA9A9 /* XCRemoteSwiftPackageReference "koala" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Picovoice/koala";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		E1B2D78C2CF6B30800A28024 /* Koala */ = {

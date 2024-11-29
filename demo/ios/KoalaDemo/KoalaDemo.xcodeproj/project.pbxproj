@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -13,6 +13,7 @@
 		32769B2E1B2C5A2A897FFB10 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32769F3923C69C8C0C435CCF /* ContentView.swift */; };
 		E1B2D7872CF6A06100A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D7862CF6A06100A28024 /* Koala */; };
 		E1B2D78A2CF6A07100A28024 /* ios_voice_processor in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D7892CF6A07100A28024 /* ios_voice_processor */; };
+		E1CF9E212CFA53BD004BA9A9 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1CF9E202CFA53BD004BA9A9 /* Koala */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1CF9E212CFA53BD004BA9A9 /* Koala in Frameworks */,
 				E1B2D78A2CF6A07100A28024 /* ios_voice_processor in Frameworks */,
 				E1B2D7872CF6A06100A28024 /* Koala in Frameworks */,
 			);
@@ -109,8 +111,8 @@
 			);
 			mainGroup = 327692BCE8C735F3534C318E;
 			packageReferences = (
-				E1B2D7852CF6A06100A28024 /* XCLocalSwiftPackageReference "../../../../koala" */,
 				E1B2D7882CF6A07100A28024 /* XCRemoteSwiftPackageReference "ios-voice-processor" */,
+				E1CF9E1F2CFA53BD004BA9A9 /* XCRemoteSwiftPackageReference "koala" */,
 			);
 			productRefGroup = 32769B87809678D96B1C6C55 /* Products */;
 			projectDirPath = "";
@@ -351,13 +353,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		E1B2D7852CF6A06100A28024 /* XCLocalSwiftPackageReference "../../../../koala" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../koala;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		E1B2D7882CF6A07100A28024 /* XCRemoteSwiftPackageReference "ios-voice-processor" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -365,6 +360,14 @@
 			requirement = {
 				kind = exactVersion;
 				version = 1.2.0;
+			};
+		};
+		E1CF9E1F2CFA53BD004BA9A9 /* XCRemoteSwiftPackageReference "koala" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Picovoice/koala";
+			requirement = {
+				kind = exactVersion;
+				version = 2.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -378,6 +381,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E1B2D7882CF6A07100A28024 /* XCRemoteSwiftPackageReference "ios-voice-processor" */;
 			productName = ios_voice_processor;
+		};
+		E1CF9E202CFA53BD004BA9A9 /* Koala */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1CF9E1F2CFA53BD004BA9A9 /* XCRemoteSwiftPackageReference "koala" */;
+			productName = Koala;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
