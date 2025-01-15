@@ -1,2 +1,2 @@
-../../binding/python/dist/pvkoala-2.0.3-py3-none-any.whl
+pvkoala==2.0.3
 pvrecorder==1.2.2
