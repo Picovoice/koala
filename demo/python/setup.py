@@ -32,7 +32,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Picovoice/koala",
     packages=["pvkoalademo"],
-    install_requires=["pvkoala==2.0.3", "pvrecorder==1.2.2"],
+    install_requires=["pvkoala==2.0.3", "pvrecorder==1.2.4"],
     include_package_data=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
