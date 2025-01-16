@@ -72,7 +72,10 @@ def default_library_path(relative: str = '') -> str:
                 relative,
                 'lib/raspberry-pi/%s/libpv_koala.so' % linux_machine)
     elif platform.system() == 'Windows':
-        return os.path.join(os.path.dirname(__file__), relative, 'lib/windows/amd64/libpv_koala.dll')
+        if platform.machine().lower() == 'amd64':
+            return os.path.join(os.path.dirname(__file__), relative, 'lib/windows/amd64/libpv_koala.dll')
+        elif platform.machine().lower() == 'arm64':
+            return os.path.join(os.path.dirname(__file__), relative, 'lib/windows/arm64/libpv_koala.dll')
 
     raise NotImplementedError('Unsupported platform.')
 
