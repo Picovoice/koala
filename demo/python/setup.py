@@ -22,9 +22,12 @@ with open(os.path.join(os.path.dirname(__file__), 'MANIFEST.in'), 'w') as f:
 with open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r') as f:
     long_description = f.read()
 
+with open(os.path.join(os.path.dirname(__file__), "requirements.txt"), "r") as f:
+    dependencies = f.read().strip().splitlines()
+
 setuptools.setup(
     name="pvkoalademo",
-    version="2.0.3",
+    version="2.0.4",
     author="Picovoice",
     author_email="hello@picovoice.ai",
     description="Koala Noise Suppression Engine demos",
@@ -32,7 +35,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Picovoice/koala",
     packages=["pvkoalademo"],
-    install_requires=["pvkoala==2.0.3", "pvrecorder==1.2.4"],
+    install_requires=dependencies,
     include_package_data=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -48,6 +51,6 @@ setuptools.setup(
             'koala_demo_mic=pvkoalademo.koala_demo_mic:main',
         ],
     ),
-    python_requires='>=3.8',
+    python_requires='>=3.9',
     keywords="Noise Cancellation, Noise Suppression, Noise Removal, Speech Enhancement, Speech Denoising",
 )
