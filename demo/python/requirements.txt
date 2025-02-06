@@ -1,2 +1,2 @@
-pvkoala==2.0.3
+pvkoala==2.0.4
 pvrecorder==1.2.4
