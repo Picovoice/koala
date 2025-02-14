@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <script src="node_modules/@picovoice/web-voice-processor/dist/iife/index.js"></script>
@@ -10,18 +10,17 @@
     <h1>Koala Web Demo</h1>
     <p>This demo uses Koala for Web and the WebVoiceProcessor to:</p>
     <ol>
+      <li>Create an instance of Koala with the model file provided.</li>
       <li>
-        Create an instance of Koala with the model file provided.
+        Select an audio file or acquire microphone (& ask permission) data
+        stream and convert to voice processing format (16kHz 16-bit linear PCM).
+        The downsampled audio is forwarded to the Koala engine. The audio
+        <i>does not</i> leave the browser: all processing is occurring via the
+        Koala WebAssembly code.
       </li>
       <li>
-        Select an audio file or acquire microphone (& ask permission) data stream and convert to voice
-        processing format (16kHz 16-bit linear PCM). The downsampled audio is
-        forwarded to the Koala engine. The audio <i>does not</i> leave the
-        browser: all processing is occurring via the Koala WebAssembly code.
-      </li>
-      <li>
-        Enhance audio real time using Koala engine. Output both original and enhanced
-        audio.
+        Enhance audio real time using Koala engine. Output both original and
+        enhanced audio.
       </li>
     </ol>
     After entering the AccessKey, click the "Start Koala" button.
@@ -37,29 +36,38 @@
       value="Start Koala"
       onclick="startKoala(document.getElementById('accessKey').value)"
     />
-    <hr/>
+    <hr />
     <div id="control" style="display: none">
       <label for="audioFile">Choose audio file to enhance:</label>
-      <input type="file" id="audioFile" name="audioFile"/>
+      <input type="file" id="audioFile" name="audioFile" />
       <p><b>OR</b></p>
-      <label for="recordAudio">Record audio to enhance (up to 2 minutes):</label>
+      <label for="recordAudio"
+        >Record audio to enhance (up to 2 minutes):</label
+      >
       <button id="recordAudio">Record Audio</button>
-      <span id="displayTimer" style="display: none;"></span>
-      <button id="stopRecord" style="display: none;">Stop Recording</button>
-      <hr/>
+      <span id="displayTimer" style="display: none"></span>
+      <button id="stopRecord" style="display: none">Stop Recording</button>
+      <hr />
     </div>
     <div id="status"></div>
-    <br>
+    <br />
     <div id="result" style="display: none">
       <label>
         Original
-        <input type="range" id="volumeControl" min="0" max="1" value="1" step="0.01" />
+        <input
+          type="range"
+          id="volumeControl"
+          min="0"
+          max="1"
+          value="1"
+          step="0.01"
+        />
         Koalafied
-        <br>
-        <br>
+        <br />
+        <br />
         <button id="playAudio">Play</button>
       </label>
     </div>
-    <br>
+    <br />
   </body>
 </html>
