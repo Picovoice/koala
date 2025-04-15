@@ -13,7 +13,7 @@ Signup or Login to [Picovoice Console](https://console.picovoice.ai/) to get you
 
 ## Requirements
 
-- The demo requires [CMake](https://cmake.org/) version 3.4 or higher.
+- The demo requires [CMake](https://cmake.org/) version 3.13 or higher.
 - **For Windows Only**: [MinGW](https://www.mingw-w64.org/) is required to build the demo.
 
 # Microphone Demo
@@ -28,8 +28,11 @@ noise suppression engine and stored in a `.wav` file.
 Use CMake to build the Koala microphone demo target:
 
 ```console
-cmake -S demo/c/ -B demo/c/build && cmake --build demo/c/build --target koala_demo_mic
+cmake -S demo/c/ -B demo/c/build -DPV_RECORDER_PLATFORM={PV_RECORDER_PLATFORM}
+cmake --build demo/c/build --target koala_demo_mic
 ```
+
+The {PV_RECORDER_PLATFORM} variable will set the compilation flags for the given platform. Exclude this variable to get a list of possible values.
 
 ## Usage
 
@@ -70,8 +73,11 @@ linear PCM encoding.
 Use CMake to build the Koala file demo target:
 
 ```console
-cmake -S demo/c/ -B demo/c/build && cmake --build demo/c/build --target koala_demo_file
+cmake -S demo/c/ -B demo/c/build -DPV_RECORDER_PLATFORM={PV_RECORDER_PLATFORM}
+cmake --build demo/c/build --target koala_demo_file
 ```
+
+The {PV_RECORDER_PLATFORM} variable will set the compilation flags for the given platform. Exclude this variable to get a list of possible values.
 
 ## Usage
 

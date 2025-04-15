@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.13)
 project(koala_demo_c)
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_BUILD_TYPE Release)
-add_subdirectory(pvrecorder)
+add_subdirectory(pvrecorder/project)
 
 set(COMMON_LIBS dl m)
 include_directories("${PROJECT_SOURCE_DIR}/../../include")
@@ -17,7 +17,7 @@ add_executable(
         koala_demo_mic
         koala_demo_mic.c
         $<TARGET_OBJECTS:pv_recorder_object>)
-target_include_directories(koala_demo_mic PRIVATE dr_libs pvrecorder/include)
+target_include_directories(koala_demo_mic PRIVATE dr_libs pvrecorder/project/include)
 
 
 if (NOT WIN32)
