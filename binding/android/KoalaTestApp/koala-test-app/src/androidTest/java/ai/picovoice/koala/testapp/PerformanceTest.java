@@ -36,12 +36,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.HashSet;
+import java.util.Set;
 
 import ai.picovoice.koala.Koala;
 
 @RunWith(AndroidJUnit4.class)
 public class PerformanceTest {
 
+    static Set<String> extractedFiles = new HashSet<>();
     Context testContext;
     Context appContext;
     AssetManager assetManager;
@@ -53,7 +56,6 @@ public class PerformanceTest {
         testContext = InstrumentationRegistry.getInstrumentation().getContext();
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         assetManager = testContext.getAssets();
-        extractAssetsRecursively("test_resources");
         testResourcesPath = new File(appContext.getFilesDir(), "test_resources").getAbsolutePath();
 
         accessKey = appContext.getString(R.string.pvTestingAccessKey);
@@ -73,7 +75,7 @@ public class PerformanceTest {
         double performanceThresholdSec = Double.parseDouble(thresholdString);
 
         Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
-        File testAudio = new File(testResourcesPath, "audio/test.wav");
+        File testAudio = new File(getAudioFilepath("test.wav"));
 
         long totalNSec = 0;
         for (int i = 0; i < numTestIterations; i++) {
@@ -106,27 +108,38 @@ public class PerformanceTest {
         );
     }
 
-    private void extractAssetsRecursively(String path) throws IOException {
-        String[] list = assetManager.list(path);
-        if (list.length > 0) {
-            File outputFile = new File(appContext.getFilesDir(), path);
-            if (!outputFile.exists()) {
-                outputFile.mkdirs();
-            }
-
-            for (String file : list) {
-                String filepath = path + "/" + file;
-                extractAssetsRecursively(filepath);
-            }
-        } else {
-            extractTestFile(path);
-        }
+    public String getAudioFilepath(String audioFilename) throws IOException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        String resPath = new File(
+                context.getFilesDir(),
+                "test_resources").getAbsolutePath();
+        extractTestFile(String.format("test_resources/audio/%s", audioFilename));
+        return new File(resPath, String.format("audio/%s", audioFilename)).getAbsolutePath();
     }
 
     private void extractTestFile(String filepath) throws IOException {
-        InputStream is = new BufferedInputStream(assetManager.open(filepath), 256);
-        File absPath = new File(appContext.getFilesDir(), filepath);
-        OutputStream os = new BufferedOutputStream(new FileOutputStream(absPath), 256);
+        File absPath = new File(
+                appContext.getFilesDir(),
+                filepath);
+
+        if (extractedFiles.contains(filepath)) {
+            return;
+        }
+
+        if (!absPath.exists()) {
+            if (absPath.getParentFile() != null) {
+                absPath.getParentFile().mkdirs();
+            }
+            absPath.createNewFile();
+        }
+
+        InputStream is = new BufferedInputStream(
+                assetManager.open(filepath),
+                256);
+        OutputStream os = new BufferedOutputStream(
+                new FileOutputStream(absPath),
+                256);
+
         int r;
         while ((r = is.read()) != -1) {
             os.write(r);
@@ -135,5 +148,8 @@ public class PerformanceTest {
 
         is.close();
         os.close();
+
+        extractedFiles.add(filepath);
+
     }
 }

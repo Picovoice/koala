@@ -37,6 +37,8 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -48,6 +50,7 @@ import ai.picovoice.koala.KoalaException;
 @RunWith(AndroidJUnit4.class)
 public class KoalaTest {
 
+    static Set<String> extractedFiles = new HashSet<>();
     Context testContext;
     Context appContext;
     AssetManager assetManager;
@@ -60,7 +63,6 @@ public class KoalaTest {
         testContext = InstrumentationRegistry.getInstrumentation().getContext();
         appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         assetManager = testContext.getAssets();
-        extractAssetsRecursively("test_resources");
         testResourcesPath = new File(appContext.getFilesDir(), "test_resources").getAbsolutePath();
 
         accessKey = appContext.getString(R.string.pvTestingAccessKey);
@@ -125,20 +127,20 @@ public class KoalaTest {
 
     @Test
     public void testPureSpeech() throws KoalaException, IOException {
-        List<Short> testPcm = loadPcm(new File(testResourcesPath, "audio/test.wav"));
+        List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
         runTest(testPcm, testPcm, 0.02);
     }
 
     @Test
     public void testPureNoise() throws KoalaException, IOException {
-        List<Short> noisePcm = loadPcm(new File(testResourcesPath, "audio/noise.wav"));
+        List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
         runTest(noisePcm, null, 0.02);
     }
 
     @Test
     public void testMixed() throws KoalaException, IOException {
-        List<Short> testPcm = loadPcm(new File(testResourcesPath, "audio/test.wav"));
-        List<Short> noisePcm = loadPcm(new File(testResourcesPath, "audio/noise.wav"));
+        List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
+        List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
         List<Short> mixedPcm = new ArrayList<>();
         for (int i = 0; i < testPcm.size(); i++) {
             Short mixed = (short) (testPcm.get(i) + noisePcm.get(i));
@@ -150,7 +152,7 @@ public class KoalaTest {
     @Test
     public void testReset() throws KoalaException, IOException {
         Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
-        List<Short> testPcm = loadPcm(new File(testResourcesPath, "audio/test.wav"));
+        List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
 
         List<short[]> referenceFrames = new ArrayList<>();
 
@@ -178,24 +180,6 @@ public class KoalaTest {
         assertTrue(koala.getVersion().length() > 0);
     }
 
-    private void extractAssetsRecursively(String path) throws IOException {
-
-        String[] list = assetManager.list(path);
-        if (list.length > 0) {
-            File outputFile = new File(appContext.getFilesDir(), path);
-            if (!outputFile.exists()) {
-                outputFile.mkdirs();
-            }
-
-            for (String file : list) {
-                String filepath = path + "/" + file;
-                extractAssetsRecursively(filepath);
-            }
-        } else {
-            extractTestFile(path);
-        }
-    }
-
     @Test
     public void testErrorStack() {
         String[] error = {};
@@ -221,11 +205,38 @@ public class KoalaTest {
         }
     }
 
-    private void extractTestFile(String filepath) throws IOException {
+    public String getAudioFilepath(String audioFilename) throws IOException {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        String resPath = new File(
+                context.getFilesDir(),
+                "test_resources").getAbsolutePath();
+        extractTestFile(String.format("test_resources/audio/%s", audioFilename));
+        return new File(resPath, String.format("audio/%s", audioFilename)).getAbsolutePath();
+    }
 
-        InputStream is = new BufferedInputStream(assetManager.open(filepath), 256);
-        File absPath = new File(appContext.getFilesDir(), filepath);
-        OutputStream os = new BufferedOutputStream(new FileOutputStream(absPath), 256);
+    private void extractTestFile(String filepath) throws IOException {
+        File absPath = new File(
+                appContext.getFilesDir(),
+                filepath);
+
+        if (extractedFiles.contains(filepath)) {
+            return;
+        }
+
+        if (!absPath.exists()) {
+            if (absPath.getParentFile() != null) {
+                absPath.getParentFile().mkdirs();
+            }
+            absPath.createNewFile();
+        }
+
+        InputStream is = new BufferedInputStream(
+                assetManager.open(filepath),
+                256);
+        OutputStream os = new BufferedOutputStream(
+                new FileOutputStream(absPath),
+                256);
+
         int r;
         while ((r = is.read()) != -1) {
             os.write(r);
@@ -234,5 +245,8 @@ public class KoalaTest {
 
         is.close();
         os.close();
+
+        extractedFiles.add(filepath);
+
     }
 }
