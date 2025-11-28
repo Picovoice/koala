@@ -42,6 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        device: [ cpu ]
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
         - os: ubuntu-latest
@@ -71,6 +72,7 @@ jobs:
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
+        --device ${{ matrix.device }}
 
   perf-self-hosted:
     runs-on: ${{ matrix.machine }}
@@ -78,6 +80,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        device: [ cpu ]
         machine: [rpi3-32, rpi3-64, rpi4-32, rpi4-64, rpi5-64]
         include:
         - machine: rpi3-32
@@ -107,21 +110,32 @@ jobs:
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
+        --device ${{ matrix.device }}
 
     - name: Machine state after
       working-directory: resources/scripts
       run: bash machine-state.sh
 
-  perf-windows-arm64:
+  perf-self-hosted-desktop:
     runs-on: ${{ matrix.machine }}
 
     strategy:
       fail-fast: false
       matrix:
-        machine: [pv-windows-arm64]
+        device: [ gpu ]
+        machine: [ pv-linux, pv-windows, pv-windows-igpu, pv-ios ]
         include:
-        - machine: pv-windows-arm64
-          proc_performance_threshold_sec: 0.8
+          - device: cpu
+            machine: pv-windows-arm64
+            performance_threshold_sec: 0.8
+          - machine: pv-linux
+            performance_threshold_sec: 0.8
+          - machine: pv-windows
+            performance_threshold_sec: 0.8
+          - machine: pv-windows-igpu
+            performance_threshold_sec: 0.8
+          - machine: pv-ios
+            performance_threshold_sec: 0.8
 
     steps:
     - uses: actions/checkout@v3
@@ -135,3 +149,4 @@ jobs:
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
+        --device ${{ matrix.device }}
