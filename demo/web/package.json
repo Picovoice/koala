@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "postinstall": "npx pvbase64 -i ../../lib/common/koala_params.pv -o ./koala_params.js",
-    "start": "yarn run http-server -a localhost -p 5000"
+    "start": "node server.js -a localhost -p 5000"
   },
   "keywords": [
     "Picovoice",
@@ -18,8 +18,9 @@
   "author": "Picovoice Inc",
   "license": "Apache-2.0",
   "dependencies": {
-    "@picovoice/koala-web": "=2.0.0",
-    "@picovoice/web-voice-processor": "~4.0.8"
+    "@picovoice/koala-web": "../../binding/web",
+    "@picovoice/web-voice-processor": "~4.0.8",
+    "mime-types": "^2.1.35"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",

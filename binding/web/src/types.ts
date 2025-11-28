@@ -1,5 +1,5 @@
 /*
-  Copyright 2023 Picovoice Inc.
+  Copyright 2023-2025 Picovoice Inc.
 
   You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
   file accompanying this source.
@@ -35,6 +35,8 @@ export type KoalaModel = PvModel;
 
 export type KoalaOptions = {
   /** @defaultValue undefined */
+  device?: string;
+  /** @defaultValue undefined */
   processErrorCallback?: (error: KoalaError) => void;
 };
 
@@ -43,8 +45,10 @@ export type KoalaWorkerInitRequest = {
   accessKey: string;
   modelPath: string;
   options: KoalaOptions;
-  wasm: string;
   wasmSimd: string;
+  wasmSimdLib: string;
+  wasmPThread: string;
+  wasmPThreadLib: string;
   sdk: string;
 };
 
