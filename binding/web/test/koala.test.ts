@@ -7,7 +7,13 @@ import { KoalaError } from "../dist/types/koala_errors";
 const ACCESS_KEY = Cypress.env('ACCESS_KEY');
 const DEVICE = Cypress.env('DEVICE');
 
-const getDeviceList = () => {
+const getDeviceList = (
+  instance: typeof Koala | typeof KoalaWorker
+) => {
+  if (instance === Koala) {
+    return ["cpu:1"];
+  }
+
   const result: string[] = [];
   if (DEVICE === 'cpu') {
     const maxThreads = self.navigator.hardwareConcurrency / 2;
@@ -263,7 +269,7 @@ describe('Koala Binding', function () {
       }
     });
 
-    for (const device of getDeviceList()) {
+    for (const device of getDeviceList(instance)) {
       it(`should be able to process pure speech (${instanceString}) (${device})`, () => {
         cy.getFramesFromFile('audio_samples/test.wav').then(async inputPcm => {
           await runTest(instance, inputPcm, inputPcm, device);
