@@ -1,5 +1,5 @@
 //
-//  Copyright 2023 Picovoice Inc.
+//  Copyright 2023-2025 Picovoice Inc.
 //  You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 //  file accompanying this source.
 //  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
@@ -13,6 +13,7 @@ import Koala
 
 class KoalaDemoUITests: XCTestCase {
     let accessKey: String = "{TESTING_ACCESS_KEY_HERE}"
+    let device: String = "{TESTING_DEVICE_HERE}"
 
     let testAudioUrl = Bundle(for: KoalaDemoUITests.self).url(forResource: "test", withExtension: "wav")!
     let noiseAudioUrl = Bundle(for: KoalaDemoUITests.self).url(forResource: "noise", withExtension: "wav")!
@@ -49,9 +50,8 @@ class KoalaDemoUITests: XCTestCase {
         return pcm
     }
 
-    func runTest(inputPcm: [Int16], refPcm: [Int16]? = nil, tolerance: Float = 0.02) throws {
-
-        try koala!.reset()
+    func runTest(device: String, inputPcm: [Int16], refPcm: [Int16]? = nil, tolerance: Float = 0.02) throws {
+        koala = try Koala(accessKey: accessKey, device: device)
 
         let frameLength = Int(Koala.frameLength)
         for frameStart in stride(from: 0, to: inputPcm.count - frameLength + 1, by: frameLength) {
@@ -70,29 +70,47 @@ class KoalaDemoUITests: XCTestCase {
 
             XCTAssertLessThan(energyDeviation, tolerance)
         }
+
+        koala!.delete()
+        koala = nil
     }
 
     func testPureSpeech() throws {
+        let devices = getTestDevices()
+
         let testPcm = try getPcm(fileUrl: testAudioUrl)
 
-        koala = try Koala(accessKey: accessKey)
-        try runTest(inputPcm: testPcm, refPcm: testPcm)
+        for device in devices {
+            try XCTContext.runActivity(named: "\(device)") { _ in
+                try runTest(device: device, inputPcm: testPcm, refPcm: testPcm)
+            }
+        }
     }
 
     func testPureNoise() throws {
+        let devices = getTestDevices()
+
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
 
-        koala = try Koala(accessKey: accessKey)
-        try runTest(inputPcm: noisePcm)
+        for device in devices {
+            try XCTContext.runActivity(named: "\(device)") { _ in
+                try runTest(device: device, inputPcm: noisePcm)
+            }
+        }
     }
 
     func testMixed() throws {
+        let devices = getTestDevices()
+
         let testPcm = try getPcm(fileUrl: testAudioUrl)
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
         let mixPcm: [Int16] = zip(testPcm, noisePcm).map(+)
 
-        koala = try Koala(accessKey: accessKey)
-        try runTest(inputPcm: mixPcm, refPcm: testPcm)
+        for device in devices {
+            try XCTContext.runActivity(named: "\(device)") { _ in
+                try runTest(device: device, inputPcm: mixPcm, refPcm: testPcm)
+            }
+        }
     }
 
     func testReset() throws {
@@ -169,5 +187,24 @@ class KoalaDemoUITests: XCTestCase {
         } catch {
             XCTAssert("\(error.localizedDescription)".count > 0)
         }
+    }
+
+    private func getTestDevices() -> [String] {
+        var result: [String] = []
+
+        if device == "cpu" {
+            let cores = ProcessInfo.processInfo.processorCount
+            let maxThreads = cores / 2
+
+            var i = 1
+            while i <= maxThreads {
+                result.append("cpu:\(i)")
+                i *= 2
+            }
+        } else {
+            result.append(device)
+        }
+
+        return result
     }
 }

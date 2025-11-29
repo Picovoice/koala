@@ -1,5 +1,5 @@
 //
-//  Copyright 2023-2024 Picovoice Inc.
+//  Copyright 2023-2025 Picovoice Inc.
 //  You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 //  file accompanying this source.
 //  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
@@ -65,10 +65,16 @@ public class Koala {
     /// - Parameters:
     ///   - accessKey: The AccessKey obtained from Picovoice Console (https://console.picovoice.ai).
     ///   - modelPath: Absolute path to file containing model parameters.
+    ///   - device: String representation of the device (e.g., CPU or GPU) to use. If set to `best`, the most
+    ///     suitable device is selected automatically. If set to `gpu`, the engine uses the first available GPU device. To select a specific
+    ///     GPU device, set this argument to `gpu:${GPU_INDEX}`, where `${GPU_INDEX}` is the index of the target GPU. If set to
+    ///     `cpu`, the engine will run on the CPU with the default number of threads. To specify the number of threads, set this
+    ///     argument to `cpu:${NUM_THREADS}`, where `${NUM_THREADS}` is the desired number of threads.
     /// - Throws: KoalaError
     public init(
             accessKey: String,
-            modelPath: String? = nil) throws {
+            modelPath: String? = nil,
+            device: String? = nil) throws {
 
         if accessKey.count == 0 {
             throw KoalaInvalidArgumentError("AccessKey is required for Koala initialization")
@@ -86,11 +92,17 @@ public class Koala {
             modelPathArg = try getResourcePath(modelPathArg!)
         }
 
+        var deviceArg = device
+        if deviceArg == nil {
+            deviceArg = "cpu:1"
+        }
+
         pv_set_sdk(Koala.sdk)
 
         var status = pv_koala_init(
                 accessKey,
                 modelPathArg,
+                deviceArg,
                 &self.handle)
         if status != PV_STATUS_SUCCESS {
             let messageStack = try getMessageStack()
