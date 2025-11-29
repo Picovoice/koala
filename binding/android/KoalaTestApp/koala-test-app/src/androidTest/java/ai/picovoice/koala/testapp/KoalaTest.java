@@ -1,5 +1,5 @@
 /*
-    Copyright 2023 Picovoice Inc.
+    Copyright 2023-2025 Picovoice Inc.
     You may not use this file except in compliance with the license. A copy of the license is
     located in the "LICENSE" file accompanying this source.
     Unless required by applicable law or agreed to in writing, software distributed under the
@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -103,8 +104,11 @@ public class KoalaTest {
         return output;
     }
 
-    private void runTest(List<Short> inputPcm, List<Short> referencePcm, double tolerance) throws KoalaException {
-        Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
+    private void runTest(String device, List<Short> inputPcm, List<Short> referencePcm, double tolerance) throws KoalaException {
+        Koala koala = new Koala.Builder()
+        .setAccessKey(accessKey)
+        .setDevice(device)
+        .build(getApplicationContext());
 
         for (int i = 0; i < (inputPcm.size() - koala.getFrameLength()); i += koala.getFrameLength()) {
             short[] frame = frameFromList(inputPcm, i, koala.getFrameLength());
@@ -125,28 +129,49 @@ public class KoalaTest {
         }
     }
 
-    @Test
-    public void testPureSpeech() throws KoalaException, IOException {
-        List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
-        runTest(testPcm, testPcm, 0.02);
-    }
+    @RunWith(Parameterized.class)
+    public static class ProcessTests extends KoalaTest {
+        @Parameterized.Parameter(value = 0)
+        public String device;
 
-    @Test
-    public void testPureNoise() throws KoalaException, IOException {
-        List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
-        runTest(noisePcm, null, 0.02);
-    }
+        @Parameterized.Parameters(name = "{0}")
+        public static Collection<Object[]> initParameters() throws IOException {
+            List<Object[]> parameters = new ArrayList<>();
 
-    @Test
-    public void testMixed() throws KoalaException, IOException {
-        List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
-        List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
-        List<Short> mixedPcm = new ArrayList<>();
-        for (int i = 0; i < testPcm.size(); i++) {
-            Short mixed = (short) (testPcm.get(i) + noisePcm.get(i));
-            mixedPcm.add(mixed);
+            List<String> devices = getTestDevices();
+
+            for (String device : devices) {
+                parameters.add(new Object[]{
+                    device
+                });
+            }
+
+            return parameters;
         }
-        runTest(mixedPcm, testPcm, 0.02);
+
+        @Test
+        public void testPureSpeech() throws KoalaException, IOException {
+            List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
+            runTest(testPcm, testPcm, 0.02);
+        }
+
+        @Test
+        public void testPureNoise() throws KoalaException, IOException {
+            List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
+            runTest(noisePcm, null, 0.02);
+        }
+
+        @Test
+        public void testMixed() throws KoalaException, IOException {
+            List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
+            List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
+            List<Short> mixedPcm = new ArrayList<>();
+            for (int i = 0; i < testPcm.size(); i++) {
+                Short mixed = (short) (testPcm.get(i) + noisePcm.get(i));
+                mixedPcm.add(mixed);
+            }
+            runTest(mixedPcm, testPcm, 0.02);
+        }
     }
 
     @Test
@@ -248,5 +273,23 @@ public class KoalaTest {
 
         extractedFiles.add(filepath);
 
+    }
+
+    private static ArrayList<String> getTestDevices() {
+        String device = InstrumentationRegistry.getInstrumentation().getTargetContext().getString(R.string.device);
+
+        ArrayList<String> result = new ArrayList<>();
+        if (device.equals("cpu")) {
+            int cores = Runtime.getRuntime().availableProcessors();
+            int maxThreads = cores / 2;
+
+            for (int i = 1; i <= maxThreads; i *= 2) {
+                result.add("cpu:" + i);
+            }
+        } else {
+            result.add(device);
+        }
+
+        return result;
     }
 }

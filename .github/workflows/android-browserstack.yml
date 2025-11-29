@@ -42,6 +42,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+############## REMOVE AFTER RELEASE ##########################
+    - name: Build binding
+      run: ./gradlew assembleRelease --info
+      working-directory: binding/android/Koala
+############## REMOVE AFTER RELEASE ##########################
+
     - name: Copy test_resources
       run: ./copy_test_resources.sh
 
@@ -54,6 +60,9 @@ jobs:
         echo keyPassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
         echo keyAlias=picovoice >> local.properties
         echo storeFile=../picovoice.jks >> local.properties
+
+    - name: Inject Device
+      run: echo device="cpu" >> local.properties
 
     - name: Setup Android keystore file
       run: echo "${{secrets.ANDROID_RELEASE_KEYSTORE_FILE_B64}}" | base64 -d > picovoice.jks
@@ -94,6 +103,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+############## REMOVE AFTER RELEASE ##########################
+    - name: Build binding
+      run: ./gradlew assembleRelease --info
+      working-directory: binding/android/Koala
+############## REMOVE AFTER RELEASE ##########################
+
     - name: Copy test_resources
       run: ./copy_test_resources.sh
 
@@ -106,6 +121,9 @@ jobs:
         echo keyPassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
         echo keyAlias=picovoice >> local.properties
         echo storeFile=../picovoice.jks >> local.properties
+
+    - name: Inject Device
+      run: echo device="cpu" >> local.properties
 
     - name: Setup Android keystore file
       run: echo "${{secrets.ANDROID_RELEASE_KEYSTORE_FILE_B64}}" | base64 -d > picovoice.jks

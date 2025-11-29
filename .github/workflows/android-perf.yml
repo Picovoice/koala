@@ -51,6 +51,12 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
+############## REMOVE AFTER RELEASE ##########################
+    - name: Build binding
+      run: ./gradlew assembleRelease --info
+      working-directory: binding/android/Koala
+############## REMOVE AFTER RELEASE ##########################
+
     - name: Copy test_resources
       run: ./copy_test_resources.sh
 
@@ -91,4 +97,3 @@ jobs:
         --devices "${{ matrix.device }}"
         --app_path "koala-test-app/build/outputs/apk/debug/koala-test-app-debug.apk"
         --test_path "koala-test-app/build/outputs/apk/androidTest/debug/koala-test-app-debug-androidTest.apk"
-
