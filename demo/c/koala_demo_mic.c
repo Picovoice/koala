@@ -99,11 +99,12 @@ static struct option long_options[] = {
         {"output_audio_path",    required_argument, NULL, 'o'},
         {"reference_audio_path", no_argument,       NULL, 'r'},
         {"show_audio_devices",   no_argument,       NULL, 's'},
+        {"device",               required_argument, NULL, 'y'},
 };
 
 static void print_usage(const char *program_name) {
     fprintf(stdout,
-            "Usage: %s [-s] [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH]\n",
+            "Usage: %s [-s] [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH -y DEVICE]\n",
             program_name);
 }
 
@@ -166,10 +167,11 @@ int picovoice_main(int argc, char *argv[]) {
     const char *output_path = NULL;
     const char *reference_path = NULL;
     const char *model_path = NULL;
+    const char *device = NULL;
     int32_t device_index = -1;
 
     int c;
-    while ((c = getopt_long(argc, argv, "hsl:a:d:o:m:r:", long_options, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "hsl:a:d:o:m:r:y:", long_options, NULL)) != -1) {
         switch (c) {
             case 's':
                 show_audio_devices();
@@ -192,6 +194,9 @@ int picovoice_main(int argc, char *argv[]) {
             case 'd':
                 device_index = (int32_t) strtol(optarg, NULL, 10);
                 break;
+            case 'y':
+                device = optarg;
+                break;
             default:
                 exit(EXIT_FAILURE);
         }
@@ -200,6 +205,10 @@ int picovoice_main(int argc, char *argv[]) {
     if (!library_path || !access_key || !output_path || !model_path) {
         print_usage(argv[0]);
         exit(EXIT_FAILURE);
+    }
+
+    if (device == NULL) {
+        device = "best";
     }
 
     drwav_data_format format;
@@ -273,6 +282,7 @@ int picovoice_main(int argc, char *argv[]) {
     pv_status_t (*pv_koala_init_func)(
             const char *,
             const char *,
+            const char *,
             pv_koala_t **) = load_symbol(koala_library, "pv_koala_init");
     if (!pv_koala_init_func) {
         print_dl_error("Failed to load 'pv_koala_init'");
@@ -319,7 +329,7 @@ int picovoice_main(int argc, char *argv[]) {
     }
 
     pv_koala_t *koala = NULL;
-    pv_status_t koala_status = pv_koala_init_func(access_key, model_path, &koala);
+    pv_status_t koala_status = pv_koala_init_func(access_key, model_path, device, &koala);
     if (koala_status != PV_STATUS_SUCCESS) {
         fprintf(stderr, "Failed to init with '%s'", pv_status_to_string_func(koala_status));
         char **message_stack = NULL;

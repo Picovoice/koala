@@ -1,9 +1,9 @@
 /*
-    Copyright 2023 Picovoice Inc.
+    Copyright 2023-2025 Picovoice Inc.
 
     You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
     file accompanying this source.
-    
+
     Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
     specific language governing permissions and limitations under the License.
@@ -92,12 +92,13 @@ static struct option long_options[] = {
         {"model_path",   required_argument, NULL, 'm'},
         {"input_path",   required_argument, NULL, 'i'},
         {"output_path",  required_argument, NULL, 'o'},
+        {"device",       required_argument, NULL, 'y'},
 };
 
 static void print_usage(const char *program_name) {
     fprintf(
             stdout,
-            "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH]\n",
+            "Usage: %s [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -i INPUT_PATH -o OUTPUT_PATH -y DEVICE]\n",
             program_name);
 }
 
@@ -129,9 +130,10 @@ int picovoice_main(int argc, char *argv[]) {
     const char *access_key = NULL;
     const char *input_path = NULL;
     const char *output_path = NULL;
+    const char *device = NULL;
 
     int c;
-    while ((c = getopt_long(argc, argv, "l:m:a:i:o:", long_options, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "l:m:a:i:o:y:", long_options, NULL)) != -1) {
         switch (c) {
             case 'l':
                 library_path = optarg;
@@ -148,6 +150,9 @@ int picovoice_main(int argc, char *argv[]) {
             case 'o':
                 output_path = optarg;
                 break;
+            case 'y':
+                device = optarg;
+                break;
             default:
                 exit(EXIT_FAILURE);
         }
@@ -156,6 +161,10 @@ int picovoice_main(int argc, char *argv[]) {
     if (!library_path || !access_key || !input_path || !output_path) {
         print_usage(argv[0]);
         exit(EXIT_FAILURE);
+    }
+
+    if (device == NULL) {
+        device = "best";
     }
 
     void *koala_library = open_dl(library_path);
@@ -177,7 +186,7 @@ int picovoice_main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    pv_status_t (*pv_koala_init_func)(const char *, const char *, pv_koala_t **) =
+    pv_status_t (*pv_koala_init_func)(const char *, const char *, const char *, pv_koala_t **) =
             load_symbol(koala_library, "pv_koala_init");
     if (!pv_koala_init_func) {
         print_dl_error("Failed to load 'pv_koala_init'");
@@ -229,7 +238,7 @@ int picovoice_main(int argc, char *argv[]) {
     }
 
     pv_koala_t *koala = NULL;
-    pv_status_t koala_status = pv_koala_init_func(access_key, model_path, &koala);
+    pv_status_t koala_status = pv_koala_init_func(access_key, model_path, device, &koala);
     if (koala_status != PV_STATUS_SUCCESS) {
         fprintf(stderr, "Failed to init with '%s'", pv_status_to_string_func(koala_status));
         char **message_stack = NULL;
