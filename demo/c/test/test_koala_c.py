@@ -13,24 +13,6 @@ import os.path
 import subprocess
 import sys
 import unittest
-from parameterized import parameterized
-
-
-def get_test_devices():
-    result = list()
-
-    device = sys.argv[3] if len(sys.argv) > 3 else "best"
-    if device == "cpu":
-        max_threads = os.cpu_count() // 2
-        i = 1
-
-        while i <= max_threads:
-            result.append(f"cpu:{i}")
-            i *= 2
-    else:
-        result.append(device)
-
-    return result
 
 
 class KoalaCTestCase(unittest.TestCase):
@@ -39,6 +21,7 @@ class KoalaCTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls._access_key = sys.argv[1]
         cls._platform = sys.argv[2]
+        cls._device = sys.argv[3]
         cls._arch = "" if len(sys.argv) != 5 else sys.argv[4]
         cls._root_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..")
 
@@ -70,15 +53,15 @@ class KoalaCTestCase(unittest.TestCase):
     def _get_audio_file(self, audio_file_name):
         return os.path.join(self._root_dir, 'resources/audio_samples', audio_file_name)
 
-    def run_koala(self, audio_file_name, device):
+    def run_koala(self, audio_file_name):
         args = [
             os.path.join(os.path.dirname(__file__), "../build/koala_demo_file"),
             "-a", self._access_key,
             "-l", self._get_library_file(),
             "-m", self._get_model_path(),
+            "-y", self._device,
             "-i", self._get_audio_file(audio_file_name),
             "-o", os.path.join(os.path.dirname(__file__), "output.wav"),
-            "-y", device,
         ]
         process = subprocess.Popen(args, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         stdout, stderr = process.communicate()
@@ -86,9 +69,19 @@ class KoalaCTestCase(unittest.TestCase):
         self.assertEqual(stderr.decode('utf-8'), '')
         self.assertTrue("Real time factor" in stdout.decode('utf-8'))
 
-    @parameterized.expand(get_test_devices)
-    def test_koala(self, device):
-        self.run_koala("test.wav", device)
+    def test_koala(self):
+        self.run_koala("test.wav")
+
+    def test_list_hardware_devices(self):
+        args = [
+            os.path.join(os.path.dirname(__file__), "../build/koala_demo_file"),
+            "-l", self._get_library_file(),
+            "-z"
+        ]
+        process = subprocess.Popen(args, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        stdout, stderr = process.communicate()
+        self.assertEqual(process.poll(), 0)
+        self.assertEqual(stderr.decode('utf-8'), '')
 
 
 if __name__ == '__main__':

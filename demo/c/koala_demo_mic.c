@@ -92,19 +92,24 @@ static void print_dl_error(const char *message) {
 static volatile bool is_interrupted = false;
 
 static struct option long_options[] = {
-        {"access_key",           required_argument, NULL, 'a'},
-        {"audio_device_index",   required_argument, NULL, 'd'},
-        {"library_path",         required_argument, NULL, 'l'},
-        {"model_path",           required_argument, NULL, 'm'},
-        {"output_audio_path",    required_argument, NULL, 'o'},
-        {"reference_audio_path", no_argument,       NULL, 'r'},
-        {"show_audio_devices",   no_argument,       NULL, 's'},
-        {"device",               required_argument, NULL, 'y'},
+        {"access_key",              required_argument, NULL, 'a'},
+        {"audio_device_index",      required_argument, NULL, 'd'},
+        {"library_path",            required_argument, NULL, 'l'},
+        {"model_path",              required_argument, NULL, 'm'},
+        {"device",                  required_argument, NULL, 'y'},
+        {"output_audio_path",       required_argument, NULL, 'o'},
+        {"reference_audio_path",    no_argument,       NULL, 'r'},
+        {"show_audio_devices",      no_argument,       NULL, 's'},
+        {"show_inference_devices",  no_argument,       NULL, 'z'},
 };
 
 static void print_usage(const char *program_name) {
     fprintf(stdout,
-            "Usage: %s [-s] [-l LIBRARY_PATH -m MODEL_PATH -a ACCESS_KEY -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH -y DEVICE]\n",
+            "Usage: %s -l LIBRARY_PATH [-m MODEL_PATH -a ACCESS_KEY -y DEVICE -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH]\n"
+            "        %s [-s, --show_audio_devices]\n"
+            "        %s [-z, --show_inference_devices]\n",
+            program_name,
+            program_name,
             program_name);
 }
 
@@ -135,6 +140,83 @@ static void show_audio_devices(void) {
     }
 
     pv_recorder_free_available_devices(count, devices);
+}
+
+static void print_inference_devices(const char *library_path) {
+    void *dl_handle = open_dl(library_path);
+    if (!dl_handle) {
+        fprintf(stderr, "Failed to open library at '%s'.\n", library_path);
+        exit(EXIT_FAILURE);
+    }
+
+    const char *(*pv_status_to_string_func)(pv_status_t) = load_symbol(dl_handle, "pv_status_to_string");
+    if (!pv_status_to_string_func) {
+        print_dl_error("Failed to load 'pv_status_to_string'");
+        exit(EXIT_FAILURE);
+    }
+
+    pv_status_t (*pv_koala_list_hardware_devices_func)(char ***, int32_t *) =
+    load_symbol(dl_handle, "pv_koala_list_hardware_devices");
+    if (!pv_koala_list_hardware_devices_func) {
+        print_dl_error("failed to load `pv_koala_list_hardware_devices`");
+        exit(EXIT_FAILURE);
+    }
+
+    pv_status_t (*pv_koala_free_hardware_devices_func)(char **, int32_t) =
+        load_symbol(dl_handle, "pv_koala_free_hardware_devices");
+    if (!pv_koala_free_hardware_devices_func) {
+        print_dl_error("failed to load `pv_koala_free_hardware_devices`");
+        exit(EXIT_FAILURE);
+    }
+
+    pv_status_t (*pv_get_error_stack_func)(char ***, int32_t *) =
+        load_symbol(dl_handle, "pv_get_error_stack");
+    if (!pv_get_error_stack_func) {
+        print_dl_error("failed to load 'pv_get_error_stack_func'");
+        exit(EXIT_FAILURE);
+    }
+
+    void (*pv_free_error_stack_func)(char **) =
+        load_symbol(dl_handle, "pv_free_error_stack");
+    if (!pv_free_error_stack_func) {
+        print_dl_error("failed to load 'pv_free_error_stack_func'");
+        exit(EXIT_FAILURE);
+    }
+
+    char **message_stack = NULL;
+    int32_t message_stack_depth = 0;
+    pv_status_t error_status = PV_STATUS_RUNTIME_ERROR;
+
+    char **hardware_devices = NULL;
+    int32_t num_hardware_devices = 0;
+    pv_status_t status = pv_koala_list_hardware_devices_func(&hardware_devices, &num_hardware_devices);
+    if (status != PV_STATUS_SUCCESS) {
+        fprintf(
+                stderr,
+                "Failed to list hardware devices with `%s`.\n",
+                pv_status_to_string_func(status));
+        error_status = pv_get_error_stack_func(&message_stack, &message_stack_depth);
+        if (error_status != PV_STATUS_SUCCESS) {
+            fprintf(
+                    stderr,
+                    ".\nUnable to get Koala error state with '%s'.\n",
+                    pv_status_to_string_func(error_status));
+            exit(EXIT_FAILURE);
+        }
+
+        if (message_stack_depth > 0) {
+            fprintf(stderr, ":\n");
+            print_error_message(message_stack, message_stack_depth);
+            pv_free_error_stack_func(message_stack);
+        }
+        exit(EXIT_FAILURE);
+    }
+
+    for (int32_t i = 0; i < num_hardware_devices; i++) {
+        fprintf(stdout, "%s\n", hardware_devices[i]);
+    }
+    pv_koala_free_hardware_devices_func(hardware_devices, num_hardware_devices);
+    close_dl(dl_handle);
 }
 
 static void print_vu_meter(const int16_t *pcm_buffer, int32_t num_samples) {
@@ -168,10 +250,11 @@ int picovoice_main(int argc, char *argv[]) {
     const char *reference_path = NULL;
     const char *model_path = NULL;
     const char *device = NULL;
+    bool show_inference_devices = false;
     int32_t device_index = -1;
 
     int c;
-    while ((c = getopt_long(argc, argv, "hsl:a:d:o:m:r:y:", long_options, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "hszl:a:y:d:o:m:r:", long_options, NULL)) != -1) {
         switch (c) {
             case 's':
                 show_audio_devices();
@@ -197,9 +280,23 @@ int picovoice_main(int argc, char *argv[]) {
             case 'y':
                 device = optarg;
                 break;
+            case 'z':
+                show_inference_devices = true;
+                break;
             default:
                 exit(EXIT_FAILURE);
         }
+    }
+
+    if (show_inference_devices) {
+        if (!library_path) {
+            fprintf(stderr, "`library_path` is required to view available inference devices.\n");
+            print_usage(argv[0]);
+            exit(EXIT_FAILURE);
+        }
+
+        print_inference_devices(library_path);
+        return EXIT_SUCCESS;
     }
 
     if (!library_path || !access_key || !output_path || !model_path) {
