@@ -9,10 +9,19 @@
 # specific language governing permissions and limitations under the License.
 #
 
-from typing import Optional
+from typing import (
+    Optional,
+    Sequence
+)
 
-from ._koala import Koala
-from ._util import default_library_path, default_model_path
+from ._koala import (
+    Koala,
+    list_hardware_devices
+)
+from ._util import (
+    default_library_path,
+    default_model_path
+)
 
 
 def create(
