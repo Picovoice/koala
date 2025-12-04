@@ -87,7 +87,8 @@ class KoalaTestCase(unittest.TestCase):
                 if reference_pcm is None or frame_start < delay_sample:
                     energy_deviation = frame_energy
                 else:
-                    reference_frame = reference_pcm[frame_start - delay_sample:frame_start - delay_sample + frame_length]
+                    reference_frame = reference_pcm[frame_start - delay_sample:
+                                                    frame_start - delay_sample + frame_length]
                     energy_deviation = abs(frame_energy - self._pcm_root_mean_square(reference_frame))
 
                 self.assertLess(energy_deviation, tolerance)
