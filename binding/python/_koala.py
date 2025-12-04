@@ -312,6 +312,34 @@ class Koala(object):
         return message_stack
 
 
+def list_hardware_devices(library_path: str) -> Sequence[str]:
+    dll_dir_obj = None
+    if hasattr(os, "add_dll_directory"):
+        dll_dir_obj = os.add_dll_directory(os.path.dirname(library_path))
+
+    library = cdll.LoadLibrary(library_path)
+
+    if dll_dir_obj is not None:
+        dll_dir_obj.close()
+
+    list_hardware_devices_func = library.pv_koala_list_hardware_devices
+    list_hardware_devices_func.argtypes = [POINTER(POINTER(c_char_p)), POINTER(c_int32)]
+    list_hardware_devices_func.restype = Koala.PicovoiceStatuses
+    c_hardware_devices = POINTER(c_char_p)()
+    c_num_hardware_devices = c_int32()
+    status = list_hardware_devices_func(byref(c_hardware_devices), byref(c_num_hardware_devices))
+    if status is not Koala.PicovoiceStatuses.SUCCESS:
+        raise _PICOVOICE_STATUS_TO_EXCEPTION[status](message='`pv_koala_list_hardware_devices` failed.')
+    res = [c_hardware_devices[i].decode() for i in range(c_num_hardware_devices.value)]
+
+    free_hardware_devices_func = library.pv_koala_free_hardware_devices
+    free_hardware_devices_func.argtypes = [POINTER(c_char_p), c_int32]
+    free_hardware_devices_func.restype = None
+    free_hardware_devices_func(c_hardware_devices, c_num_hardware_devices.value)
+
+    return res
+
+
 __all__ = [
     'Koala',
     'KoalaActivationError',
@@ -326,4 +354,5 @@ __all__ = [
     'KoalaMemoryError',
     'KoalaRuntimeError',
     'KoalaStopIterationError',
+    'list_hardware_devices',
 ]

@@ -51,4 +51,23 @@ def create(
         library_path=library_path)
 
 
-__all__ = ['create']
+def available_devices(library_path: Optional[str] = None) -> Sequence[str]:
+    """
+    Lists all available devices that Koala can use for inference. Each entry in the list can be the `device` argument
+    of `.create` factory method or `Koala` constructor.
+
+    :param library_path: Absolute path to Koala's dynamic library. If not set it will be set to the default location.
+
+    :return: List of all available devices that Koala can use for inference.
+    """
+
+    if library_path is None:
+        library_path = default_library_path()
+
+    return list_hardware_devices(library_path=library_path)
+
+
+__all__ = [
+    'available_devices',
+    'create'
+]

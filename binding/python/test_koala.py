@@ -17,8 +17,15 @@ import unittest
 import wave
 from typing import Optional, Sequence
 
-from _koala import Koala, KoalaError
-from _util import default_library_path, default_model_path
+from _koala import (
+    Koala,
+    KoalaError,
+    list_hardware_devices,
+)
+from _util import (
+    default_library_path,
+    default_model_path
+)
 
 
 class KoalaTestCase(unittest.TestCase):
@@ -176,6 +183,13 @@ class KoalaTestCase(unittest.TestCase):
             self.assertLess(len(e.message_stack), 8)
 
         k._handle = address
+
+    def test_available_devices(self) -> None:
+        res = list_hardware_devices(library_path=default_library_path("../.."))
+        self.assertGreater(len(res), 0)
+        for x in res:
+            self.assertIsInstance(x, str)
+            self.assertGreater(len(x), 0)
 
 
 if __name__ == '__main__':
