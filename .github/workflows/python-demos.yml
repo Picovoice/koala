@@ -27,8 +27,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13']
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        python-version: [ '3.9', '3.10', '3.11', '3.12', '3.13', '3.14' ]
 
     steps:
     - uses: actions/checkout@v3
@@ -62,7 +62,7 @@ jobs:
 
     strategy:
       matrix:
-        machine: [rpi3-32, rpi3-64, rpi4-32, rpi4-64, rpi5-64, pv-windows-arm64]
+        machine: [ rpi3-32, rpi3-64, rpi4-32, rpi4-64, rpi5-64, pv-windows-arm64 ]
 
     steps:
     - uses: actions/checkout@v3

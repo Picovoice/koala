@@ -15,34 +15,10 @@ import struct
 import sys
 import unittest
 import wave
-from parameterized import parameterized
 from typing import Optional, Sequence
 
 from _koala import Koala, KoalaError
 from _util import default_library_path, default_model_path
-
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--access-key', required=True)
-parser.add_argument('--device', required=True)
-args = parser.parse_args()
-
-
-def get_test_devices():
-    result = list()
-
-    device = args.device
-    if device == "cpu":
-        max_threads = os.cpu_count() // 2
-        i = 1
-
-        while i <= max_threads:
-            result.append(f"cpu:{i}")
-            i *= 2
-    else:
-        result.append(device)
-
-    return result
 
 
 class KoalaTestCase(unittest.TestCase):
@@ -87,7 +63,6 @@ class KoalaTestCase(unittest.TestCase):
 
     def _run_test(
             self,
-            device: str,
             input_pcm: Sequence[int],
             reference_pcm: Optional[Sequence[int]] = None,
             tolerance: float = 0.02) -> None:
@@ -97,7 +72,7 @@ class KoalaTestCase(unittest.TestCase):
             o = Koala(
                 access_key=self.access_key,
                 model_path=default_model_path("../../"),
-                device=device,
+                device=self.device,
                 library_path=default_library_path("../../"),
             )
 
@@ -120,18 +95,15 @@ class KoalaTestCase(unittest.TestCase):
             if o is not None:
                 o.delete()
 
-    @parameterized.expand(get_test_devices)
-    def test_pure_speech(self, device) -> None:
-        self._run_test(device, self.test_pcm, self.test_pcm, tolerance=0.02)
+    def test_pure_speech(self) -> None:
+        self._run_test(self.test_pcm, self.test_pcm, tolerance=0.02)
 
-    @parameterized.expand(get_test_devices)
-    def test_pure_noise(self, device) -> None:
-        self._run_test(device, self.noise_pcm, tolerance=0.02)
+    def test_pure_noise(self) -> None:
+        self._run_test(self.noise_pcm, tolerance=0.02)
 
-    @parameterized.expand(get_test_devices)
-    def test_mixed(self, device) -> None:
+    def test_mixed(self) -> None:
         noisy_pcm = [x + y for x, y in zip(self.test_pcm, self.noise_pcm)]
-        self._run_test(device, noisy_pcm, self.test_pcm, tolerance=0.02)
+        self._run_test(noisy_pcm, self.test_pcm, tolerance=0.02)
 
     def test_reset(self) -> None:
         frame_length = self.koala.frame_length
@@ -206,6 +178,11 @@ class KoalaTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--access-key', required=True)
+    parser.add_argument('--device', required=True)
+    args = parser.parse_args()
+
     KoalaTestCase.access_key = args.access_key
     KoalaTestCase.device = args.device
     unittest.main(argv=sys.argv[:1])
