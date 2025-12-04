@@ -123,7 +123,7 @@ jobs:
       fail-fast: false
       matrix:
         device: [ gpu ]
-        machine: [ pv-linux, pv-windows, pv-windows-igpu, pv-ios ]
+        machine: [ pv-linux, pv-windows, pv-ios ]
         include:
           - device: cpu:1
             machine: pv-windows-arm64
@@ -131,8 +131,6 @@ jobs:
           - machine: pv-linux
             proc_performance_threshold_sec: 0.8
           - machine: pv-windows
-            proc_performance_threshold_sec: 0.8
-          - machine: pv-windows-igpu
             proc_performance_threshold_sec: 0.8
           - machine: pv-ios
             proc_performance_threshold_sec: 0.8

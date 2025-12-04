@@ -72,8 +72,6 @@ jobs:
             machine: pv-linux
           - device: gpu
             machine: pv-windows
-          - device: gpu
-            machine: pv-windows-igpu
 
     steps:
     - uses: actions/checkout@v3
