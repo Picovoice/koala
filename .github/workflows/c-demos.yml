@@ -178,16 +178,19 @@ jobs:
           platform: linux
           arch: x86_64
           make_file: "Unix Makefiles"
+          pv_recorder_platform: "linux"
         - device: gpu
           machine: pv-windows
           platform: windows
           arch: amd64
           make_file: "MinGW Makefiles"
+          pv_recorder_platform: "windows-amd64"
         - device: gpu
           machine: pv-ios
           platform: mac
           arch: arm64
           make_file: "Unix Makefiles"
+          pv_recorder_platform: "mac-arm64"
 
     steps:
     - uses: actions/checkout@v3
