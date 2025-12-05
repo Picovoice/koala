@@ -43,7 +43,8 @@ jobs:
           KoalaAppTestUITests/KoalaAppTestUITests.swift
 
       - name: Inject Device
-        run: sed -i '.bak' 's:{TESTING_DEVICE_HERE}:cpu:' FalconAppTestUITests/FalconAppTestUITests.swift
+        run: sed -i '.bak' 's:{TESTING_DEVICE_HERE}:cpu\:1:'
+          KoalaAppTestUITests/BaseTest.swift
 
       - name: XCode Build
         run: xcrun xcodebuild build-for-testing

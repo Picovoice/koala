@@ -60,6 +60,30 @@ public class Koala {
         self.sdk = sdk
     }
 
+    /// Lists all available devices that Koala can use for inference.
+    /// Entries in the list can be used as the `device` argument when initializing Koala.
+    ///
+    /// - Throws: KoalaError
+    /// - Returns: Array of available devices that Koala can be used for inference.
+    public static func getAvailableDevices() throws -> [String] {
+        var cHardwareDevices: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?
+        var numHardwareDevices: Int32 = 0
+        let status = pv_koala_list_hardware_devices(&cHardwareDevices, &numHardwareDevices)
+        if status != PV_STATUS_SUCCESS {
+            let messageStack = try EagleBase.getMessageStack()
+            throw pvStatusToKoalaError(status, "Koala getAvailableDevices failed", messageStack)
+        }
+
+        var hardwareDevices: [String] = []
+        for i in 0..<numHardwareDevices {
+            hardwareDevices.append(String(cString: cHardwareDevices!.advanced(by: Int(i)).pointee!))
+        }
+
+        pv_koala_free_hardware_devices(cHardwareDevices, numHardwareDevices)
+
+        return hardwareDevices
+    }
+
     /// Constructor.
     ///
     /// - Parameters:

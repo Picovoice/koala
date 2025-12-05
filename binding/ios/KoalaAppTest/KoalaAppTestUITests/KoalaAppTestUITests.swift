@@ -50,7 +50,7 @@ class KoalaDemoUITests: XCTestCase {
         return pcm
     }
 
-    func runTest(device: String, inputPcm: [Int16], refPcm: [Int16]? = nil, tolerance: Float = 0.02) throws {
+    func runTest(inputPcm: [Int16], refPcm: [Int16]? = nil, tolerance: Float = 0.02) throws {
         koala = try Koala(accessKey: accessKey, device: device)
 
         let frameLength = Int(Koala.frameLength)
@@ -79,24 +79,14 @@ class KoalaDemoUITests: XCTestCase {
         let devices = getTestDevices()
 
         let testPcm = try getPcm(fileUrl: testAudioUrl)
-
-        for device in devices {
-            try XCTContext.runActivity(named: "\(device)") { _ in
-                try runTest(device: device, inputPcm: testPcm, refPcm: testPcm)
-            }
-        }
+        try runTest(inputPcm: testPcm, refPcm: testPcm)
     }
 
     func testPureNoise() throws {
         let devices = getTestDevices()
 
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
-
-        for device in devices {
-            try XCTContext.runActivity(named: "\(device)") { _ in
-                try runTest(device: device, inputPcm: noisePcm)
-            }
-        }
+        try runTest(inputPcm: noisePcm)
     }
 
     func testMixed() throws {
@@ -105,12 +95,7 @@ class KoalaDemoUITests: XCTestCase {
         let testPcm = try getPcm(fileUrl: testAudioUrl)
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
         let mixPcm: [Int16] = zip(testPcm, noisePcm).map(+)
-
-        for device in devices {
-            try XCTContext.runActivity(named: "\(device)") { _ in
-                try runTest(device: device, inputPcm: mixPcm, refPcm: testPcm)
-            }
-        }
+        try runTest(inputPcm: mixPcm, refPcm: testPcm)
     }
 
     func testReset() throws {
@@ -156,6 +141,14 @@ class KoalaDemoUITests: XCTestCase {
         XCTAssertGreaterThan(Koala.version, "")
     }
 
+    func testGetAvailableDevices() throws {
+        let devices = try Koala.getAvailableDevices()
+        XCTAssert(!devices.isEmpty)
+        for device in devices {
+            XCTAssert(!device.isEmpty)
+        }
+    }
+
     func testMessageStack() throws {
         var first_error: String = ""
         do {
@@ -187,24 +180,5 @@ class KoalaDemoUITests: XCTestCase {
         } catch {
             XCTAssert("\(error.localizedDescription)".count > 0)
         }
-    }
-
-    private func getTestDevices() -> [String] {
-        var result: [String] = []
-
-        if device == "cpu" {
-            let cores = ProcessInfo.processInfo.processorCount
-            let maxThreads = cores / 2
-
-            var i = 1
-            while i <= maxThreads {
-                result.append("cpu:\(i)")
-                i *= 2
-            }
-        } else {
-            result.append(device)
-        }
-
-        return result
     }
 }
