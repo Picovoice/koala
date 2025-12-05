@@ -52,6 +52,14 @@ type pv_koala_delete_type = (object: number) => void;
 type pv_koala_frame_length_type = () => number;
 type pv_sample_rate_type = () => number;
 type pv_koala_version_type = () => number;
+type pv_koala_list_hardware_devices_type = (
+  hardwareDevices: number,
+  numHardwareDevices: number
+) => number;
+type pv_koala_free_hardware_devices_type = (
+  hardwareDevices: number,
+  numHardwareDevices: number
+) => number;
 type pv_set_sdk_type = (sdk: number) => void;
 type pv_get_error_stack_type = (
   messageStack: number,
@@ -67,6 +75,8 @@ type KoalaModule = EmscriptenModule & {
   _pv_koala_frame_length: pv_koala_frame_length_type;
   _pv_sample_rate: pv_sample_rate_type
   _pv_koala_version: pv_koala_version_type
+  _pv_koala_list_hardware_devices: pv_koala_list_hardware_devices_type;
+  _pv_koala_free_hardware_devices: pv_koala_free_hardware_devices_type;
 
   _pv_set_sdk: pv_set_sdk_type;
   _pv_get_error_stack: pv_get_error_stack_type;
@@ -385,7 +395,7 @@ class Koala {
         );
 
         if (status !== PvStatus.SUCCESS) {
-          const messageStack = await Koala.getMessageStack(
+          const messageStack = Koala.getMessageStack(
             this._module._pv_get_error_stack,
             this._module._pv_free_error_stack,
             this._messageStackAddressAddressAddress,
@@ -443,7 +453,7 @@ class Koala {
 
           const status = await this._pv_koala_reset(this._objectAddress);
           if (status !== PvStatus.SUCCESS) {
-            const messageStack = await Koala.getMessageStack(
+            const messageStack = Koala.getMessageStack(
               this._module._pv_get_error_stack,
               this._module._pv_free_error_stack,
               this._messageStackAddressAddressAddress,
@@ -488,6 +498,111 @@ class Koala {
         // eslint-disable-next-line no-console
         console.warn(`Unrecognized command: ${e.data.command}`);
     }
+  }
+
+  /**
+   * Lists all available devices that Koala can use for inference.
+   * Each entry in the list can be the used as the `device` argument for the `.create` method.
+   *
+   * @returns List of all available devices that Koala can use for inference.
+   */
+  public static async listAvailableDevices(): Promise<string[]> {
+    return new Promise<string[]>((resolve, reject) => {
+      Koala._koalaMutex
+        .runExclusive(async () => {
+          const isSimd = await simd();
+          if (!isSimd) {
+            throw new KoalaErrors.KoalaRuntimeError('Unsupported Browser');
+          }
+
+          const blob = new Blob(
+            [base64ToUint8Array(this._wasmSimdLib)],
+            { type: 'application/javascript' }
+          );
+          const module: KoalaModule = await createModuleSimd({
+            mainScriptUrlOrBlob: blob,
+            wasmBinary: base64ToUint8Array(this._wasmSimd),
+          });
+
+          const hardwareDevicesAddressAddress = module._malloc(Int32Array.BYTES_PER_ELEMENT);
+          if (hardwareDevicesAddressAddress === 0) {
+            throw new KoalaErrors.KoalaOutOfMemoryError(
+              'malloc failed: Cannot allocate memory for hardwareDevices'
+            );
+          }
+
+          const numHardwareDevicesAddress = module._malloc(Int32Array.BYTES_PER_ELEMENT);
+          if (numHardwareDevicesAddress === 0) {
+            throw new KoalaErrors.KoalaOutOfMemoryError(
+              'malloc failed: Cannot allocate memory for numHardwareDevices'
+            );
+          }
+
+          const status: PvStatus = module._pv_koala_list_hardware_devices(
+            hardwareDevicesAddressAddress,
+            numHardwareDevicesAddress
+          );
+
+          const messageStackDepthAddress = module._malloc(Int32Array.BYTES_PER_ELEMENT);
+          if (!messageStackDepthAddress) {
+            throw new KoalaErrors.KoalaOutOfMemoryError(
+              'malloc failed: Cannot allocate memory for messageStackDepth'
+            );
+          }
+
+          const messageStackAddressAddressAddress = module._malloc(Int32Array.BYTES_PER_ELEMENT);
+          if (!messageStackAddressAddressAddress) {
+            throw new KoalaErrors.KoalaOutOfMemoryError(
+              'malloc failed: Cannot allocate memory messageStack'
+            );
+          }
+
+          if (status !== PvStatus.SUCCESS) {
+            const messageStack = Koala.getMessageStack(
+              module._pv_get_error_stack,
+              module._pv_free_error_stack,
+              messageStackAddressAddressAddress,
+              messageStackDepthAddress,
+              module.HEAP32,
+              module.HEAPU8,
+            );
+            module._pv_free(messageStackAddressAddressAddress);
+            module._pv_free(messageStackDepthAddress);
+
+            throw pvStatusToException(
+              status,
+              'List devices failed',
+              messageStack
+            );
+          }
+          module._pv_free(messageStackAddressAddressAddress);
+          module._pv_free(messageStackDepthAddress);
+
+          const numHardwareDevices: number = module.HEAP32[numHardwareDevicesAddress / Int32Array.BYTES_PER_ELEMENT];
+          module._pv_free(numHardwareDevicesAddress);
+
+          const hardwareDevicesAddress = module.HEAP32[hardwareDevicesAddressAddress / Int32Array.BYTES_PER_ELEMENT];
+
+          const hardwareDevices: string[] = [];
+          for (let i = 0; i < numHardwareDevices; i++) {
+            const deviceAddress = module.HEAP32[hardwareDevicesAddress / Int32Array.BYTES_PER_ELEMENT + i];
+            hardwareDevices.push(arrayBufferToStringAtIndex(module.HEAPU8, deviceAddress));
+          }
+          module._pv_koala_free_hardware_devices(
+            hardwareDevicesAddress,
+            numHardwareDevices
+          );
+          module._pv_free(hardwareDevicesAddressAddress);
+
+          return hardwareDevices;
+        })
+        .then((result: string[]) => {
+          resolve(result);
+        })
+        .catch((error: any) => {
+          reject(error);
+        });
+    });
   }
 
   private static async initWasm(
@@ -598,7 +713,7 @@ class Koala {
     module._pv_free(deviceAddress);
 
     if (status !== PvStatus.SUCCESS) {
-      const messageStack = await Koala.getMessageStack(
+      const messageStack = Koala.getMessageStack(
         module._pv_get_error_stack,
         module._pv_free_error_stack,
         messageStackAddressAddressAddress,
@@ -622,7 +737,7 @@ class Koala {
 
     status = module._pv_koala_delay_sample(objectAddress, delaySampleAddress);
     if (status !== PV_STATUS_SUCCESS) {
-      const messageStack = await Koala.getMessageStack(
+      const messageStack = Koala.getMessageStack(
         module._pv_get_error_stack,
         module._pv_free_error_stack,
         messageStackAddressAddressAddress,
@@ -679,14 +794,14 @@ class Koala {
     };
   }
 
-  private static async getMessageStack(
+  private static getMessageStack(
     pv_get_error_stack: pv_get_error_stack_type,
     pv_free_error_stack: pv_free_error_stack_type,
     messageStackAddressAddressAddress: number,
     messageStackDepthAddress: number,
     memoryBufferInt32: Int32Array,
     memoryBufferUint8: Uint8Array
-  ): Promise<string[]> {
+  ): string[] {
     const status = pv_get_error_stack(messageStackAddressAddressAddress, messageStackDepthAddress);
     if (status !== PvStatus.SUCCESS) {
       throw new Error(`Unable to get error state: ${status}`);
