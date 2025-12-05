@@ -70,7 +70,7 @@ public class Koala {
         var numHardwareDevices: Int32 = 0
         let status = pv_koala_list_hardware_devices(&cHardwareDevices, &numHardwareDevices)
         if status != PV_STATUS_SUCCESS {
-            let messageStack = try EagleBase.getMessageStack()
+            let messageStack = try getMessageStack()
             throw pvStatusToKoalaError(status, "Koala getAvailableDevices failed", messageStack)
         }
 
@@ -90,10 +90,11 @@ public class Koala {
     ///   - accessKey: The AccessKey obtained from Picovoice Console (https://console.picovoice.ai).
     ///   - modelPath: Absolute path to file containing model parameters.
     ///   - device: String representation of the device (e.g., CPU or GPU) to use. If set to `best`, the most
-    ///     suitable device is selected automatically. If set to `gpu`, the engine uses the first available GPU device. To select a specific
-    ///     GPU device, set this argument to `gpu:${GPU_INDEX}`, where `${GPU_INDEX}` is the index of the target GPU. If set to
-    ///     `cpu`, the engine will run on the CPU with the default number of threads. To specify the number of threads, set this
-    ///     argument to `cpu:${NUM_THREADS}`, where `${NUM_THREADS}` is the desired number of threads.
+    ///     suitable device is selected automatically. If set to `gpu`, the engine uses the first available
+    ///     GPU device. To select a specific GPU device, set this argument to `gpu:${GPU_INDEX}`, where `${GPU_INDEX}`
+    ///     is the index of the target GPU. If set to `cpu`, the engine will run on the CPU with the default
+    ///     number of threads. To specify the number of threads, set this argument to `cpu:${NUM_THREADS}`,
+    ///     where `${NUM_THREADS}` is the desired number of threads.
     /// - Throws: KoalaError
     public init(
             accessKey: String,
