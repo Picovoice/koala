@@ -45,7 +45,7 @@ android {
         resValue 'string', 'pvTestingAccessKey', properties.getProperty("pvTestingAccessKey", "")
         resValue 'string', 'numTestIterations', properties.getProperty("numTestIterations", "")
         resValue 'string', 'performanceThresholdSec', properties.getProperty("performanceThresholdSec", "")
-        resValue 'string', 'device', properties.getProperty("device", "")
+        resValue 'string', 'pvTestingDevice', properties.getProperty("pvTestingDevice", "")
     }
 
     signingConfigs {
