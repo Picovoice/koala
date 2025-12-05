@@ -108,9 +108,9 @@ public class KoalaTest {
 
     private void runTest(List<Short> inputPcm, List<Short> referencePcm, double tolerance) throws KoalaException {
         Koala koala = new Koala.Builder()
-        .setAccessKey(accessKey)
-        .setDevice(device)
-        .build(getApplicationContext());
+            .setAccessKey(accessKey)
+            .setDevice(device)
+            .build(getApplicationContext());
 
         for (int i = 0; i < (inputPcm.size() - koala.getFrameLength()); i += koala.getFrameLength()) {
             short[] frame = frameFromList(inputPcm, i, koala.getFrameLength());
