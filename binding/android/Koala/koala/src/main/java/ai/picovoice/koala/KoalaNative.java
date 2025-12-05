@@ -32,4 +32,5 @@ class KoalaNative {
 
     static native int delaySample(long object) throws KoalaException;
 
+    static native String[] listHardwareDevices() throws KoalaException;
 }

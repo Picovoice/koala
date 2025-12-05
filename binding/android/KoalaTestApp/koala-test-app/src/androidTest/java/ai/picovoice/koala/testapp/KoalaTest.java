@@ -58,6 +58,7 @@ public class KoalaTest {
     String testResourcesPath;
 
     String accessKey = "";
+    String device;
 
     @Before
     public void Setup() throws IOException {
@@ -67,6 +68,7 @@ public class KoalaTest {
         testResourcesPath = new File(appContext.getFilesDir(), "test_resources").getAbsolutePath();
 
         accessKey = appContext.getString(R.string.pvTestingAccessKey);
+        device = appContext.getString(R.string.pvTestingDevice);
     }
 
     private List<Short> loadPcm(File file) throws IOException {
@@ -104,7 +106,7 @@ public class KoalaTest {
         return output;
     }
 
-    private void runTest(String device, List<Short> inputPcm, List<Short> referencePcm, double tolerance) throws KoalaException {
+    private void runTest(List<Short> inputPcm, List<Short> referencePcm, double tolerance) throws KoalaException {
         Koala koala = new Koala.Builder()
         .setAccessKey(accessKey)
         .setDevice(device)
@@ -129,49 +131,43 @@ public class KoalaTest {
         }
     }
 
-    @RunWith(Parameterized.class)
-    public static class ProcessTests extends KoalaTest {
-        @Parameterized.Parameter(value = 0)
-        public String device;
-
-        @Parameterized.Parameters(name = "{0}")
-        public static Collection<Object[]> initParameters() throws IOException {
-            List<Object[]> parameters = new ArrayList<>();
-
-            List<String> devices = getTestDevices();
-
-            for (String device : devices) {
-                parameters.add(new Object[]{
-                    device
-                });
-            }
-
-            return parameters;
+    @Test
+    public void testInitFailWithInvalidDevice() {
+        boolean didFail = false;
+        try {
+            new Koala.Builder()
+                    .setAccessKey(accessKey)
+                    .setDevice("invalid:9")
+                    .build(appContext);
+        } catch (KoalaException e) {
+            didFail = true;
         }
 
-        @Test
-        public void testPureSpeech() throws KoalaException, IOException {
-            List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
-            runTest(testPcm, testPcm, 0.02);
-        }
+        assertTrue(didFail);
+    }
 
-        @Test
-        public void testPureNoise() throws KoalaException, IOException {
-            List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
-            runTest(noisePcm, null, 0.02);
-        }
+    @Test
+    public void testPureSpeech() throws KoalaException, IOException {
+        List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
+        runTest(testPcm, testPcm, 0.02);
+    }
 
-        @Test
-        public void testMixed() throws KoalaException, IOException {
-            List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
-            List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
-            List<Short> mixedPcm = new ArrayList<>();
-            for (int i = 0; i < testPcm.size(); i++) {
-                Short mixed = (short) (testPcm.get(i) + noisePcm.get(i));
-                mixedPcm.add(mixed);
-            }
-            runTest(mixedPcm, testPcm, 0.02);
+    @Test
+    public void testPureNoise() throws KoalaException, IOException {
+        List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
+        runTest(noisePcm, null, 0.02);
+    }
+
+    @Test
+    public void testMixed() throws KoalaException, IOException {
+        List<Short> testPcm = loadPcm(new File(getAudioFilepath("test.wav")));
+        List<Short> noisePcm = loadPcm(new File(getAudioFilepath("noise.wav")));
+        List<Short> mixedPcm = new ArrayList<>();
+        for (int i = 0; i < testPcm.size(); i++) {
+            Short mixed = (short) (testPcm.get(i) + noisePcm.get(i));
+            mixedPcm.add(mixed);
         }
+        runTest(mixedPcm, testPcm, 0.02);
     }
 
     @Test
@@ -230,6 +226,15 @@ public class KoalaTest {
         }
     }
 
+    @Test
+    public void testGetAvailableDevices() throws KoalaException {
+        String[] availableDevices = Koala.getAvailableDevices();
+        assertTrue(availableDevices.length > 0);
+        for (String d : availableDevices) {
+            assertTrue(d != null && d.length() > 0);
+        }
+    }
+
     public String getAudioFilepath(String audioFilename) throws IOException {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         String resPath = new File(
@@ -273,23 +278,5 @@ public class KoalaTest {
 
         extractedFiles.add(filepath);
 
-    }
-
-    private static ArrayList<String> getTestDevices() {
-        String device = InstrumentationRegistry.getInstrumentation().getTargetContext().getString(R.string.device);
-
-        ArrayList<String> result = new ArrayList<>();
-        if (device.equals("cpu")) {
-            int cores = Runtime.getRuntime().availableProcessors();
-            int maxThreads = cores / 2;
-
-            for (int i = 1; i <= maxThreads; i *= 2) {
-                result.add("cpu:" + i);
-            }
-        } else {
-            result.add(device);
-        }
-
-        return result;
     }
 }

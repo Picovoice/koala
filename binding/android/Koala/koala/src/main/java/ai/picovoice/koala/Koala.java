@@ -40,6 +40,17 @@ public class Koala {
     }
 
     /**
+     * Lists all available devices that Koala can use for inference.
+     * Each entry in the list can be used as the `device` argument when initializing Koala.
+     *
+     * @return Array of all available devices that Koala can be used for inference.
+     * @throws KoalaException if getting available devices fails.
+     */
+    public static String[] getAvailableDevices() throws KoalaException {
+        return KoalaNative.listHardwareDevices();
+    }
+
+    /**
      * Constructor.
      *
      * @param accessKey AccessKey obtained from Picovoice Console
