@@ -1,5 +1,5 @@
 /*
-    Copyright 2023 Picovoice Inc.
+    Copyright 2023-2025 Picovoice Inc.
     You may not use this file except in compliance with the license. A copy of the license is
     located in the "LICENSE" file accompanying this source.
     Unless required by applicable law or agreed to in writing, software distributed under the
@@ -50,6 +50,7 @@ public class PerformanceTest {
     AssetManager assetManager;
     String testResourcesPath;
     String accessKey;
+    String device;
 
     @Before
     public void Setup() throws IOException {
@@ -59,6 +60,7 @@ public class PerformanceTest {
         testResourcesPath = new File(appContext.getFilesDir(), "test_resources").getAbsolutePath();
 
         accessKey = appContext.getString(R.string.pvTestingAccessKey);
+        device = appContext.getString(R.string.pvTestingDevice);
     }
 
     @Test
@@ -74,7 +76,10 @@ public class PerformanceTest {
         } catch (NumberFormatException ignored) { }
         double performanceThresholdSec = Double.parseDouble(thresholdString);
 
-        Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
+        Koala koala = new Koala.Builder()
+                .setAccessKey(accessKey)
+                .setDevice(device)
+                .build(getApplicationContext());
         File testAudio = new File(getAudioFilepath("test.wav"));
 
         long totalNSec = 0;

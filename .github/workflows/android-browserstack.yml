@@ -112,7 +112,7 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
-        
+
     - name: Build binding
       run: ./gradlew assembleRelease --info
       working-directory: binding/android/Koala
@@ -129,6 +129,9 @@ jobs:
 
     - name: Inject AccessKey
       run: echo pvTestingAccessKey="${{secrets.PV_VALID_ACCESS_KEY}}" >> local.properties
+
+    - name: Inject Device
+      run: echo pvTestingDevice="cpu:1" >> local.properties
 
     - name: Inject Android keystore variables
       run: |
