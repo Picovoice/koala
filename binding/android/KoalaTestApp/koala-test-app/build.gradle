@@ -12,8 +12,8 @@ if (rootProject.file("local.properties").exists()) {
     if (project.hasProperty("performanceThresholdSec")) {
         properties.put("performanceThresholdSec", project.getProperty("performanceThresholdSec"))
     }
-    if (project.hasProperty("device")) {
-        properties.put("device", project.getProperty("device"))
+    if (project.hasProperty("pvTestingDevice")) {
+        properties.put("pvTestingDevice", project.getProperty("pvTestingDevice"))
     }
 
     if (project.hasProperty("storePassword")) {
