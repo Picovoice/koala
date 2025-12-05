@@ -243,7 +243,9 @@ When done be sure to explicitly release the resources using `koala.delete()`.
 ```c
     pv_koala_t *handle = NULL;
     const char *model_path = "${MODEL_PATH}";
-    pv_status_t status = pv_koala_init(${ACCESS_KEY}, model_path, &handle);
+    const char *device = "best";
+
+    pv_status_t status = pv_koala_init(${ACCESS_KEY}, model_path, device, &handle);
     if (status != PV_STATUS_SUCCESS) {
         // error handling logic
     }
