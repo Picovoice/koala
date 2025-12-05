@@ -20,8 +20,8 @@ class KoalaCTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls._access_key = sys.argv[1]
-        cls._platform = sys.argv[2]
-        cls._device = sys.argv[3]
+        cls._device = sys.argv[2]
+        cls._platform = sys.argv[3]
         cls._arch = "" if len(sys.argv) != 5 else sys.argv[4]
         cls._root_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..")
 
@@ -86,6 +86,6 @@ class KoalaCTestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     if len(sys.argv) < 4 or len(sys.argv) > 5:
-        print("usage: test_koala_c.py ${AccessKey} ${Platform} ${Device} [${Arch}]")
+        print("usage: test_koala_c.py ${AccessKey} ${Device} ${Platform} [${Arch}]")
         exit(1)
     unittest.main(argv=sys.argv[:1])
