@@ -13,6 +13,7 @@ downsample
 downsampled
 drwav
 dtype
+Embedder
 Emscripten
 frombuffer
 hanning
