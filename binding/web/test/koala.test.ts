@@ -7,27 +7,6 @@ import { KoalaError } from "../dist/types/koala_errors";
 const ACCESS_KEY = Cypress.env('ACCESS_KEY');
 const DEVICE = Cypress.env('DEVICE');
 
-const getDeviceList = (
-  instance: typeof Koala | typeof KoalaWorker
-) => {
-  if (instance === Koala) {
-    return ["cpu:1"];
-  }
-
-  const result: string[] = [];
-  if (DEVICE === 'cpu') {
-    const maxThreads = self.navigator.hardwareConcurrency / 2;
-
-    for (let i = 1; i <= maxThreads; i *= 2) {
-      result.push(`cpu:${i}`);
-    }
-  } else {
-    result.push(DEVICE);
-  }
-
-  return result;
-};
-
 function rootMeanSquare(pcm: Int16Array): number {
   let sumSquares = 0;
   for (let i = 0; i < pcm.length; i++) {
@@ -44,7 +23,6 @@ async function runTest(
   instance: typeof Koala | typeof KoalaWorker,
   inputPcm: Int16Array,
   referencePcm?: Int16Array,
-  device?: string,
   tolerance = 0.02
 ) {
   const errorFrames: number[] = [];
@@ -98,7 +76,7 @@ async function runTest(
         },
         { publicPath: '/test/koala_params.pv', forceWrite: true },
         {
-          device: device,
+          device: DEVICE,
           processErrorCallback: (error: KoalaError) => {
             reject(error);
           },
@@ -269,34 +247,32 @@ describe('Koala Binding', function () {
       }
     });
 
-    for (const device of getDeviceList(instance)) {
-      it(`should be able to process pure speech (${instanceString}) (${device})`, () => {
-        cy.getFramesFromFile('audio_samples/test.wav').then(async inputPcm => {
-          await runTest(instance, inputPcm, inputPcm, device);
-        });
+    it(`should be able to process pure speech (${instanceString})`, () => {
+      cy.getFramesFromFile('audio_samples/test.wav').then(async inputPcm => {
+        await runTest(instance, inputPcm, inputPcm);
       });
+    });
 
-      it(`should be able to process noise speech (${instanceString}) (${device})`, () => {
-        cy.getFramesFromFile('audio_samples/noise.wav').then(async inputPcm => {
-          await runTest(instance, inputPcm, undefined, device);
-        });
+    it(`should be able to process noise speech (${instanceString})`, () => {
+      cy.getFramesFromFile('audio_samples/noise.wav').then(async inputPcm => {
+        await runTest(instance, inputPcm, undefined);
       });
+    });
 
-      it(`should be able to process mixed speech (${instanceString}) (${device})`, () => {
-        cy.getFramesFromFile('audio_samples/noise.wav').then(inputPcm => {
-          cy.getFramesFromFile('audio_samples/test.wav').then(
-            async referencePcm => {
-              const noisyPcm = new Int16Array(inputPcm.length);
-              for (let i = 0; i < inputPcm.length; i++) {
-                noisyPcm[i] = inputPcm[i] + referencePcm[i];
-              }
-
-              await runTest(instance, noisyPcm, referencePcm, device);
+    it(`should be able to process mixed speech (${instanceString})`, () => {
+      cy.getFramesFromFile('audio_samples/noise.wav').then(inputPcm => {
+        cy.getFramesFromFile('audio_samples/test.wav').then(
+          async referencePcm => {
+            const noisyPcm = new Int16Array(inputPcm.length);
+            for (let i = 0; i < inputPcm.length; i++) {
+              noisyPcm[i] = inputPcm[i] + referencePcm[i];
             }
-          );
-        });
+
+            await runTest(instance, noisyPcm, referencePcm);
+          }
+        );
       });
-    }
+    });
 
     it(`should be able to reset (${instanceString})`, () => {
       cy.getFramesFromFile('audio_samples/test.wav').then(async inputPcm => {

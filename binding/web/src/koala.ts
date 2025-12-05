@@ -99,6 +99,7 @@ type KoalaWasmOutput = {
   outputBufferAddress: number;
 };
 
+const CPU_DEVICE_REGEX = /^cpu(:\d+)?$/;
 const PV_STATUS_SUCCESS = 10000;
 
 class Koala {
@@ -282,7 +283,7 @@ class Koala {
     modelPath: string,
     options: KoalaOptions = {}
   ): Promise<Koala> {
-    let { device } = options;
+    let { device = "best" } = options;
     const { processErrorCallback } = options;
 
     if (!isAccessKeyValid(accessKey)) {
@@ -294,15 +295,22 @@ class Koala {
       throw new KoalaErrors.KoalaRuntimeError('Browser not supported.');
     }
 
-    const isWorkerScope = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
-    if (!isWorkerScope) {
-      if (device && device !== "cpu:1") {
-        console.warn("Multi-threading is not supported on main thread.");
-      }
+    if (device === "best") {
       device = "cpu:1";
     }
 
-    const sabDefined = (typeof SharedArrayBuffer !== 'undefined') && (device !== "cpu:1");
+    const isWorkerScope = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+    if (!isWorkerScope) {
+      if (device && CPU_DEVICE_REGEX.test(device)) {
+        if (device !== "cpu" && device !== "cpu:1") {
+          console.warn("Multi-threading is not supported on main thread.");
+        }
+        device = "cpu:1";
+      }
+    }
+
+    const sabDefined = (typeof SharedArrayBuffer !== 'undefined')
+      && (device !== "cpu") && (device !== "cpu:1");
 
     return new Promise<Koala>((resolve, reject) => {
       Koala._koalaMutex
@@ -350,7 +358,7 @@ class Koala {
 
     if (pcm.length !== this.frameLength) {
       const error =
-        new KoalaErrors.KoalaInvalidArgumentError(`Koala process requires frames of length ${this.frameLength}. 
+        new KoalaErrors.KoalaInvalidArgumentError(`Koala process requires frames of length ${this.frameLength}.
         Received frame of size ${pcm.length}.`);
       if (this._processErrorCallback) {
         this._processErrorCallback(error);
