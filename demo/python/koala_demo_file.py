@@ -1,5 +1,5 @@
 #
-#    Copyright 2023 Picovoice Inc.
+#    Copyright 2023-2025 Picovoice Inc.
 #
 #    You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 #    file accompanying this source.
@@ -13,7 +13,7 @@ import argparse
 import struct
 import wave
 
-from pvkoala import create, KoalaActivationLimitError
+from pvkoala import create, available_devices, KoalaActivationLimitError
 
 PROGRESS_BAR_LENGTH = 30
 
@@ -22,15 +22,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--access_key',
-        required=True,
         help='AccessKey obtained from Picovoice Console (https://console.picovoice.ai/)')
     parser.add_argument(
         '--input_path',
-        required=True,
         help='Absolute path to .wav file with the input audio to be enhanced')
     parser.add_argument(
         '--output_path',
-        required=True,
         help='Absolute path to .wav file where the enhanced audio will be stored')
     parser.add_argument(
         '--library_path',
@@ -38,7 +35,28 @@ def main():
     parser.add_argument(
         '--model_path',
         help='Absolute path to Koala model. Default: using the model provided by `pvkoala`')
+    parser.add_argument(
+        '--device',
+        help='Device to run inference on (`best`, `cpu:{num_threads}` or `gpu:{gpu_index}`). '
+             'Default: automatically selects best device for `pvkoala`')
+    parser.add_argument(
+        '--show_inference_devices',
+        action='store_true',
+        help='Show the list of available devices for Koala inference and exit')
     args = parser.parse_args()
+
+    if args.show_inference_devices:
+        print('\n'.join(available_devices(library_path=args.library_path)))
+        return
+
+    if args.access_key is None:
+        raise ValueError('Missing required argument --access_key')
+
+    if args.input_path is None:
+        raise ValueError('Missing required argument --output_path')
+
+    if args.output_path is None:
+        raise ValueError('Missing required argument --output_path')
 
     if not args.input_path.lower().endswith('.wav'):
         raise ValueError('Given argument --input_path must have WAV file extension')
@@ -52,6 +70,7 @@ def main():
     koala = create(
         access_key=args.access_key,
         model_path=args.model_path,
+        device=args.device,
         library_path=args.library_path)
 
     length_sec = 0.0
