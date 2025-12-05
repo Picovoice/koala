@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 55;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,6 +18,7 @@
 		1E00656427CFF7EC006FF6E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E00656227CFF7EC006FF6E9 /* LaunchScreen.storyboard */; };
 		1E00657927CFF7EC006FF6E9 /* KoalaAppTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E00657827CFF7EC006FF6E9 /* KoalaAppTestUITests.swift */; };
 		1E5B7B332800F75900F8BDDB /* PerformanceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5B7B322800F75900F8BDDB /* PerformanceTest.swift */; };
+		1E9C521C2EE2661700860AA4 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1E9C521B2EE2661700860AA4 /* Koala */; };
 		E1B2D78D2CF6B30800A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D78C2CF6B30800A28024 /* Koala */; };
 		E1B2D78F2CF6B30D00A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D78E2CF6B30D00A28024 /* Koala */; };
 		E1B2D7912CF6B31200A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D7902CF6B31200A28024 /* Koala */; };
@@ -64,6 +65,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1B2D78D2CF6B30800A28024 /* Koala in Frameworks */,
+				1E9C521C2EE2661700860AA4 /* Koala in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,7 +238,7 @@
 			);
 			mainGroup = 1E00654B27CFF7EB006FF6E9;
 			packageReferences = (
-				E1CF9E222CFA572A004BA9A9 /* XCRemoteSwiftPackageReference "koala" */,
+				1E9C521A2EE2661700860AA4 /* XCLocalSwiftPackageReference "../../../../koala" */,
 			);
 			productRefGroup = 1E00655527CFF7EB006FF6E9 /* Products */;
 			projectDirPath = "";
@@ -650,24 +652,21 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		1E9C521A2EE2661700860AA4 /* XCLocalSwiftPackageReference "../../../../koala" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../../koala;
+		};
 		E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../../../koala;
 		};
 /* End XCLocalSwiftPackageReference section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		E1CF9E222CFA572A004BA9A9 /* XCRemoteSwiftPackageReference "koala" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Picovoice/koala";
-			requirement = {
-				kind = exactVersion;
-				version = 2.0.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
 /* Begin XCSwiftPackageProductDependency section */
+		1E9C521B2EE2661700860AA4 /* Koala */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Koala;
+		};
 		E1B2D78C2CF6B30800A28024 /* Koala */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */;
