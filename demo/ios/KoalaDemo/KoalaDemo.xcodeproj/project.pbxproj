@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E9C521F2EE3B91400860AA4 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1E9C521E2EE3B91400860AA4 /* Koala */; };
 		32769079E5BC2BA141FA659F /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327695EA9D71F6A29C6D079A /* ViewModel.swift */; };
 		3276967434C9CEBD0AF09237 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 327694975368499C3B7946DD /* Assets.xcassets */; };
 		327698EADFD16D8F70823520 /* KoalaDemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 327697358B823E5B2EF0FA8C /* KoalaDemoApp.swift */; };
@@ -31,6 +32,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E1CF9E212CFA53BD004BA9A9 /* Koala in Frameworks */,
+				1E9C521F2EE3B91400860AA4 /* Koala in Frameworks */,
 				E1B2D78A2CF6A07100A28024 /* ios_voice_processor in Frameworks */,
 				E1B2D7872CF6A06100A28024 /* Koala in Frameworks */,
 			);
@@ -112,7 +114,7 @@
 			mainGroup = 327692BCE8C735F3534C318E;
 			packageReferences = (
 				E1B2D7882CF6A07100A28024 /* XCRemoteSwiftPackageReference "ios-voice-processor" */,
-				E1CF9E1F2CFA53BD004BA9A9 /* XCRemoteSwiftPackageReference "koala" */,
+				1E9C521D2EE3B91400860AA4 /* XCLocalSwiftPackageReference "../../../../koala" */,
 			);
 			productRefGroup = 32769B87809678D96B1C6C55 /* Products */;
 			projectDirPath = "";
@@ -222,7 +224,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -252,7 +254,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -353,6 +355,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		1E9C521D2EE3B91400860AA4 /* XCLocalSwiftPackageReference "../../../../koala" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../../koala;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		E1B2D7882CF6A07100A28024 /* XCRemoteSwiftPackageReference "ios-voice-processor" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -373,6 +382,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1E9C521E2EE3B91400860AA4 /* Koala */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Koala;
+		};
 		E1B2D7862CF6A06100A28024 /* Koala */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Koala;

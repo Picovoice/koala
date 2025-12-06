@@ -119,7 +119,7 @@ public class Koala {
 
         var deviceArg = device
         if deviceArg == nil {
-            deviceArg = "cpu:1"
+            deviceArg = "best"
         }
 
         pv_set_sdk(Koala.sdk)
