@@ -31,7 +31,7 @@ jobs:
 
     strategy:
       matrix:
-        device: [ cpu:1 ]
+        device: [ cpu:1, cpu ]
         node-version: [ 18.x, 20.x, 22.x, 24.x ]
 
     steps:

@@ -34,7 +34,7 @@ export enum PvStatus {
 export type KoalaModel = PvModel;
 
 export type KoalaOptions = {
-  /** @defaultValue undefined */
+  /** @defaultValue best */
   device?: string;
   /** @defaultValue undefined */
   processErrorCallback?: (error: KoalaError) => void;

@@ -70,7 +70,6 @@ type pv_free_error_stack_type = (messageStack: number) => void;
 type KoalaModule = EmscriptenModule & {
   _pv_free: (address: number) => void;
 
-  _pv_koala_delete: pv_koala_delete_type
   _pv_koala_delay_sample: pv_koala_delay_sample_type
   _pv_koala_frame_length: pv_koala_frame_length_type;
   _pv_sample_rate: pv_sample_rate_type
@@ -96,6 +95,7 @@ type KoalaWasmOutput = {
 
   pv_koala_process: pv_koala_process_type;
   pv_koala_reset: pv_koala_reset_type;
+  pv_koala_delete: pv_koala_delete_type;
 
   version: string;
   sampleRate: number;
@@ -109,14 +109,15 @@ type KoalaWasmOutput = {
   outputBufferAddress: number;
 };
 
-const CPU_DEVICE_REGEX = /^cpu(:\d+)?$/;
 const PV_STATUS_SUCCESS = 10000;
 
 class Koala {
-  private readonly _module: KoalaModule;
+  private _module?: KoalaModule;
 
   private readonly _pv_koala_process: pv_koala_process_type;
   private readonly _pv_koala_reset: pv_koala_reset_type;
+  private readonly _pv_koala_delete: pv_koala_delete_type;
+
 
   private readonly _delaySample: number;
   private readonly _frameLength: number;
@@ -153,6 +154,7 @@ class Koala {
 
     this._pv_koala_process = handleWasm.pv_koala_process;
     this._pv_koala_reset = handleWasm.pv_koala_reset;
+    this._pv_koala_delete = handleWasm.pv_koala_delete;
 
     this._delaySample = handleWasm.delaySample;
     this._frameLength = handleWasm.frameLength;
@@ -305,22 +307,18 @@ class Koala {
       throw new KoalaErrors.KoalaRuntimeError('Browser not supported.');
     }
 
-    if (device === "best") {
-      device = "cpu:1";
-    }
-
     const isWorkerScope = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
-    if (!isWorkerScope) {
-      if (device && CPU_DEVICE_REGEX.test(device)) {
-        if (device !== "cpu" && device !== "cpu:1") {
-          console.warn("Multi-threading is not supported on main thread.");
-        }
-        device = "cpu:1";
-      }
+    if (
+      !isWorkerScope &&
+      (device === 'best' || (device.startsWith('cpu') && device !== 'cpu:1'))
+    ) {
+      // eslint-disable-next-line no-console
+      console.warn('Multi-threading is not supported on main thread.');
+      device = 'cpu:1';
     }
 
-    const sabDefined = (typeof SharedArrayBuffer !== 'undefined')
-      && (device !== "cpu") && (device !== "cpu:1");
+    const sabDefined = typeof SharedArrayBuffer !== 'undefined'
+      && (device !== "cpu:1");
 
     return new Promise<Koala>((resolve, reject) => {
       Koala._koalaMutex
@@ -328,7 +326,7 @@ class Koala {
           const wasmOutput = await Koala.initWasm(
             accessKey.trim(),
             modelPath,
-            (device) ? device : "best",
+            device,
             (sabDefined) ? this._wasmPThread : this._wasmSimd,
             (sabDefined) ? this._wasmPThreadLib : this._wasmSimdLib,
             (sabDefined) ? createModulePThread : createModuleSimd,
@@ -482,11 +480,12 @@ class Koala {
       return;
     }
 
-    this._module._pv_koala_delete(this._objectAddress);
+    await this._pv_koala_delete(this._objectAddress);
     this._module._pv_free(this._inputBufferAddress);
     this._module._pv_free(this._outputBufferAddress);
     this._module._pv_free(this._messageStackAddressAddressAddress);
     this._module._pv_free(this._messageStackDepthAddress);
+    this._module = undefined;
   }
 
   async onmessage(e: MessageEvent): Promise<void> {
@@ -634,6 +633,11 @@ class Koala {
       module,
       "pv_koala_reset",
       1);
+    const pv_koala_delete: pv_koala_delete_type = this.wrapAsyncFunction(
+      module,
+      "pv_koala_delete",
+      1);
+
 
     const objectAddressAddress = module._malloc(Int32Array.BYTES_PER_ELEMENT);
     if (objectAddressAddress === 0) {
@@ -780,6 +784,7 @@ class Koala {
 
       pv_koala_process: pv_koala_process,
       pv_koala_reset: pv_koala_reset,
+      pv_koala_delete: pv_koala_delete,
 
       delaySample: delaySample,
       frameLength: frameLength,
