@@ -59,7 +59,7 @@ public class Koala {
      *              suitable device is selected automatically. If set to `gpu`, the engine uses the first
      *              available GPU device. To select a specific GPU device, set this argument to `gpu:${GPU_INDEX}`,
      *              where `${GPU_INDEX}` is the index of the target GPU. If set to `cpu`, the engine will run on
-     *              the CPU with the default number of threads. To specify the number of threads, set this 
+     *              the CPU with the default number of threads. To specify the number of threads, set this
      *              argument to `cpu:${NUM_THREADS}`, where `${NUM_THREADS}` is the desired number of threads.
      *
      * @throws KoalaException if there is an error while initializing Koala.
@@ -265,7 +265,7 @@ public class Koala {
             }
 
             if (device == null) {
-                device = "cpu:1";
+                device = "best";
             }
 
             return new Koala(accessKey, modelPath, device);
