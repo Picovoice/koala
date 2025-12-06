@@ -39,7 +39,7 @@ Browsers that don't support `SharedArrayBuffers` or applications that don't incl
 IndexedDB is required to use `Koala` in a worker thread. Browsers without IndexedDB support
 (i.e. Firefox Incognito Mode) should use `Koala` in the main thread.
 
-Due to limitations, multi-threading is disabled for `Koala` in the main thread.
+Multi-threading is only enabled for `Koala` when using on a web worker.
 
 ## Installation
 
