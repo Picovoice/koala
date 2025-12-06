@@ -107,7 +107,7 @@ static void print_usage(const char *program_name) {
     fprintf(stdout,
             "Usage: %s -l LIBRARY_PATH [-m MODEL_PATH -a ACCESS_KEY -y DEVICE -d AUDIO_DEVICE_INDEX -o WAV_OUTPUT_PATH -r WAV_REFERENCE_PATH]\n"
             "        %s [-s, --show_audio_devices]\n"
-            "        %s [-z, --show_inference_devices]\n",
+            "        %s [-z, --show_inference_devices] -l LIBRARY_PATH\n",
             program_name,
             program_name,
             program_name);

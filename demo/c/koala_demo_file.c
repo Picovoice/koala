@@ -101,7 +101,7 @@ static void print_usage(const char *program_name) {
     fprintf(
             stdout,
             "Usage: %s -l LIBRARY_PATH [-m MODEL_PATH -a ACCESS_KEY -y DEVICE -i INPUT_PATH -o OUTPUT_PATH]\n"
-            "        %s [-z, --show_inference_devices]\n",
+            "        %s [-z, --show_inference_devices] -l LIBRARY_PATH\n",
             program_name,
             program_name);
 }
