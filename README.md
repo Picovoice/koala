@@ -322,6 +322,13 @@ Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://con
 
 ## Releases
 
+### v3.0.0 - December 9th, 2025
+
+ - Improved engine performance
+ - Added support for running on GPU or multiple CPU cores
+ - Node.js min version bumped to Node 18
+ - iOS min version bumped to iOS 16
+
 ### v2.0.0 - November 24th, 2023
 
 - Improvements to error reporting
