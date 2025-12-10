@@ -70,9 +70,9 @@ jobs:
       run: >
         python3 test_koala_perf.py
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
+        --device ${{ matrix.device }}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
-        --device ${{ matrix.device }}
 
   perf-self-hosted:
     runs-on: ${{ matrix.machine }}
@@ -108,31 +108,24 @@ jobs:
       run: >
         python3 test_koala_perf.py
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
+        --device ${{ matrix.device }}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
-        --device ${{ matrix.device }}
 
     - name: Machine state after
       working-directory: resources/scripts
       run: bash machine-state.sh
 
-  perf-self-hosted-desktop:
+  perf-windows-arm64:
     runs-on: ${{ matrix.machine }}
 
     strategy:
       fail-fast: false
       matrix:
-        device: [ gpu ]
-        machine: [ pv-linux, pv-windows, pv-ios ]
+        device: [ cpu:1 ]
+        machine: [ pv-windows-arm64 ]
         include:
-          - device: cpu:1
-            machine: pv-windows-arm64
-            proc_performance_threshold_sec: 0.8
-          - machine: pv-linux
-            proc_performance_threshold_sec: 0.8
-          - machine: pv-windows
-            proc_performance_threshold_sec: 0.8
-          - machine: pv-ios
+          - machine: pv-windows-arm64
             proc_performance_threshold_sec: 0.8
 
     steps:
@@ -145,6 +138,6 @@ jobs:
       run: >
         python3 test_koala_perf.py
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
+        --device ${{ matrix.device }}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{ matrix.proc_performance_threshold_sec}}
-        --device ${{ matrix.device }}

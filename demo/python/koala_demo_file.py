@@ -53,7 +53,7 @@ def main():
         raise ValueError('Missing required argument --access_key')
 
     if args.input_path is None:
-        raise ValueError('Missing required argument --output_path')
+        raise ValueError('Missing required argument --input_path')
 
     if args.output_path is None:
         raise ValueError('Missing required argument --output_path')
