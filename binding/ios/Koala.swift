@@ -1,5 +1,5 @@
 //
-//  Copyright 2023-2024 Picovoice Inc.
+//  Copyright 2023-2025 Picovoice Inc.
 //  You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 //  file accompanying this source.
 //  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
@@ -60,15 +60,46 @@ public class Koala {
         self.sdk = sdk
     }
 
+    /// Lists all available devices that Koala can use for inference.
+    /// Entries in the list can be used as the `device` argument when initializing Koala.
+    ///
+    /// - Throws: KoalaError
+    /// - Returns: Array of available devices that Koala can be used for inference.
+    public static func getAvailableDevices() throws -> [String] {
+        var cHardwareDevices: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?
+        var numHardwareDevices: Int32 = 0
+        let status = pv_koala_list_hardware_devices(&cHardwareDevices, &numHardwareDevices)
+        if status != PV_STATUS_SUCCESS {
+            let messageStack = try getMessageStack()
+            throw pvStatusToKoalaError(status, "Koala getAvailableDevices failed", messageStack)
+        }
+
+        var hardwareDevices: [String] = []
+        for i in 0..<numHardwareDevices {
+            hardwareDevices.append(String(cString: cHardwareDevices!.advanced(by: Int(i)).pointee!))
+        }
+
+        pv_koala_free_hardware_devices(cHardwareDevices, numHardwareDevices)
+
+        return hardwareDevices
+    }
+
     /// Constructor.
     ///
     /// - Parameters:
     ///   - accessKey: The AccessKey obtained from Picovoice Console (https://console.picovoice.ai).
     ///   - modelPath: Absolute path to file containing model parameters.
+    ///   - device: String representation of the device (e.g., CPU or GPU) to use. If set to `best`, the most
+    ///     suitable device is selected automatically. If set to `gpu`, the engine uses the first available
+    ///     GPU device. To select a specific GPU device, set this argument to `gpu:${GPU_INDEX}`, where `${GPU_INDEX}`
+    ///     is the index of the target GPU. If set to `cpu`, the engine will run on the CPU with the default
+    ///     number of threads. To specify the number of threads, set this argument to `cpu:${NUM_THREADS}`,
+    ///     where `${NUM_THREADS}` is the desired number of threads.
     /// - Throws: KoalaError
     public init(
             accessKey: String,
-            modelPath: String? = nil) throws {
+            modelPath: String? = nil,
+            device: String? = nil) throws {
 
         if accessKey.count == 0 {
             throw KoalaInvalidArgumentError("AccessKey is required for Koala initialization")
@@ -86,22 +117,28 @@ public class Koala {
             modelPathArg = try getResourcePath(modelPathArg!)
         }
 
+        var deviceArg = device
+        if deviceArg == nil {
+            deviceArg = "best"
+        }
+
         pv_set_sdk(Koala.sdk)
 
         var status = pv_koala_init(
                 accessKey,
                 modelPathArg,
+                deviceArg,
                 &self.handle)
         if status != PV_STATUS_SUCCESS {
-            let messageStack = try getMessageStack()
-            throw pvStatusToKoalaError(status, "Koala init failed", messageStack)
+            let messageStack = try Koala.getMessageStack()
+            throw Koala.pvStatusToKoalaError(status, "Koala init failed", messageStack)
         }
 
         var cDelaySample: Int32 = 0
         status = pv_koala_delay_sample(self.handle, &cDelaySample)
         if status != PV_STATUS_SUCCESS {
-            let messageStack = try getMessageStack()
-            throw pvStatusToKoalaError(status, "Failed to get Koala delay sample", messageStack)
+            let messageStack = try Koala.getMessageStack()
+            throw Koala.pvStatusToKoalaError(status, "Failed to get Koala delay sample", messageStack)
         }
         self.delaySample = UInt32(cDelaySample)
     }
@@ -161,8 +198,8 @@ public class Koala {
         var enhancedPcm = [Int16](repeating: 0, count: Int(Koala.frameLength))
         let status = pv_koala_process(self.handle, pcm, &enhancedPcm[0])
         if status != PV_STATUS_SUCCESS {
-            let messageStack = try getMessageStack()
-            throw pvStatusToKoalaError(status, "Koala process failed", messageStack)
+            let messageStack = try Koala.getMessageStack()
+            throw Koala.pvStatusToKoalaError(status, "Koala process failed", messageStack)
         }
 
         return enhancedPcm
@@ -179,8 +216,8 @@ public class Koala {
 
         let status = pv_koala_reset(self.handle)
         if status != PV_STATUS_SUCCESS {
-            let messageStack = try getMessageStack()
-            throw pvStatusToKoalaError(status, "Koala process failed", messageStack)
+            let messageStack = try Koala.getMessageStack()
+            throw Koala.pvStatusToKoalaError(status, "Koala process failed", messageStack)
         }
     }
 
@@ -203,7 +240,7 @@ public class Koala {
                            """)
     }
 
-    private func pvStatusToKoalaError(
+    private static func pvStatusToKoalaError(
         _ status: pv_status_t,
         _ message: String,
         _ messageStack: [String] = []) -> KoalaError {
@@ -236,7 +273,7 @@ public class Koala {
         }
     }
 
-    private func getMessageStack() throws -> [String] {
+    private static func getMessageStack() throws -> [String] {
         var messageStackRef: UnsafeMutablePointer<UnsafeMutablePointer<Int8>?>?
         var messageStackDepth: Int32 = 0
         let status = pv_get_error_stack(&messageStackRef, &messageStackDepth)
