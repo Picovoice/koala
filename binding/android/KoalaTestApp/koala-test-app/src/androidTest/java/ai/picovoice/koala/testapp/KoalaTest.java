@@ -1,5 +1,5 @@
 /*
-    Copyright 2023 Picovoice Inc.
+    Copyright 2023-2025 Picovoice Inc.
     You may not use this file except in compliance with the license. A copy of the license is
     located in the "LICENSE" file accompanying this source.
     Unless required by applicable law or agreed to in writing, software distributed under the
@@ -57,6 +57,7 @@ public class KoalaTest {
     String testResourcesPath;
 
     String accessKey = "";
+    String device;
 
     @Before
     public void Setup() throws IOException {
@@ -66,6 +67,7 @@ public class KoalaTest {
         testResourcesPath = new File(appContext.getFilesDir(), "test_resources").getAbsolutePath();
 
         accessKey = appContext.getString(R.string.pvTestingAccessKey);
+        device = appContext.getString(R.string.pvTestingDevice);
     }
 
     private List<Short> loadPcm(File file) throws IOException {
@@ -104,7 +106,10 @@ public class KoalaTest {
     }
 
     private void runTest(List<Short> inputPcm, List<Short> referencePcm, double tolerance) throws KoalaException {
-        Koala koala = new Koala.Builder().setAccessKey(accessKey).build(getApplicationContext());
+        Koala koala = new Koala.Builder()
+                .setAccessKey(accessKey)
+                .setDevice(device)
+                .build(getApplicationContext());
 
         for (int i = 0; i < (inputPcm.size() - koala.getFrameLength()); i += koala.getFrameLength()) {
             short[] frame = frameFromList(inputPcm, i, koala.getFrameLength());
@@ -123,6 +128,21 @@ public class KoalaTest {
             }
             assertTrue(energyDeviation < tolerance);
         }
+    }
+
+    @Test
+    public void testInitFailWithInvalidDevice() {
+        boolean didFail = false;
+        try {
+            new Koala.Builder()
+                    .setAccessKey(accessKey)
+                    .setDevice("invalid:9")
+                    .build(appContext);
+        } catch (KoalaException e) {
+            didFail = true;
+        }
+
+        assertTrue(didFail);
     }
 
     @Test
@@ -202,6 +222,15 @@ public class KoalaTest {
             for (int i = 0; i < error.length; i++) {
                 assertEquals(e.getMessageStack()[i], error[i]);
             }
+        }
+    }
+
+    @Test
+    public void testGetAvailableDevices() throws KoalaException {
+        String[] availableDevices = Koala.getAvailableDevices();
+        assertTrue(availableDevices.length > 0);
+        for (String d : availableDevices) {
+            assertTrue(d != null && d.length() > 0);
         }
     }
 

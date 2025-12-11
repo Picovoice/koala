@@ -12,6 +12,9 @@ if (rootProject.file("local.properties").exists()) {
     if (project.hasProperty("performanceThresholdSec")) {
         properties.put("performanceThresholdSec", project.getProperty("performanceThresholdSec"))
     }
+    if (project.hasProperty("pvTestingDevice")) {
+        properties.put("pvTestingDevice", project.getProperty("pvTestingDevice"))
+    }
 
     if (project.hasProperty("storePassword")) {
         properties.put("storePassword", project.getProperty("storePassword"))
@@ -42,6 +45,7 @@ android {
         resValue 'string', 'pvTestingAccessKey', properties.getProperty("pvTestingAccessKey", "")
         resValue 'string', 'numTestIterations', properties.getProperty("numTestIterations", "")
         resValue 'string', 'performanceThresholdSec', properties.getProperty("performanceThresholdSec", "")
+        resValue 'string', 'pvTestingDevice', properties.getProperty("pvTestingDevice", "")
     }
 
     signingConfigs {
@@ -113,7 +117,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     implementation 'androidx.navigation:navigation-fragment:2.3.5'
     implementation 'androidx.navigation:navigation-ui:2.3.5'
-    implementation 'ai.picovoice:koala-android:2.0.1'
+    implementation files('../../Koala/koala/build/outputs/aar/koala-release.aar')
 
     // Espresso UI Testing
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
