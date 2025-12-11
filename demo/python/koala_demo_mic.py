@@ -1,5 +1,5 @@
 #
-#    Copyright 2023 Picovoice Inc.
+#    Copyright 2023-2025 Picovoice Inc.
 #
 #    You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 #    file accompanying this source.
@@ -15,7 +15,7 @@ import math
 import struct
 import wave
 
-from pvkoala import create, KoalaActivationLimitError
+from pvkoala import create, available_devices, KoalaActivationLimitError
 from pvrecorder import PvRecorder
 
 VU_DYNAMIC_RANGE_DB = 50.0
@@ -39,6 +39,14 @@ def main():
     parser.add_argument(
         '--model_path',
         help='Absolute path to Koala model. Default: using the model provided by `pvkoala`')
+    parser.add_argument(
+        '--device',
+        help='Device to run inference on (`best`, `cpu:{num_threads}` or `gpu:{gpu_index}`). '
+             'Default: automatically selects best device for `pvkoala`')
+    parser.add_argument(
+        '--show_inference_devices',
+        action='store_true',
+        help='Show the list of available devices for Koala inference and exit')
     parser.add_argument('--audio_device_index', type=int, default=-1, help='Index of input audio device')
     parser.add_argument('--show_audio_devices', action='store_true', help='Only list available devices and exit')
     args = parser.parse_args()
@@ -46,6 +54,10 @@ def main():
     if args.show_audio_devices:
         for index, name in enumerate(PvRecorder.get_available_devices()):
             print('Device #%d: %s' % (index, name))
+        return
+
+    if args.show_inference_devices:
+        print('\n'.join(available_devices(library_path=args.library_path)))
         return
 
     if args.access_key is None:
@@ -63,6 +75,7 @@ def main():
     koala = create(
         access_key=args.access_key,
         model_path=args.model_path,
+        device=args.device,
         library_path=args.library_path)
 
     length_sec = 0.0

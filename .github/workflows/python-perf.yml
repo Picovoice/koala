@@ -42,7 +42,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        device: [ cpu:1 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
         include:
         - os: ubuntu-latest
           proc_performance_threshold_sec: 0.8
@@ -69,6 +70,7 @@ jobs:
       run: >
         python3 test_koala_perf.py
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
+        --device ${{ matrix.device }}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
 
@@ -78,7 +80,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [rpi3-32, rpi3-64, rpi4-32, rpi4-64, rpi5-64]
+        device: [ cpu:1 ]
+        machine: [ rpi3-32, rpi3-64, rpi4-32, rpi4-64, rpi5-64 ]
         include:
         - machine: rpi3-32
           proc_performance_threshold_sec: 2.5
@@ -105,6 +108,7 @@ jobs:
       run: >
         python3 test_koala_perf.py
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
+        --device ${{ matrix.device }}
         --num-test-iterations 20
         --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
 
@@ -118,10 +122,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        machine: [pv-windows-arm64]
+        device: [ cpu:1 ]
+        machine: [ pv-windows-arm64 ]
         include:
-        - machine: pv-windows-arm64
-          proc_performance_threshold_sec: 0.8
+          - machine: pv-windows-arm64
+            proc_performance_threshold_sec: 0.8
 
     steps:
     - uses: actions/checkout@v3
@@ -133,5 +138,6 @@ jobs:
       run: >
         python3 test_koala_perf.py
         --access-key ${{secrets.PV_VALID_ACCESS_KEY}}
+        --device ${{ matrix.device }}
         --num-test-iterations 20
-        --proc-performance-threshold-sec ${{matrix.proc_performance_threshold_sec}}
+        --proc-performance-threshold-sec ${{ matrix.proc_performance_threshold_sec}}
