@@ -18,6 +18,7 @@ Emscripten
 frombuffer
 hanning
 HEAPU
+hszl
 iife
 irfft
 jetson
