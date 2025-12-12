@@ -1,5 +1,5 @@
 #
-#    Copyright 2023 Picovoice Inc.
+#    Copyright 2023-2025 Picovoice Inc.
 #
 #    You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 #    file accompanying this source.
@@ -35,6 +35,7 @@ class KoalaPerformanceTestCase(unittest.TestCase):
 
         koala = Koala(
             access_key=self.access_key,
+            device=self.device,
             library_path=default_library_path('../..'),
             model_path=default_model_path('../..'))
 
@@ -60,11 +61,13 @@ class KoalaPerformanceTestCase(unittest.TestCase):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--access-key', required=True)
+    parser.add_argument('--device', required=True)
     parser.add_argument('--num-test-iterations', type=int, required=True)
     parser.add_argument('--proc-performance-threshold-sec', type=float, required=True)
     args = parser.parse_args()
 
     KoalaPerformanceTestCase.access_key = args.access_key
+    KoalaPerformanceTestCase.device = args.device
     KoalaPerformanceTestCase.num_test_iterations = args.num_test_iterations
     KoalaPerformanceTestCase.proc_performance_threshold_sec = args.proc_performance_threshold_sec
 

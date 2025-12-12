@@ -243,7 +243,9 @@ When done be sure to explicitly release the resources using `koala.delete()`.
 ```c
     pv_koala_t *handle = NULL;
     const char *model_path = "${MODEL_PATH}";
-    pv_status_t status = pv_koala_init(${ACCESS_KEY}, model_path, &handle);
+    const char *device = "best";
+
+    pv_status_t status = pv_koala_init(${ACCESS_KEY}, model_path, device, &handle);
     if (status != PV_STATUS_SUCCESS) {
         // error handling logic
     }
@@ -319,6 +321,13 @@ for (;;) {
 Replace `${ACCESS_KEY}` with yours obtained from [Picovoice Console](https://console.picovoice.ai/). Finally, when done release the resources using `koala.release()`.
 
 ## Releases
+
+### v3.0.0 - December 9th, 2025
+
+ - Improved engine performance
+ - Added support for running on GPU or multiple CPU cores
+ - Node.js min version bumped to Node 18
+ - iOS min version bumped to iOS 16
 
 ### v2.0.0 - November 24th, 2023
 

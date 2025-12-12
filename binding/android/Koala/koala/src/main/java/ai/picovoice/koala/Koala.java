@@ -1,5 +1,5 @@
 /*
-    Copyright 2023 Picovoice Inc.
+    Copyright 2023-2025 Picovoice Inc.
     You may not use this file except in compliance with the license. A copy of the license is
     located in the "LICENSE" file accompanying this source.
     Unless required by applicable law or agreed to in writing, software distributed under the
@@ -40,16 +40,33 @@ public class Koala {
     }
 
     /**
+     * Lists all available devices that Koala can use for inference.
+     * Each entry in the list can be used as the `device` argument when initializing Koala.
+     *
+     * @return Array of all available devices that Koala can be used for inference.
+     * @throws KoalaException if getting available devices fails.
+     */
+    public static String[] getAvailableDevices() throws KoalaException {
+        return KoalaNative.listHardwareDevices();
+    }
+
+    /**
      * Constructor.
      *
      * @param accessKey AccessKey obtained from Picovoice Console
      * @param modelPath Absolute path to the file containing Koala model parameters.
+     * @param device String representation of the device (e.g., CPU or GPU) to use. If set to `best`, the most
+     *              suitable device is selected automatically. If set to `gpu`, the engine uses the first
+     *              available GPU device. To select a specific GPU device, set this argument to `gpu:${GPU_INDEX}`,
+     *              where `${GPU_INDEX}` is the index of the target GPU. If set to `cpu`, the engine will run on
+     *              the CPU with the default number of threads. To specify the number of threads, set this
+     *              argument to `cpu:${NUM_THREADS}`, where `${NUM_THREADS}` is the desired number of threads.
      *
      * @throws KoalaException if there is an error while initializing Koala.
      */
-    private Koala(String accessKey, String modelPath) throws KoalaException {
+    private Koala(String accessKey, String modelPath, String device) throws KoalaException {
         KoalaNative.setSdk(Koala._sdk);
-        handle = KoalaNative.init(accessKey, modelPath);
+        handle = KoalaNative.init(accessKey, modelPath, device);
     }
 
     private static void extractPackageResources(Context context) throws KoalaException {
@@ -184,6 +201,7 @@ public class Koala {
 
         private String accessKey = null;
         private String modelPath = null;
+        private String device = null;
 
         /**
          * Setter for the AccessKey.
@@ -202,6 +220,16 @@ public class Koala {
          */
         public Builder setModelPath(String modelPath) {
             this.modelPath = modelPath;
+            return this;
+        }
+
+        /**
+         * Setter for device.
+         *
+         * @param device String representation of the device
+         */
+        public Builder setDevice(String device) {
+            this.device = device;
             return this;
         }
 
@@ -236,7 +264,11 @@ public class Koala {
                 }
             }
 
-            return new Koala(accessKey, modelPath);
+            if (device == null) {
+                device = "best";
+            }
+
+            return new Koala(accessKey, modelPath, device);
         }
     }
 }

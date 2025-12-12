@@ -57,6 +57,9 @@ jobs:
     - name: Inject AccessKey
       run: echo pvTestingAccessKey="${{secrets.PV_VALID_ACCESS_KEY}}" >> local.properties
 
+    - name: Inject Device
+      run: echo pvTestingDevice="cpu:1" >> local.properties
+
     - name: Inject Android keystore variables
       run: |
         echo storePassword="${{secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD}}" >> local.properties
@@ -91,4 +94,3 @@ jobs:
         --devices "${{ matrix.device }}"
         --app_path "koala-test-app/build/outputs/apk/debug/koala-test-app-debug.apk"
         --test_path "koala-test-app/build/outputs/apk/androidTest/debug/koala-test-app-debug-androidTest.apk"
-

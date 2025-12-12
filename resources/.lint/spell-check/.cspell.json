@@ -48,6 +48,9 @@
     // android
     "**/AndroidManifest.xml",
     "**/activity_main.xml",
-    "**/koala_activity_demo.xml"
+    "**/koala_activity_demo.xml",
+
+    // wasm
+    "**/lib/wasm/**/*.js"
   ]
 }

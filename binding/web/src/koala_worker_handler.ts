@@ -1,5 +1,5 @@
 /*
-  Copyright 2023 Picovoice Inc.
+  Copyright 2023-2025 Picovoice Inc.
   You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
   file accompanying this source.
   Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
@@ -10,7 +10,7 @@
 /// <reference no-default-lib="false"/>
 /// <reference lib="webworker" />
 
-import { Koala } from './koala';
+import Koala from './koala';
 import { KoalaWorkerRequest, KoalaWorkerInitRequest, PvStatus } from './types';
 import { KoalaError } from './koala_errors';
 
@@ -41,8 +41,10 @@ const initRequest = async (request: KoalaWorkerInitRequest): Promise<any> => {
     };
   }
   try {
-    Koala.setWasm(request.wasm);
     Koala.setWasmSimd(request.wasmSimd);
+    Koala.setWasmSimdLib(request.wasmSimdLib);
+    Koala.setWasmPThread(request.wasmPThread);
+    Koala.setWasmPThreadLib(request.wasmPThreadLib);
     Koala.setSdk(request.sdk);
     koala = await Koala._init(
       request.accessKey,

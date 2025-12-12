@@ -18,9 +18,8 @@
 		1E00656427CFF7EC006FF6E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E00656227CFF7EC006FF6E9 /* LaunchScreen.storyboard */; };
 		1E00657927CFF7EC006FF6E9 /* KoalaAppTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E00657827CFF7EC006FF6E9 /* KoalaAppTestUITests.swift */; };
 		1E5B7B332800F75900F8BDDB /* PerformanceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5B7B322800F75900F8BDDB /* PerformanceTest.swift */; };
-		E1B2D78D2CF6B30800A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D78C2CF6B30800A28024 /* Koala */; };
-		E1B2D78F2CF6B30D00A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D78E2CF6B30D00A28024 /* Koala */; };
-		E1B2D7912CF6B31200A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D7902CF6B31200A28024 /* Koala */; };
+		1EE706392EECA83B00D7B1A1 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1EE706382EECA83B00D7B1A1 /* Koala */; };
+		1EE7063B2EECBF5F00D7B1A1 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1EE7063A2EECBF5F00D7B1A1 /* Koala */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,7 +62,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1B2D78D2CF6B30800A28024 /* Koala in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,7 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1B2D78F2CF6B30D00A28024 /* Koala in Frameworks */,
+				1EE706392EECA83B00D7B1A1 /* Koala in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1B2D7912CF6B31200A28024 /* Koala in Frameworks */,
+				1EE7063B2EECBF5F00D7B1A1 /* Koala in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -236,7 +234,7 @@
 			);
 			mainGroup = 1E00654B27CFF7EB006FF6E9;
 			packageReferences = (
-				E1CF9E222CFA572A004BA9A9 /* XCRemoteSwiftPackageReference "koala" */,
+				1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */,
 			);
 			productRefGroup = 1E00655527CFF7EB006FF6E9 /* Products */;
 			projectDirPath = "";
@@ -470,7 +468,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -499,7 +497,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -520,7 +518,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 65723695GD;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -543,7 +541,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 65723695GD;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -567,7 +565,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 65723695GD;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -592,7 +590,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 65723695GD;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -649,38 +647,26 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../koala;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
-		E1CF9E222CFA572A004BA9A9 /* XCRemoteSwiftPackageReference "koala" */ = {
+		1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Picovoice/koala";
 			requirement = {
 				kind = exactVersion;
-				version = 2.0.1;
+				version = 3.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		E1B2D78C2CF6B30800A28024 /* Koala */ = {
+		1EE706382EECA83B00D7B1A1 /* Koala */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */;
+			package = 1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */;
 			productName = Koala;
 		};
-		E1B2D78E2CF6B30D00A28024 /* Koala */ = {
+		1EE7063A2EECBF5F00D7B1A1 /* Koala */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */;
-			productName = Koala;
-		};
-		E1B2D7902CF6B31200A28024 /* Koala */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */;
+			package = 1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */;
 			productName = Koala;
 		};
 /* End XCSwiftPackageProductDependency section */

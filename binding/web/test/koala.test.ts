@@ -5,6 +5,7 @@ import koalaParams from './koala_params';
 import { KoalaError } from "../dist/types/koala_errors";
 
 const ACCESS_KEY = Cypress.env('ACCESS_KEY');
+const DEVICE = Cypress.env('DEVICE');
 
 function rootMeanSquare(pcm: Int16Array): number {
   let sumSquares = 0;
@@ -75,6 +76,7 @@ async function runTest(
         },
         { publicPath: '/test/koala_params.pv', forceWrite: true },
         {
+          device: DEVICE,
           processErrorCallback: (error: KoalaError) => {
             reject(error);
           },
@@ -106,7 +108,7 @@ async function testReset(
   let frames: Int16Array[] = [];
   let numFrames = 0;
 
-  const koala = await Koala.create(
+  const koala = await instance.create(
     ACCESS_KEY,
     enhancedPcm => {
       frames.push(enhancedPcm);
@@ -201,6 +203,12 @@ describe('Koala Binding', function () {
     }
   });
 
+  it('List hardware devices', async () => {
+    const hardwareDevices: string[] = await Koala.listAvailableDevices();
+    expect(Array.isArray(hardwareDevices)).to.be.true;
+    expect(hardwareDevices).length.to.be.greaterThan(0);
+  });
+
   for (const instance of [Koala, KoalaWorker]) {
     const instanceString = instance === KoalaWorker ? 'worker' : 'main';
     it(`should be able to init with public path (${instanceString})`, async () => {
@@ -226,7 +234,7 @@ describe('Koala Binding', function () {
 
     it(`should be able to init with base64 (${instanceString})`, async () => {
       try {
-        const koala = await Koala.create(ACCESS_KEY, _ => {}, {
+        const koala = await instance.create(ACCESS_KEY, _ => {}, {
           base64: koalaParams,
           forceWrite: true,
         });
@@ -253,7 +261,7 @@ describe('Koala Binding', function () {
 
     it(`should be able to process noise speech (${instanceString})`, () => {
       cy.getFramesFromFile('audio_samples/noise.wav').then(async inputPcm => {
-        await runTest(instance, inputPcm);
+        await runTest(instance, inputPcm, undefined);
       });
     });
 

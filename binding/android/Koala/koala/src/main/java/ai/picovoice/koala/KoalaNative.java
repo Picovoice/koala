@@ -1,5 +1,5 @@
 /*
-    Copyright 2023 Picovoice Inc.
+    Copyright 2023-2025 Picovoice Inc.
 
     You may not use this file except in compliance with the license. A copy of the license is
     located in the "LICENSE" file accompanying this source.
@@ -22,7 +22,7 @@ class KoalaNative {
 
     static native void setSdk(String sdk);
 
-    static native long init(String accessKey, String modelPath) throws KoalaException;
+    static native long init(String accessKey, String modelPath, String device) throws KoalaException;
 
     static native void delete(long object);
 
@@ -32,4 +32,5 @@ class KoalaNative {
 
     static native int delaySample(long object) throws KoalaException;
 
+    static native String[] listHardwareDevices() throws KoalaException;
 }

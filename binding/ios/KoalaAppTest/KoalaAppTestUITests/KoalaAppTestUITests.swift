@@ -1,5 +1,5 @@
 //
-//  Copyright 2023 Picovoice Inc.
+//  Copyright 2023-2025 Picovoice Inc.
 //  You may not use this file except in compliance with the license. A copy of the license is located in the "LICENSE"
 //  file accompanying this source.
 //  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
@@ -13,6 +13,7 @@ import Koala
 
 class KoalaDemoUITests: XCTestCase {
     let accessKey: String = "{TESTING_ACCESS_KEY_HERE}"
+    let device: String = "{TESTING_DEVICE_HERE}"
 
     let testAudioUrl = Bundle(for: KoalaDemoUITests.self).url(forResource: "test", withExtension: "wav")!
     let noiseAudioUrl = Bundle(for: KoalaDemoUITests.self).url(forResource: "noise", withExtension: "wav")!
@@ -50,8 +51,7 @@ class KoalaDemoUITests: XCTestCase {
     }
 
     func runTest(inputPcm: [Int16], refPcm: [Int16]? = nil, tolerance: Float = 0.02) throws {
-
-        try koala!.reset()
+        koala = try Koala(accessKey: accessKey, device: device)
 
         let frameLength = Int(Koala.frameLength)
         for frameStart in stride(from: 0, to: inputPcm.count - frameLength + 1, by: frameLength) {
@@ -70,19 +70,18 @@ class KoalaDemoUITests: XCTestCase {
 
             XCTAssertLessThan(energyDeviation, tolerance)
         }
+
+        koala!.delete()
+        koala = nil
     }
 
     func testPureSpeech() throws {
         let testPcm = try getPcm(fileUrl: testAudioUrl)
-
-        koala = try Koala(accessKey: accessKey)
         try runTest(inputPcm: testPcm, refPcm: testPcm)
     }
 
     func testPureNoise() throws {
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
-
-        koala = try Koala(accessKey: accessKey)
         try runTest(inputPcm: noisePcm)
     }
 
@@ -90,8 +89,6 @@ class KoalaDemoUITests: XCTestCase {
         let testPcm = try getPcm(fileUrl: testAudioUrl)
         let noisePcm = try getPcm(fileUrl: noiseAudioUrl)
         let mixPcm: [Int16] = zip(testPcm, noisePcm).map(+)
-
-        koala = try Koala(accessKey: accessKey)
         try runTest(inputPcm: mixPcm, refPcm: testPcm)
     }
 
@@ -136,6 +133,14 @@ class KoalaDemoUITests: XCTestCase {
 
     func testVersion() throws {
         XCTAssertGreaterThan(Koala.version, "")
+    }
+
+    func testGetAvailableDevices() throws {
+        let devices = try Koala.getAvailableDevices()
+        XCTAssert(!devices.isEmpty)
+        for device in devices {
+            XCTAssert(!device.isEmpty)
+        }
     }
 
     func testMessageStack() throws {

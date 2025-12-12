@@ -1,6 +1,7 @@
 import { Koala, KoalaWorker } from '../';
 
 const ACCESS_KEY = Cypress.env('ACCESS_KEY');
+const DEVICE = Cypress.env('DEVICE');
 const NUM_TEST_ITERATIONS = Number(Cypress.env('NUM_TEST_ITERATIONS'));
 const PROC_PERFORMANCE_THRESHOLD_SEC = Number(
   Cypress.env('PROC_PERFORMANCE_THRESHOLD_SEC')
@@ -15,12 +16,13 @@ async function testPerformance(
     let numFrames = 0;
     let processedFrames = 0;
 
-    const koala = await Koala.create(
+    const koala = await instance.create(
       ACCESS_KEY,
       _ => {
         processedFrames += 1;
       },
-      { publicPath: '/test/koala_params.pv', forceWrite: true }
+      { publicPath: '/test/koala_params.pv', forceWrite: true },
+      { device: DEVICE }
     );
 
     numFrames = Math.round(inputPcm.length / koala.frameLength) - 1;
