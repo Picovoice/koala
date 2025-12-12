@@ -93,8 +93,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/retry/-/retry-0.4.3.tgz#c2b9d2e374ee62c586d3adbea87199b1d7a7a6ba"
   integrity sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==
 
-"@picovoice/koala-web@../../binding/web":
+"@picovoice/koala-web@3.0.0":
   version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@picovoice/koala-web/-/koala-web-3.0.0.tgz#95824e583563c5385c51e84bbbc02b8818ae8eb9"
+  integrity sha512-2n7v4UvmppFKys73YnWpY2zKmBkGbHg2SMVaVjDBPVGCOmvL8kLeWMnimMhaUccwv0eJpCtEU0svc/9RRJUiCg==
   dependencies:
     "@picovoice/web-utils" "=1.4.3"
 
