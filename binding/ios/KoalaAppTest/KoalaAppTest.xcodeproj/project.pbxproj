@@ -19,6 +19,7 @@
 		1E00657927CFF7EC006FF6E9 /* KoalaAppTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E00657827CFF7EC006FF6E9 /* KoalaAppTestUITests.swift */; };
 		1E5B7B332800F75900F8BDDB /* PerformanceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5B7B322800F75900F8BDDB /* PerformanceTest.swift */; };
 		1EE706392EECA83B00D7B1A1 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1EE706382EECA83B00D7B1A1 /* Koala */; };
+		1EE7063B2EECBF5F00D7B1A1 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1EE7063A2EECBF5F00D7B1A1 /* Koala */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +61,8 @@
 		1E00655127CFF7EB006FF6E9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
+			files = (
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		1E00657127CFF7EC006FF6E9 /* Frameworks */ = {
@@ -73,6 +76,9 @@
 		1E5B7B272800F6FE00F8BDDB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
+			files = (
+				1EE7063B2EECBF5F00D7B1A1 /* Koala in Frameworks */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -654,6 +660,11 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		1EE706382EECA83B00D7B1A1 /* Koala */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */;
+			productName = Koala;
+		};
+		1EE7063A2EECBF5F00D7B1A1 /* Koala */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */;
 			productName = Koala;
