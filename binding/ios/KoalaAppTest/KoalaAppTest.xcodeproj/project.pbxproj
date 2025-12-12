@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,10 +18,7 @@
 		1E00656427CFF7EC006FF6E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1E00656227CFF7EC006FF6E9 /* LaunchScreen.storyboard */; };
 		1E00657927CFF7EC006FF6E9 /* KoalaAppTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E00657827CFF7EC006FF6E9 /* KoalaAppTestUITests.swift */; };
 		1E5B7B332800F75900F8BDDB /* PerformanceTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5B7B322800F75900F8BDDB /* PerformanceTest.swift */; };
-		1E9C521C2EE2661700860AA4 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1E9C521B2EE2661700860AA4 /* Koala */; };
-		E1B2D78D2CF6B30800A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D78C2CF6B30800A28024 /* Koala */; };
-		E1B2D78F2CF6B30D00A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D78E2CF6B30D00A28024 /* Koala */; };
-		E1B2D7912CF6B31200A28024 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1B2D7902CF6B31200A28024 /* Koala */; };
+		1EE706392EECA83B00D7B1A1 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1EE706382EECA83B00D7B1A1 /* Koala */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,26 +60,19 @@
 		1E00655127CFF7EB006FF6E9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
-			files = (
-				E1B2D78D2CF6B30800A28024 /* Koala in Frameworks */,
-				1E9C521C2EE2661700860AA4 /* Koala in Frameworks */,
-			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		1E00657127CFF7EC006FF6E9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E1B2D78F2CF6B30D00A28024 /* Koala in Frameworks */,
+				1EE706392EECA83B00D7B1A1 /* Koala in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		1E5B7B272800F6FE00F8BDDB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
-			files = (
-				E1B2D7912CF6B31200A28024 /* Koala in Frameworks */,
-			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -238,7 +228,7 @@
 			);
 			mainGroup = 1E00654B27CFF7EB006FF6E9;
 			packageReferences = (
-				1E9C521A2EE2661700860AA4 /* XCLocalSwiftPackageReference "../../../../koala" */,
+				1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */,
 			);
 			productRefGroup = 1E00655527CFF7EB006FF6E9 /* Products */;
 			projectDirPath = "";
@@ -651,35 +641,21 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		1E9C521A2EE2661700860AA4 /* XCLocalSwiftPackageReference "../../../../koala" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../koala;
+/* Begin XCRemoteSwiftPackageReference section */
+		1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Picovoice/koala";
+			requirement = {
+				kind = exactVersion;
+				version = 3.0.0;
+			};
 		};
-		E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../koala;
-		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1E9C521B2EE2661700860AA4 /* Koala */ = {
+		1EE706382EECA83B00D7B1A1 /* Koala */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Koala;
-		};
-		E1B2D78C2CF6B30800A28024 /* Koala */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */;
-			productName = Koala;
-		};
-		E1B2D78E2CF6B30D00A28024 /* Koala */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */;
-			productName = Koala;
-		};
-		E1B2D7902CF6B31200A28024 /* Koala */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E1B2D77F2CF69F2400A28024 /* XCLocalSwiftPackageReference "../../../../koala" */;
+			package = 1EE706372EECA81300D7B1A1 /* XCRemoteSwiftPackageReference "koala" */;
 			productName = Koala;
 		};
 /* End XCSwiftPackageProductDependency section */
