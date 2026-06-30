@@ -85,7 +85,7 @@ jobs:
       - name: Run tests on AWS Device Farm
         run: python3 ../../../script/automation/devicefarm.py
           --type ios
-          --run_name cobra-ios-perf
+          --run_name koala-ios-perf
           --app_path "ddp/Build/Products/Debug-iphoneos/KoalaAppTest.ipa"
           --test_path "ddp/Build/Products/Debug-iphoneos/PerformanceTest.zip"
           --aws_id "${{secrets.AWS_DEVICE_FARM_ACCESS_KEY_ID}}"
