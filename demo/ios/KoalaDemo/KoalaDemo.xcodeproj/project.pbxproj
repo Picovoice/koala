@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07217D433005A25A0036EF8E /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 07217D423005A25A0036EF8E /* Koala */; };
+		07217D443005A4370036EF8E /* Koala in Embed Frameworks */ = {isa = PBXBuildFile; productRef = E1CF9E202CFA53BD004BA9A9 /* Koala */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		1E31B67B2EECA5B3005D0570 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = 1E31B67A2EECA5B3005D0570 /* Koala */; };
 		1E9C521F2EE3B91400860AA4 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		1EE706332EECA70100D7B1A1 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
@@ -19,6 +21,20 @@
 		E1B2D78A2CF6A07100A28024 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		E1CF9E212CFA53BD004BA9A9 /* Koala in Frameworks */ = {isa = PBXBuildFile; productRef = E1CF9E202CFA53BD004BA9A9 /* Koala */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		07217D453005A4370036EF8E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				07217D443005A4370036EF8E /* Koala in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		327694975368499C3B7946DD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -39,6 +55,7 @@
 				1EE706332EECA70100D7B1A1 /* (null) in Frameworks */,
 				1E31B67B2EECA5B3005D0570 /* Koala in Frameworks */,
 				E1B2D78A2CF6A07100A28024 /* (null) in Frameworks */,
+				07217D433005A25A0036EF8E /* Koala in Frameworks */,
 				E1B2D7872CF6A06100A28024 /* (null) in Frameworks */,
 				1EE706362EECA74500D7B1A1 /* ios_voice_processor in Frameworks */,
 			);
@@ -85,6 +102,7 @@
 				32769E8C15D0D566DE02D742 /* Sources */,
 				32769FD78B69EE3D028A9BD8 /* Frameworks */,
 				327698D80053ADD919041906 /* Resources */,
+				07217D453005A4370036EF8E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -104,7 +122,6 @@
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
 					327696DE3A6139B4D33CA898 = {
-						DevelopmentTeam = 65723695GD;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -119,8 +136,8 @@
 			);
 			mainGroup = 327692BCE8C735F3534C318E;
 			packageReferences = (
-				1E31B6792EECA5B3005D0570 /* XCRemoteSwiftPackageReference "koala" */,
 				1EE706342EECA74500D7B1A1 /* XCRemoteSwiftPackageReference "ios-voice-processor" */,
+				07217D413005A25A0036EF8E /* XCLocalSwiftPackageReference "../../../../koala" */,
 			);
 			productRefGroup = 32769B87809678D96B1C6C55 /* Products */;
 			projectDirPath = "";
@@ -361,6 +378,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		07217D413005A25A0036EF8E /* XCLocalSwiftPackageReference "../../../../koala" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../../koala;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		1E31B6792EECA5B3005D0570 /* XCRemoteSwiftPackageReference "koala" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -381,6 +405,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		07217D423005A25A0036EF8E /* Koala */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Koala;
+		};
 		1E31B67A2EECA5B3005D0570 /* Koala */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 1E31B6792EECA5B3005D0570 /* XCRemoteSwiftPackageReference "koala" */;
