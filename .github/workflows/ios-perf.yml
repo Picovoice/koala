@@ -6,14 +6,12 @@ on:
     branches: [ main ]
     paths:
       - '.github/workflows/ios-perf.yml'
-      - 'binding/ios/KoalaAppTest/PerformanceTest/PerformanceTest.swift'
-      - 'binding/ios/KoalaAppTest/Podfile.lock'
+      - 'binding/ios/KoalaAppTest/**'
   pull_request:
     branches: [ main, 'v[0-9]+.[0-9]+' ]
     paths:
       - '.github/workflows/ios-perf.yml'
-      - 'binding/ios/KoalaAppTest/PerformanceTest/PerformanceTest.swift'
-      - 'binding/ios/KoalaAppTest/Podfile.lock'
+      - 'binding/ios/KoalaAppTest/**'
 
 defaults:
   run:

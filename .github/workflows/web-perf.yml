@@ -7,7 +7,8 @@ on:
     paths:
       - 'lib/wasm/**'
       - 'lib/common/**'
-      - 'binding/web/test/koala_perf.test.ts'
+      - 'binding/web/**'
+      - '!binding/web/README.md'
       - '.github/workflows/web-perf.yml'
       - 'resources/audio_samples/**'
   pull_request:
@@ -15,7 +16,8 @@ on:
     paths:
       - 'lib/wasm/**'
       - 'lib/common/**'
-      - 'binding/web/test/koala_perf.test.ts'
+      - 'binding/web/**'
+      - '!binding/web/README.md'
       - '.github/workflows/web-perf.yml'
       - 'resources/audio_samples/**'
 
